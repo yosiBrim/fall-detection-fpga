@@ -1,0 +1,23 @@
+
+# הגדרת ספריות עבודה
+vlib work
+vmap work work
+
+# קומפילציה של הקבצים
+vcom common_pkg.vhd
+vcom debounce.vhd
+vcom debounce_rst.vhd
+vcom i2c_master.vhd
+vcom sccb_master.vhd
+vcom vga_controller_2.vhd
+vcom ov7670_fsm.vhd
+
+vcom ov7670_configuration.vhd
+vcom ov7670_capture_2.vhd
+vcom top_2.vhd
+vcom vga_controller_tb.vhd
+# סימולציה
+vsim -voptargs=+acc=lprn vga_controller_tb
+
+# הפעלת סימולציה (לדוגמה 1000 ננו-שניות)
+#run 1000ns
