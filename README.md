@@ -30,6 +30,4 @@ FPGA project implementing a real-time video pipeline using an OV7670 camera:
 - Camera control: `ov7670_xclk`, `ov7670_pwdn`, `ov7670_reset`
 - Detection: `posture_change_detected` (+ `current_posture`)
 
-## Notes
-This repo contains academic project material. IP folders are included to preserve reproducibility.
-EOF
+
