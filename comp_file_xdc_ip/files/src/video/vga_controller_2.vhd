@@ -26,7 +26,7 @@ ARCHITECTURE rtl OF vga_controller IS
     CONSTANT FRAME_WIDTH : NATURAL := 640;
     CONSTANT FRAME_HEIGHT : NATURAL := 480;
 
-    -- ϊζξεο VGA πλεο ςαεψ 640x480@60Hz
+    -- ΧªΧ–ΧΧ•Χ VGA Χ Χ›Χ•Χ ΧΆΧ‘Χ•Χ¨ 640x480@60Hz
     CONSTANT H_SYNC_PULSE_WIDTH : NATURAL := 96; -- Sync pulse
     CONSTANT H_BACK_PORCH : NATURAL := 48;       -- Back porch  
     CONSTANT H_FRONT_PORCH : NATURAL := 16;      -- Front porch
@@ -48,11 +48,11 @@ ARCHITECTURE rtl OF vga_controller IS
     SIGNAL line_finished : STD_LOGIC := '0';
     SIGNAL frame_finished : STD_LOGIC := '0';
     
-    -- ϊηιμϊ ΰζεψ δϊφεβδ (ργψ: Sync -> Back Porch -> Display)
+    -- ΧªΧ—Χ™ΧΧª ΧΧ–Χ•Χ¨ Χ”ΧªΧ¦Χ•Χ’Χ” (Χ΅Χ“Χ¨: Sync -> Back Porch -> Display)
     CONSTANT H_DISPLAY_START : NATURAL := H_SYNC_PULSE_WIDTH + H_BACK_PORCH;  -- 96+48=144
     CONSTANT V_DISPLAY_START : NATURAL := V_SYNC_PULSE_WIDTH + V_BACK_PORCH;  -- 2+33=35
     
-    -- ξωϊπιν ςζψ μηιωεα ξιχεν δτιχρμ
+    -- ΧΧ©ΧªΧ Χ™Χ ΧΆΧ–Χ¨ ΧΧ—Χ™Χ©Χ•Χ‘ ΧΧ™Χ§Χ•Χ Χ”Χ¤Χ™Χ§Χ΅Χ
     SIGNAL display_x : INTEGER RANGE 0 TO FRAME_WIDTH - 1;
     SIGNAL display_y : INTEGER RANGE 0 TO FRAME_HEIGHT - 1;
     SIGNAL in_display_area : STD_LOGIC;
@@ -64,11 +64,11 @@ BEGIN
 
 
     
-    -- ηιωεα ξιχεν δτιχρμ αϊεκ ΰζεψ δϊφεβδ
+    -- Χ—Χ™Χ©Χ•Χ‘ ΧΧ™Χ§Χ•Χ Χ”Χ¤Χ™Χ§Χ΅Χ Χ‘ΧªΧ•Χ ΧΧ–Χ•Χ¨ Χ”ΧªΧ¦Χ•Χ’Χ”
     display_x <= hsync_reg - H_DISPLAY_START WHEN hsync_reg >= H_DISPLAY_START AND hsync_reg < (H_DISPLAY_START + FRAME_WIDTH) ELSE 0;
     display_y <= vsync_reg - V_DISPLAY_START WHEN vsync_reg >= V_DISPLAY_START AND vsync_reg < (V_DISPLAY_START + FRAME_HEIGHT) ELSE 0;
     
-    -- γβμ ωξφιιο ΰν ΰπηπε αϊεκ ΰζεψ δϊφεβδ
+    -- Χ“Χ’Χ Χ©ΧΧ¦Χ™Χ™Χ ΧΧ ΧΧ Χ—Χ Χ• Χ‘ΧªΧ•Χ ΧΧ–Χ•Χ¨ Χ”ΧªΧ¦Χ•Χ’Χ”
     in_display_area <= '1' WHEN (hsync_reg >= H_DISPLAY_START AND hsync_reg < (H_DISPLAY_START + FRAME_WIDTH) AND
                                   vsync_reg >= V_DISPLAY_START AND vsync_reg < (V_DISPLAY_START + FRAME_HEIGHT)) ELSE '0';
 
@@ -77,13 +77,13 @@ BEGIN
     line_finished <= '1' WHEN hsync_reg = H_TOTAL_LINE - 1 ELSE '0';
     frame_finished <= '1' WHEN vsync_reg = V_MAX_LINE - 1 ELSE '0';
 
-    -- ϊζξεο H-Sync (Sync αΰξφς, μΰ αδϊημδ!)
+    -- ΧªΧ–ΧΧ•Χ H-Sync (Sync Χ‘ΧΧΧ¦ΧΆ, ΧΧ Χ‘Χ”ΧªΧ—ΧΧ”!)
     VGA_HS_O <= NOT H_POL WHEN (hsync_reg >= 0 AND hsync_reg < H_SYNC_PULSE_WIDTH) ELSE H_POL;
 
-    -- ϊζξεο V-Sync (Sync αΰξφς, μΰ αδϊημδ!)
+    -- ΧªΧ–ΧΧ•Χ V-Sync (Sync Χ‘ΧΧΧ¦ΧΆ, ΧΧ Χ‘Χ”ΧªΧ—ΧΧ”!)
     VGA_VS_O <= NOT V_POL WHEN (vsync_reg >= 0 AND vsync_reg < V_SYNC_PULSE_WIDTH) ELSE V_POL;
 
-    -- ςγλεο ξεπιν
+    -- ΧΆΧ“Χ›Χ•Χ ΧΧ•Χ Χ™Χ
     hsync_next <= 0 WHEN line_finished = '1' ELSE 
                   hsync_reg + 1 WHEN start = '1' ELSE 
                   hsync_reg;
@@ -92,8 +92,8 @@ BEGIN
                   vsync_reg + 1 WHEN line_finished = '1' ELSE
                   vsync_reg;
 
-    -- ηιωεα λϊεαϊ BRAM - ςν ρπλψεο θεα ιεϊψ
--- ωπδ ΰϊ δηιωεα ωμ bram_address_next:
+    -- Χ—Χ™Χ©Χ•Χ‘ Χ›ΧªΧ•Χ‘Χª BRAM - ΧΆΧ Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ•Χ‘ Χ™Χ•ΧªΧ¨
+-- Χ©Χ Χ” ΧΧª Χ”Χ—Χ™Χ©Χ•Χ‘ Χ©Χ bram_address_next:
 --	--PROCESS(hsync_reg, vsync_reg, frame_finished, start)
 --		VARIABLE next_hsync : INTEGER RANGE 0 TO H_TOTAL_LINE - 1;
 --		VARIABLE next_x, next_y : INTEGER;
@@ -101,14 +101,14 @@ BEGIN
 --		IF frame_finished = '1' THEN
 --			bram_address_next <= (OTHERS => '0');
 --		ELSIF start = '1' THEN
---			-- ηωα ΰϊ δξιχεν ωμ δτιχρμ δαΰ
+--			-- Χ—Χ©Χ‘ ΧΧª Χ”ΧΧ™Χ§Χ•Χ Χ©Χ Χ”Χ¤Χ™Χ§Χ΅Χ Χ”Χ‘Χ
 --			IF hsync_reg = H_TOTAL_LINE - 1 THEN
 --				next_hsync := 0;
 --			ELSE
 --				next_hsync := hsync_reg + 1;
 --			END IF;
 --			
---			-- αγεχ ΰν δτιχρμ δαΰ ιδιδ αΰζεψ δϊφεβδ
+--			-- Χ‘Χ“Χ•Χ§ ΧΧ Χ”Χ¤Χ™Χ§Χ΅Χ Χ”Χ‘Χ Χ™Χ”Χ™Χ” Χ‘ΧΧ–Χ•Χ¨ Χ”ΧªΧ¦Χ•Χ’Χ”
 --			IF next_hsync >= H_DISPLAY_START AND next_hsync < (H_DISPLAY_START + FRAME_WIDTH) AND
 --			   vsync_reg >= V_DISPLAY_START and vsync_reg < (V_DISPLAY_START + FRAME_HEIGHT) THEN
 --				
@@ -146,7 +146,7 @@ END PROCESS;
 	BEGIN
 		IF rising_edge(pxl_clk) THEN
 			IF start = '1' THEN
-				pxl_data_reg <= doutb; -- ψιωεν πϊεπι δ-BRAM
+				pxl_data_reg <= doutb; -- Χ¨Χ™Χ©Χ•Χ Χ ΧªΧ•Χ Χ™ Χ”-BRAM
 			END IF;
 		END IF;
 	END PROCESS;
@@ -155,7 +155,7 @@ END PROCESS;
 	VGA_G <= pxl_data_reg(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
 	VGA_B <= pxl_data_reg(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
 
-    -- ωπδ ΰϊ ιφιΰεϊ RGB:
+    -- Χ©Χ Χ” ΧΧª Χ™Χ¦Χ™ΧΧ•Χª RGB:
     --VGA_R <= doutb(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
     --VGA_G <= doutb(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
     --VGA_B <= doutb(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
