@@ -221,32 +221,74 @@ BEGIN
                     END IF;
                 END IF;
                 
-            WHEN write_to_bram =>
-                -- כתוב רק אם זה פיקסל חוקי
-                IF reg.pixel_reg <= 640 AND reg.href_cnt < 480 THEN
+WHEN write_to_bram =>
+                -- בדיקה שאנחנו בתוך גבולות התמונה (640x480)
+                IF reg.pixel_reg < 640 AND reg.href_cnt < 480 THEN
+                    -- כתיבה רגילה לזיכרון התצוגה (BRAM)
                     wea <= "1";
                     dina <= reg.rgb_reg(11 DOWNTO 0);
                     reg_next.bram_address <= reg.bram_address + 1;
+                   
+                    -- === לוגיקה חדשה: הוספת הפיקסל לסכום הקוביה ===
+                    -- הנוסחה (blk_y * 8 + blk_x) מחשבת את מספר הקוביה הרציף (0-47)
+                    block_sums(blk_y * 8 + blk_x) <= block_sums(blk_y * 8 + blk_x) + unsigned(reg.rgb_reg);
+                   
+                    -- קידום המונים האופקיים (X)
+                    IF cnt_x = 79 THEN      -- האם סיימנו שורה בתוך קוביה? (הגענו ל-80)
+                        cnt_x <= 0;
+                        IF blk_x < 7 THEN   -- אם לא הגענו לקצה המסך, עבור לקוביה הבאה
+                             blk_x <= blk_x + 1;
+                        ELSE
+                             blk_x <= 0;    -- הגענו לקצה ימין, חזור להתחלה (אופציונלי כאן, מתאפס למטה)
+                        END IF;
+                    ELSE
+                        cnt_x <= cnt_x + 1; -- התקדם בתוך אותה קוביה
+                    END IF;
                 END IF;
-                
-                -- בדוק אם סיימנו את השורה
+
+                -- בדיקה אם סיימנו את השורה כולה (640 פיקסלים)
                 IF reg.pixel_reg >= 640 THEN
                     reg_next.href_cnt <= reg.href_cnt + 1;
                     reg_next.line_started <= '0';
+                   
+                    -- === איפוס מונים בסוף שורה ===
+                    cnt_x <= 0;
+                    blk_x <= 0; -- תמיד מתחילים שורה חדשה בקוביה השמאלית (0)
+
+                    -- קידום המונים האנכיים (Y) - האם סיימנו "גובה" של קוביה?
+                    IF cnt_y = 79 THEN
+                        cnt_y <= 0;
+                        IF blk_y < 5 THEN -- עבור לשורת הקוביות הבאה
+                            blk_y <= blk_y + 1;
+                        END IF;
+                    ELSE
+                        cnt_y <= cnt_y + 1; -- אנחנו עדיין באותה שורת קוביות
+                    END IF;
+
+                    -- בדיקה אם סיימנו את כל התמונה (פריים)
                     IF reg.href_cnt >= 479 THEN
                         reg_next.state <= frame_finished;
                     ELSE
                         reg_next.state <= start_capturing;
                     END IF;
                 ELSE
+                    -- השורה לא נגמרה, חזור לקרוא את הפיקסל הבא
                     reg_next.state <= capture_line;
                 END IF;
-                
-            WHEN frame_finished =>
+
+
+
+WHEN frame_finished =>
                 frame_finished_o <= '1';
                 reg_next.rgb_reg <= (OTHERS => '0');
-				reg_next.href_cnt <= 0;
+                reg_next.href_cnt <= 0;
                 reg_next.bram_address <= (OTHERS => '0');
+               
+                -- === איפוס המנגנון החדש ===
+                block_sums <= (OTHERS => (OTHERS => '0')); -- איפוס כל הסכומים לאפס
+                cnt_x <= 0; blk_x <= 0;
+                cnt_y <= 0; blk_y <= 0;
+               
                 reg_next.state <= wait_for_new_frame;
 
             WHEN OTHERS => NULL;
