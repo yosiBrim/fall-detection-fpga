@@ -178,5 +178,32 @@ BEGIN
 END PROCESS;
 
 
+--חדש 
+-- תהליך ציור רשת (Grid) לחלוקה ל-48 חלקים
+    PROCESS (in_display_area_delayed, pxl_data_reg, display_x, display_y)
+    BEGIN
+        -- אם אנחנו מחוץ לאזור התצוגה - מסך שחור
+        IF in_display_area_delayed = '0' THEN
+            VGA_R <= "0000";
+            VGA_G <= "0000";
+            VGA_B <= "0000";
+        ELSE
+            -- אם אנחנו בתוך התצוגה, נבדוק אם צריך לצייר קו רשת
+            -- בדיקה: האם המיקום הנוכחי הוא כפולה של 80? (80, 160, 240...)
+            IF (display_x MOD 80 = 0) OR (display_x MOD 80 = 1) OR -- קווים אנכיים
+               (display_y MOD 80 = 0) OR (display_y MOD 80 = 1) THEN -- קווים אופקיים
+               
+                -- צבע הרשת: אדום בוהק
+                VGA_R <= "1111";
+                VGA_G <= "0000";
+                VGA_B <= "0000";
+            ELSE
+                -- אחרת, הצג את הפיקסל הרגיל מהמצלמה
+                VGA_R <= pxl_data_reg(11 DOWNTO 8);
+                VGA_G <= pxl_data_reg(7 DOWNTO 4);
+                VGA_B <= pxl_data_reg(3 DOWNTO 0);
+            END IF;
+        END IF;
+    END PROCESS;
     
 END ARCHITECTURE;
