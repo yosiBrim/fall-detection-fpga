@@ -5,32 +5,32 @@ USE ieee.numeric_std.ALL;
 ENTITY ov7670_capture IS
     PORT (
 	
-	    --ΰεϊεϊ ξςψλϊ λμμιιν
+	    --ΧΧ•ΧªΧ•Χª ΧΧΆΧ¨Χ›Χª Χ›ΧΧΧ™Χ™Χ
 		
-        clk : IN STD_LOGIC; --ωςεο δξςψλϊ δψΰωιϊ (100 ξβδ)
-        rst : IN STD_LOGIC;  -- ΰιτερ
-        config_finished : IN STD_LOGIC; --ΰεϊ ΰιωεψ "δξφμξδ δεβγψδ"
+        clk : IN STD_LOGIC; --Χ©ΧΆΧ•Χ Χ”ΧΧΆΧ¨Χ›Χª Χ”Χ¨ΧΧ©Χ™Χª (100 ΧΧ’Χ”)
+        rst : IN STD_LOGIC;  -- ΧΧ™Χ¤Χ•Χ΅
+        config_finished : IN STD_LOGIC; --ΧΧ•Χª ΧΧ™Χ©Χ•Χ¨ "Χ”ΧΧ¦ΧΧΧ” Χ”Χ•Χ’Χ“Χ¨Χ”"
 		
 		
-        -- ΰεϊεϊ δξφμξδ
+        -- ΧΧ•ΧªΧ•Χª Χ”ΧΧ¦ΧΧΧ”
         --camera signals  
 		
-        ov7670_vsync : IN STD_LOGIC; -- ΰιτερ ϊξεπδ  ,ρπλψεο ΰπλι
-        ov7670_href : IN STD_LOGIC; --ΰιωεψ ωεψδ,ρπλψεο ΰετχι
-        ov7670_pclk : IN STD_LOGIC; --δξθψεπεν ωξλϊια ΰϊ δχφα,ωςεο δτιχρμιν
-        ov7670_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0); --δξιγς δβεμξι
+        ov7670_vsync : IN STD_LOGIC; -- ΧΧ™Χ¤Χ•Χ΅ ΧªΧΧ•Χ Χ”  ,Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ Χ›Χ™
+        ov7670_href : IN STD_LOGIC; --ΧΧ™Χ©Χ•Χ¨ Χ©Χ•Χ¨Χ”,Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ•Χ¤Χ§Χ™
+        ov7670_pclk : IN STD_LOGIC; --Χ”ΧΧΧ¨Χ•Χ Χ•Χ Χ©ΧΧ›ΧªΧ™Χ‘ ΧΧª Χ”Χ§Χ¦Χ‘,Χ©ΧΆΧ•Χ Χ”Χ¤Χ™Χ§Χ΅ΧΧ™Χ
+        ov7670_data : IN STD_LOGIC_VECTOR(7 DOWNTO 0); --Χ”ΧΧ™Χ“ΧΆ Χ”Χ’Χ•ΧΧΧ™
 		
-		--ΰεϊεϊ αχψδ ερθθερ
+		--ΧΧ•ΧªΧ•Χª Χ‘Χ§Χ¨Χ” Χ•Χ΅ΧΧΧ•Χ΅
 		
         start : IN STD_LOGIC;
-        frame_finished_o : OUT STD_LOGIC; --γβμ ιφιΰδ,ριιξϊι ϊξεπδ
+        frame_finished_o : OUT STD_LOGIC; --Χ“Χ’Χ Χ™Χ¦Χ™ΧΧ”,Χ΅Χ™Χ™ΧΧªΧ™ ΧªΧΧ•Χ Χ”
     
-        --ΰεϊεϊ μζιλψεο δRAM 
+        --ΧΧ•ΧªΧ•Χª ΧΧ–Χ™Χ›Χ¨Χ•Χ Χ”RAM 
         --frame_buffer signals
 		
-        wea : OUT STD_LOGIC_VECTOR(0 DOWNTO 0); --τχεγϊ λϊεα!
-        dina : OUT STD_LOGIC_VECTOR(11 DOWNTO 0); -- δτιχρμ δξελο,12 αιθ
-        addra : OUT STD_LOGIC_VECTOR(18 DOWNTO 0) --μΰιζδ λϊεαϊ
+        wea : OUT STD_LOGIC_VECTOR(0 DOWNTO 0); --Χ¤Χ§Χ•Χ“Χª Χ›ΧªΧ•Χ‘!
+        dina : OUT STD_LOGIC_VECTOR(11 DOWNTO 0); -- Χ”Χ¤Χ™Χ§Χ΅Χ Χ”ΧΧ•Χ›Χ,12 Χ‘Χ™Χ
+        addra : OUT STD_LOGIC_VECTOR(18 DOWNTO 0) --ΧΧΧ™Χ–Χ” Χ›ΧªΧ•Χ‘Χª
     );
 	
 END ov7670_capture;
@@ -39,97 +39,97 @@ ARCHITECTURE rtl OF ov7670_capture IS
 ARCHITECTURE rtl OF ov7670_capture IS
 ARCHITECTURE rtl OF ov7670_capture IS
 
-    -- === 1. δβγψϊ δξφαιν (State Machine) ===
+    -- === 1. Χ”Χ’Χ“Χ¨Χª Χ”ΧΧ¦Χ‘Χ™Χ (State Machine) ===
     TYPE state_type IS (
-        idle,                -- ξφα δξϊπδ
-        start_capturing,     -- δϊημϊ ϊδμικ
-        wait_for_new_frame,  -- δξϊπδ μρπλψεο ΰπλι
-        frame_finished,      -- ριεν ϊξεπδ
-        capture_line,        -- δξϊπδ μϊηιμϊ ωεψδ
-        capture_rgb_byte,    -- χμιθϊ δαιϊ δψΰωεο
-        write_to_bram        -- χμιθϊ δαιϊ δωπι ελϊιαδ
+        idle,                -- ΧΧ¦Χ‘ Χ”ΧΧªΧ Χ”
+        start_capturing,     -- Χ”ΧªΧ—ΧΧª ΧªΧ”ΧΧ™Χ
+        wait_for_new_frame,  -- Χ”ΧΧªΧ Χ” ΧΧ΅Χ Χ›Χ¨Χ•Χ ΧΧ Χ›Χ™
+        frame_finished,      -- Χ΅Χ™Χ•Χ ΧªΧΧ•Χ Χ”
+        capture_line,        -- Χ”ΧΧªΧ Χ” ΧΧªΧ—Χ™ΧΧª Χ©Χ•Χ¨Χ”
+        capture_rgb_byte,    -- Χ§ΧΧ™ΧΧª Χ”Χ‘Χ™Χª Χ”Χ¨ΧΧ©Χ•Χ
+        write_to_bram        -- Χ§ΧΧ™ΧΧª Χ”Χ‘Χ™Χª Χ”Χ©Χ Χ™ Χ•Χ›ΧªΧ™Χ‘Χ”
     );
 
-    -- === 2. ριβπμιν μρπλψεο (Synchronized Signals) ===
-    -- δξθψδ: δςαψϊ ΰεϊεϊ ξδωςεο ωμ δξφμξδ μωςεο ωμ δ-FPGA
-    -- λμ ΰεϊ ςεαψ γψκ ωπι τμιτ-τμετιν (sync1, sync2) λγι μξπες ΰι-ιφιαεϊ
+    -- === 2. Χ΅Χ™Χ’Χ ΧΧ™Χ ΧΧ΅Χ Χ›Χ¨Χ•Χ (Synchronized Signals) ===
+    -- Χ”ΧΧΧ¨Χ”: Χ”ΧΆΧ‘Χ¨Χª ΧΧ•ΧªΧ•Χª ΧΧ”Χ©ΧΆΧ•Χ Χ©Χ Χ”ΧΧ¦ΧΧΧ” ΧΧ©ΧΆΧ•Χ Χ©Χ Χ”-FPGA
+    -- Χ›Χ ΧΧ•Χª ΧΆΧ•Χ‘Χ¨ Χ“Χ¨Χ Χ©Χ Χ™ Χ¤ΧΧ™Χ¤-Χ¤ΧΧ•Χ¤Χ™Χ (sync1, sync2) Χ›Χ“Χ™ ΧΧΧ Χ•ΧΆ ΧΧ™-Χ™Χ¦Χ™Χ‘Χ•Χª
     
-    -- ρπλψεο ΰεϊ δ-VSYNC (δϊημϊ ϊξεπδ)
+    -- Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ•Χª Χ”-VSYNC (Χ”ΧªΧ—ΧΧª ΧªΧΧ•Χ Χ”)
     SIGNAL vsync_sync1, vsync_sync2, vsync_prev : STD_LOGIC := '0';
     
-    -- ρπλψεο ΰεϊ δ-HREF (δϊημϊ ωεψδ)
+    -- Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ•Χª Χ”-HREF (Χ”ΧªΧ—ΧΧª Χ©Χ•Χ¨Χ”)
     SIGNAL href_sync1, href_sync2, href_prev : STD_LOGIC := '0';
     
-    -- ρπλψεο ΰεϊ δ-PCLK (ωςεο δτιχρμιν - ΰπε ξϊιιηριν ΰμιε λΰεϊ ψβιμ λΰο)
+    -- Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ•Χª Χ”-PCLK (Χ©ΧΆΧ•Χ Χ”Χ¤Χ™Χ§Χ΅ΧΧ™Χ - ΧΧ Χ• ΧΧªΧ™Χ™Χ—Χ΅Χ™Χ ΧΧΧ™Χ• Χ›ΧΧ•Χª Χ¨Χ’Χ™Χ Χ›ΧΧ)
     SIGNAL pclk_sync1, pclk_sync2, pclk_prev : STD_LOGIC := '0';
     
-    -- ρπλψεο ΰεϊεϊ δξιγς (Data Bus) - 
-    -- βν 8 δηεθιν ωμ δφας φψιλιν μςαεψ ρπλψεο λγι ωμΰ πχψΰ "ζαμ" αζξο ξςαψ
+    -- Χ΅Χ Χ›Χ¨Χ•Χ ΧΧ•ΧªΧ•Χª Χ”ΧΧ™Χ“ΧΆ (Data Bus) - 
+    -- Χ’Χ 8 Χ”Χ—Χ•ΧΧ™Χ Χ©Χ Χ”Χ¦Χ‘ΧΆ Χ¦Χ¨Χ™Χ›Χ™Χ ΧΧΆΧ‘Χ•Χ¨ Χ΅Χ Χ›Χ¨Χ•Χ Χ›Χ“Χ™ Χ©ΧΧ Χ Χ§Χ¨Χ "Χ–Χ‘Χ" Χ‘Χ–ΧΧ ΧΧΆΧ‘Χ¨
     SIGNAL data_sync1, data_sync2 : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
 
-    -- === 3. ριβπμιν μβιμει ωιπειιν (Edge Detection) ===
-    -- γβμιν ωιςμε μ-'1' μξηζεψ ωςεο ΰηγ αγιεχ λωχεψδ ωιπει
+    -- === 3. Χ΅Χ™Χ’Χ ΧΧ™Χ ΧΧ’Χ™ΧΧ•Χ™ Χ©Χ™Χ Χ•Χ™Χ™Χ (Edge Detection) ===
+    -- Χ“Χ’ΧΧ™Χ Χ©Χ™ΧΆΧΧ• Χ-'1' ΧΧΧ—Χ–Χ•Χ¨ Χ©ΧΆΧ•Χ ΧΧ—Χ“ Χ‘Χ“Χ™Χ•Χ§ Χ›Χ©Χ§Χ•Χ¨Χ” Χ©Χ™Χ Χ•Χ™
     
     SIGNAL vsync_falling_edge, vsync_rising_edge : STD_LOGIC := '0';
     SIGNAL href_rising_edge, href_falling_edge : STD_LOGIC := '0';
-    SIGNAL pclk_rising_edge : STD_LOGIC := '0'; -- δψβς δχψιθι ωαε γεβξιν τιχρμ
+    SIGNAL pclk_rising_edge : STD_LOGIC := '0'; -- Χ”Χ¨Χ’ΧΆ Χ”Χ§Χ¨Χ™ΧΧ™ Χ©Χ‘Χ• Χ“Χ•Χ’ΧΧ™Χ Χ¤Χ™Χ§Χ΅Χ
 
-    -- === 4. ξαπδ δπϊεπιν (Registers Record) ===
+    -- === 4. ΧΧ‘Χ Χ” Χ”Χ ΧªΧ•Χ Χ™Χ (Registers Record) ===
     TYPE reg_type IS RECORD
         state : state_type;
-        href_cnt : INTEGER RANGE 0 TO 500;          -- ξεπδ ωεψεϊ (ςγ 480)
-        rgb_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);     -- ΰεβψ ζξπι μτιχρμ (16 αιθ)
-        pixel_reg : INTEGER RANGE 0 TO 650;         -- ξεπδ τιχρμιν αωεψδ (ςγ 640)
-        bram_address : UNSIGNED(18 DOWNTO 0);        -- λϊεαϊ αζιλψεο
-        line_started : STD_LOGIC;                    -- γβμ: δΰν δϊημπε ωεψδ?
+        href_cnt : INTEGER RANGE 0 TO 500;          -- ΧΧ•Χ Χ” Χ©Χ•Χ¨Χ•Χª (ΧΆΧ“ 480)
+        rgb_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);     -- ΧΧ•Χ’Χ¨ Χ–ΧΧ Χ™ ΧΧ¤Χ™Χ§Χ΅Χ (16 Χ‘Χ™Χ)
+        pixel_reg : INTEGER RANGE 0 TO 650;         -- ΧΧ•Χ Χ” Χ¤Χ™Χ§Χ΅ΧΧ™Χ Χ‘Χ©Χ•Χ¨Χ” (ΧΆΧ“ 640)
+        bram_address : UNSIGNED(18 DOWNTO 0);        -- Χ›ΧªΧ•Χ‘Χª Χ‘Χ–Χ™Χ›Χ¨Χ•Χ
+        line_started : STD_LOGIC;                    -- Χ“Χ’Χ: Χ”ΧΧ Χ”ΧªΧ—ΧΧ Χ• Χ©Χ•Χ¨Χ”?
     END RECORD reg_type;
 
 	
-	-- === 5. χαες δΰϊηεμ (Initialization Constant) -  ===
-    -- ζδε "ϊαπιϊ" ωμ δξφα δδϊημϊι. λωμεηφιν Reset, ΰπηπε ξςϊιχιν ΰϊ ζδ μψβιρθψ.
+	-- === 5. Χ§Χ‘Χ•ΧΆ Χ”ΧΧªΧ—Χ•Χ (Initialization Constant) -  ===
+    -- Χ–Χ”Χ• "ΧªΧ‘Χ Χ™Χª" Χ©Χ Χ”ΧΧ¦Χ‘ Χ”Χ”ΧªΧ—ΧΧªΧ™. Χ›Χ©ΧΧ•Χ—Χ¦Χ™Χ Reset, ΧΧ Χ—Χ Χ• ΧΧΆΧªΧ™Χ§Χ™Χ ΧΧª Χ–Χ” ΧΧ¨Χ’Χ™Χ΅ΧΧ¨.
     CONSTANT INIT_REG_FILE : reg_type := (
-        state => idle,                          -- ξϊηιμιν αξφα ξπεηδ
-        href_cnt => 0,                          -- ΰιτερ ξεπδ ωεψεϊ
-        rgb_reg => (OTHERS => '0'),             -- ΰιτερ ΰεβψ δφας (δλμ ΰτριν)
-        pixel_reg => 0,                         -- ΰιτερ ξεπδ τιχρμιν
-        bram_address => (OTHERS => '0'),        -- ΰιτερ λϊεαϊ δζιλψεο μδϊημδ (0)
-        line_started => '0'                     -- ΰιτερ γβμ ωεψδ
+        state => idle,                          -- ΧΧªΧ—Χ™ΧΧ™Χ Χ‘ΧΧ¦Χ‘ ΧΧ Χ•Χ—Χ”
+        href_cnt => 0,                          -- ΧΧ™Χ¤Χ•Χ΅ ΧΧ•Χ Χ” Χ©Χ•Χ¨Χ•Χª
+        rgb_reg => (OTHERS => '0'),             -- ΧΧ™Χ¤Χ•Χ΅ ΧΧ•Χ’Χ¨ Χ”Χ¦Χ‘ΧΆ (Χ”Χ›Χ ΧΧ¤Χ΅Χ™Χ)
+        pixel_reg => 0,                         -- ΧΧ™Χ¤Χ•Χ΅ ΧΧ•Χ Χ” Χ¤Χ™Χ§Χ΅ΧΧ™Χ
+        bram_address => (OTHERS => '0'),        -- ΧΧ™Χ¤Χ•Χ΅ Χ›ΧªΧ•Χ‘Χª Χ”Χ–Χ™Χ›Χ¨Χ•Χ ΧΧ”ΧªΧ—ΧΧ” (0)
+        line_started => '0'                     -- ΧΧ™Χ¤Χ•Χ΅ Χ“Χ’Χ Χ©Χ•Χ¨Χ”
     );
 
-    -- === 6. δΰεϊεϊ δψΰωιιν (Registers) ===
-    -- λΰο ΰπηπε ξωϊξωιν αχαες ωδβγψπε μξςμδ λγι μΰϊημ ΰϊ δριβπμιν λαψ αδφδψδ
-    SIGNAL reg : reg_type := INIT_REG_FILE;      -- δξφα δπεληι
-    SIGNAL reg_next : reg_type := INIT_REG_FILE; -- δξφα δαΰ
+    -- === 6. Χ”ΧΧ•ΧªΧ•Χª Χ”Χ¨ΧΧ©Χ™Χ™Χ (Registers) ===
+    -- Χ›ΧΧ ΧΧ Χ—Χ Χ• ΧΧ©ΧªΧΧ©Χ™Χ Χ‘Χ§Χ‘Χ•ΧΆ Χ©Χ”Χ’Χ“Χ¨Χ Χ• ΧΧΧΆΧΧ” Χ›Χ“Χ™ ΧΧΧªΧ—Χ ΧΧª Χ”Χ΅Χ™Χ’Χ ΧΧ™Χ Χ›Χ‘Χ¨ Χ‘Χ”Χ¦Χ”Χ¨Χ”
+    SIGNAL reg : reg_type := INIT_REG_FILE;      -- Χ”ΧΧ¦Χ‘ Χ”Χ Χ•Χ›Χ—Χ™
+    SIGNAL reg_next : reg_type := INIT_REG_FILE; -- Χ”ΧΧ¦Χ‘ Χ”Χ‘Χ
 	
 	
 BEGIN
 
--- === ηιαεψ δλϊεαϊ μζιλψεο ===
-    -- μρεβ STD_LOGIC_VECTOR ωδψλια δηιφεπι (BRAM) γεψω.
+-- === Χ—Χ™Χ‘Χ•Χ¨ Χ”Χ›ΧªΧ•Χ‘Χª ΧΧ–Χ™Χ›Χ¨Χ•Χ ===
+    -- ΧΧ΅Χ•Χ’ STD_LOGIC_VECTOR Χ©Χ”Χ¨Χ›Χ™Χ‘ Χ”Χ—Χ™Χ¦Χ•Χ Χ™ (BRAM) Χ“Χ•Χ¨Χ©.
     addra <= STD_LOGIC_VECTOR(reg.bram_address);
 
-    -- === μεβιχϊ βιμει χφεεϊ (Edge Detection) ===
-    -- μεβιχδ ζε ψφδ αξχαιμ (Concurrent) εξζδδ ωιπειιν αΰεϊεϊ δηιφεπιιν.
-    -- διΰ ξωεεδ αιο δςψκ δπεληι δξρεπλψο (sync2) μαιο δςψκ αξηζεψ δωςεο δχεγν (prev).
+    -- === ΧΧ•Χ’Χ™Χ§Χª Χ’Χ™ΧΧ•Χ™ Χ§Χ¦Χ•Χ•Χª (Edge Detection) ===
+    -- ΧΧ•Χ’Χ™Χ§Χ” Χ–Χ• Χ¨Χ¦Χ” Χ‘ΧΧ§Χ‘Χ™Χ (Concurrent) Χ•ΧΧ–Χ”Χ” Χ©Χ™Χ Χ•Χ™Χ™Χ Χ‘ΧΧ•ΧªΧ•Χª Χ”Χ—Χ™Χ¦Χ•Χ Χ™Χ™Χ.
+    -- Χ”Χ™Χ ΧΧ©Χ•Χ•Χ” Χ‘Χ™Χ Χ”ΧΆΧ¨Χ Χ”Χ Χ•Χ›Χ—Χ™ Χ”ΧΧ΅Χ•Χ Χ›Χ¨Χ (sync2) ΧΧ‘Χ™Χ Χ”ΧΆΧ¨Χ Χ‘ΧΧ—Χ–Χ•Χ¨ Χ”Χ©ΧΆΧ•Χ Χ”Χ§Χ•Χ“Χ (prev).
 
-    -- ζιδει ιψιγϊ VSYNC (ξ-1 μ-0):
-    -- ζδε δψβς δχψιθι ωαε δξφμξδ ξρξπϊ ωϊξεπδ ηγωδ ξϊηιμδ ατεςμ (Active Video).
+    -- Χ–Χ™Χ”Χ•Χ™ Χ™Χ¨Χ™Χ“Χª VSYNC (Χ-1 Χ-0):
+    -- Χ–Χ”Χ• Χ”Χ¨Χ’ΧΆ Χ”Χ§Χ¨Χ™ΧΧ™ Χ©Χ‘Χ• Χ”ΧΧ¦ΧΧΧ” ΧΧ΅ΧΧ Χª Χ©ΧªΧΧ•Χ Χ” Χ—Χ“Χ©Χ” ΧΧªΧ—Χ™ΧΧ” Χ‘Χ¤Χ•ΧΆΧ (Active Video).
     vsync_falling_edge <= '1' WHEN vsync_prev = '1' AND vsync_sync2 = '0' ELSE '0';
 
-    -- ζιδει ςμιιϊ VSYNC (ξ-0 μ-1):
-    -- ξρξο ωδϊξεπδ δρϊιιξδ επλπριν μζξο "ξϊ" (V-Blank).
+    -- Χ–Χ™Χ”Χ•Χ™ ΧΆΧΧ™Χ™Χª VSYNC (Χ-0 Χ-1):
+    -- ΧΧ΅ΧΧ Χ©Χ”ΧªΧΧ•Χ Χ” Χ”Χ΅ΧªΧ™Χ™ΧΧ” Χ•Χ Χ›Χ Χ΅Χ™Χ ΧΧ–ΧΧ "ΧΧª" (V-Blank).
     vsync_rising_edge <= '1' WHEN vsync_prev = '0' AND vsync_sync2 = '1' ELSE '0';
 
-    -- ζιδει ςμιιϊ HREF (ξ-0 μ-1):
-    -- ξρξο ωωεψδ ηγωδ ξϊηιμδ εξϊηιμιν μδβις τιχρμιν ϊχτιν.
+    -- Χ–Χ™Χ”Χ•Χ™ ΧΆΧΧ™Χ™Χª HREF (Χ-0 Χ-1):
+    -- ΧΧ΅ΧΧ Χ©Χ©Χ•Χ¨Χ” Χ—Χ“Χ©Χ” ΧΧªΧ—Χ™ΧΧ” Χ•ΧΧªΧ—Χ™ΧΧ™Χ ΧΧ”Χ’Χ™ΧΆ Χ¤Χ™Χ§Χ΅ΧΧ™Χ ΧªΧ§Χ¤Χ™Χ.
     href_rising_edge <= '1' WHEN href_prev = '0' AND href_sync2 = '1' ELSE '0';
 
-    -- ζιδει ιψιγϊ HREF (ξ-1 μ-0):
-    -- ξρξο ωδωεψδ δρϊιιξδ.
+    -- Χ–Χ™Χ”Χ•Χ™ Χ™Χ¨Χ™Χ“Χª HREF (Χ-1 Χ-0):
+    -- ΧΧ΅ΧΧ Χ©Χ”Χ©Χ•Χ¨Χ” Χ”Χ΅ΧªΧ™Χ™ΧΧ”.
     href_falling_edge <= '1' WHEN href_prev = '1' AND href_sync2 = '0' ELSE '0';
 
-    -- ζιδει ςμιιϊ PCLK (ξ-0 μ-1):
-    -- ζδε "δγετχ" ωμ δξιγς. αψβς δζδ αγιεχ δξφμξδ ΰεξψϊ ωδξιγς αχεει δ-DATA δεΰ ιφια επλεο μχψιΰδ.
+    -- Χ–Χ™Χ”Χ•Χ™ ΧΆΧΧ™Χ™Χª PCLK (Χ-0 Χ-1):
+    -- Χ–Χ”Χ• "Χ”Χ“Χ•Χ¤Χ§" Χ©Χ Χ”ΧΧ™Χ“ΧΆ. Χ‘Χ¨Χ’ΧΆ Χ”Χ–Χ” Χ‘Χ“Χ™Χ•Χ§ Χ”ΧΧ¦ΧΧΧ” ΧΧ•ΧΧ¨Χª Χ©Χ”ΧΧ™Χ“ΧΆ Χ‘Χ§Χ•Χ•Χ™ Χ”-DATA Χ”Χ•Χ Χ™Χ¦Χ™Χ‘ Χ•Χ Χ›Χ•Χ ΧΧ§Χ¨Χ™ΧΧ”.
     pclk_rising_edge <= '1' WHEN pclk_prev = '0' AND pclk_sync2 = '1' ELSE '0';
 
     sync : PROCESS (clk, rst)
@@ -172,30 +172,30 @@ BEGIN
             WHEN wait_for_new_frame =>
                 IF vsync_falling_edge = '1' THEN
                     reg_next.href_cnt <= 0;
-                    reg_next.bram_address <= (OTHERS => '0'); -- ΰτρ λϊεαϊ BRAM
+                    reg_next.bram_address <= (OTHERS => '0'); -- ΧΧ¤Χ΅ Χ›ΧªΧ•Χ‘Χª BRAM
                     reg_next.line_started <= '0';
                     reg_next.state <= start_capturing;
                 END IF;
 
             WHEN start_capturing =>
-                -- ψχ ΰν δωεψδ ςγιιο μΰ δϊηιμδ ε-HREF τςιμ
+                -- Χ¨Χ§ ΧΧ Χ”Χ©Χ•Χ¨Χ” ΧΆΧ“Χ™Χ™Χ ΧΧ Χ”ΧªΧ—Χ™ΧΧ” Χ•-HREF Χ¤ΧΆΧ™Χ
                 IF href_sync2 = '1' AND reg.line_started = '0' THEN
                     reg_next.pixel_reg <= 0;
 					reg_next.bram_address <= to_unsigned(reg.href_cnt * 640, 19);
                     reg_next.line_started <= '1';
                     reg_next.state <= capture_line;
                 ELSIF href_sync2 = '0' THEN
-                    -- HREF μΰ τςιμ, ΰτρ ΰϊ δγβμ
+                    -- HREF ΧΧ Χ¤ΧΆΧ™Χ, ΧΧ¤Χ΅ ΧΧª Χ”Χ“Χ’Χ
                     reg_next.line_started <= '0';
                 END IF;
 
             WHEN capture_line =>
-                -- εεγΰ ω-HREF ςγιιο τςιμ εψχ ΰζ ϊχψΰ πϊεπιν
+                -- Χ•Χ•Χ“Χ Χ©-HREF ΧΆΧ“Χ™Χ™Χ Χ¤ΧΆΧ™Χ Χ•Χ¨Χ§ ΧΧ– ΧªΧ§Χ¨Χ Χ ΧªΧ•Χ Χ™Χ
                 IF href_sync2 = '1' AND pclk_rising_edge = '1' AND reg.pixel_reg < 640 THEN
                     reg_next.rgb_reg(15 DOWNTO 8) <= data_sync2;
                     reg_next.state <= capture_rgb_byte;
                 ELSIF href_sync2 = '0' THEN
-                    -- HREF πβξψ, ριιν ΰϊ δωεψδ
+                    -- HREF Χ Χ’ΧΧ¨, Χ΅Χ™Χ™Χ ΧΧª Χ”Χ©Χ•Χ¨Χ”
                     reg_next.href_cnt <= reg.href_cnt + 1;
                     reg_next.line_started <= '0';
                     IF reg.href_cnt = 479 THEN
@@ -211,7 +211,7 @@ BEGIN
                     reg_next.pixel_reg <= reg.pixel_reg + 1;
                     reg_next.state <= write_to_bram;
                 ELSIF href_sync2 = '0' THEN
-                    -- HREF πβξψ, ριιν ΰϊ δωεψδ
+                    -- HREF Χ Χ’ΧΧ¨, Χ΅Χ™Χ™Χ ΧΧª Χ”Χ©Χ•Χ¨Χ”
                     reg_next.href_cnt <= reg.href_cnt + 1;
                     reg_next.line_started <= '0';
                     IF reg.href_cnt = 479 THEN
@@ -222,14 +222,14 @@ BEGIN
                 END IF;
                 
             WHEN write_to_bram =>
-                -- λϊεα ψχ ΰν ζδ τιχρμ ηεχι
+                -- Χ›ΧªΧ•Χ‘ Χ¨Χ§ ΧΧ Χ–Χ” Χ¤Χ™Χ§Χ΅Χ Χ—Χ•Χ§Χ™
                 IF reg.pixel_reg <= 640 AND reg.href_cnt < 480 THEN
                     wea <= "1";
                     dina <= reg.rgb_reg(11 DOWNTO 0);
                     reg_next.bram_address <= reg.bram_address + 1;
                 END IF;
                 
-                -- αγεχ ΰν ριιξπε ΰϊ δωεψδ
+                -- Χ‘Χ“Χ•Χ§ ΧΧ Χ΅Χ™Χ™ΧΧ Χ• ΧΧª Χ”Χ©Χ•Χ¨Χ”
                 IF reg.pixel_reg >= 640 THEN
                     reg_next.href_cnt <= reg.href_cnt + 1;
                     reg_next.line_started <= '0';
