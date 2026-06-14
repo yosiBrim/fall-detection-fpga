@@ -1,3 +1,11 @@
+# ==============================================================================
+# Script Name: build_project.tcl
+# Description: Automatically reconstructs the Vivado project environment.
+# Usage: Run 'source build_project.tcl' in the Vivado Tcl Console.
+# Created by: Yossi Brim & Elad Asbag
+# ==============================================================================
+
+
 #*****************************************************************************************
 # Vivado (TM) v2025.1 (64-bit)
 #
