@@ -1,21 +1,15 @@
-# 🖥️ RTL (Register Transfer Level) - Hardware Logic
-
-תיקייה זו מכילה את כל קובצי ה-VHDL של המערכת, המחולקים לפי מודולים לוגיים. 
-
 ## 🏗️ Hardware Architecture Diagram
-התרשים הבא מתאר את זרימת המידע בתוך ה-FPGA:
 
-+-----------------------------------------------------------------------------------+
-|                                 TOP LEVEL (top_2.vhd)                             |
-|                                                                                   |
-|  +----------------+      +-----------------------+      +----------------------+  |
-|  |                |      |                       |      |                      |  |
-|  |   Camera       |=====>|   Image Processing    |=====>|   Video Output       |  |
-|  |   (OV7670)     | RGB  |   (Fall Detection)    | RGB  |   (VGA Controller)   |  |
-|  |                |      |                       |      |                      |  |
-|  +----------------+      +-----------------------+      +----------------------+  |
-|          ^                           |                              |             |
-|          | (I2C/SCCB)                v (Alert)                      v             |
-+----------|---------------------------|------------------------------|-------------+
-           |                           |                              |
-       To Sensor                   To System/LEDs                 To Monitor
+```mermaid
+graph LR
+    cam[📷 Camera OV7670] -->|RGB Pixels| ip(🧠 Image Processing \n Fall Detection)
+    cam -.->|SCCB / I2C| ctrl[⚙️ Camera Controller]
+    
+    ip -->|Alert Signal| leds[🚨 System LEDs]
+    ip -->|Processed Frame| vga[🖥️ VGA Controller]
+    
+    vga --> monitor[Monitor Display]
+    
+    style cam fill:#f9f,stroke:#333,stroke-width:2px
+    style ip fill:#bbf,stroke:#333,stroke-width:4px
+    style vga fill:#bfb,stroke:#333,stroke-width:2px
