@@ -10,7 +10,8 @@ This project implements a real-time video processing pipeline designed to detect
 
 > ⚠️ **Project Scope & AI Disclaimer**
 > The primary, guaranteed deliverable of this engineering project is the robust hardware RTL pipeline (OV7670 Camera ➔ BRAM Buffering ➔ VGA Display). 
-> As an advanced proposed extension, we plan to instantiate a **Soft-Core Processor (e.g., Xilinx MicroBlaze)** within the FPGA fabric. This will allow us to run C/C++ based Edge AI or decision-making algorithms directly on the chip. Full integration of this software layer remains a secondary goal dependent on hardware resource and timeline constraints.
+> **Proof of Concept:** The algorithmic logic for posture detection has already been successfully validated via a PoC on a **Raspberry Pi**. 
+> **Proposed Extension:** As an advanced step for this repository, we plan to migrate this logic by instantiating a **Soft-Core Processor (e.g., Xilinx MicroBlaze)** within the FPGA fabric. This will allow us to run C/C++ based decision-making algorithms directly on the chip, though full integration remains a secondary goal dependent on hardware resource and timeline constraints.
 
 **Key Features:**
 * **Image Acquisition:** Live video capture from an OV7670 camera via SCCB/I2C configuration.
