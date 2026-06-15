@@ -6,13 +6,17 @@
 ---
 
 ## 📌 Project Overview
-This project implements a real-time video processing pipeline designed to detect posture changes and falls. The system leverages the parallel processing capabilities of an FPGA for image acquisition and hardware-level buffering, tightly coupled with an Edge AI environment for advanced posture inference.
+This project implements a real-time video processing pipeline designed to detect posture changes and falls. The system leverages the parallel processing capabilities of an FPGA for image acquisition and hardware-level buffering, coupled with an architectural design for Edge AI integration.
+
+> ⚠️ **Project Scope & AI Disclaimer**
+> The primary, guaranteed deliverable of this engineering project is the robust FPGA hardware pipeline (OV7670 Camera ➔ BRAM Buffering ➔ VGA Display). 
+> The Edge AI software layer (MobileNet-SSD) has been successfully proven as a **Proof of Concept (PoC) on a Raspberry Pi**. However, within the scope of this specific repository, its full integration with the FPGA hardware remains a proposed extension for future development.
 
 **Key Features:**
 * **Image Acquisition:** Live video capture from an OV7670 camera via SCCB/I2C configuration.
 * **Hardware Buffering:** Fast frame buffering utilizing on-chip Block RAM (BRAM).
 * **Video Output:** Real-time VGA controller output.
-* **Detection Pipeline:** Image processing block for posture change / fall detection.
+* **Architecture:** Hardware design ready for posture change / fall detection data handoff.
 
 ## 🏗️ System Architecture
 
@@ -27,14 +31,14 @@ graph LR
     cam[📷 OV7670 Sensor] -->|RGB Data / VSYNC| ctrl
     cam -.->|I2C / SCCB| ctrl
     
-    img -->|Pre-processed Data| ai(🧠 Edge AI Controller)
+    img -.->|Proposed Extension| ai(🧠 Raspberry Pi / Edge AI)
     
     vga --> monitor[🖥️ VGA Monitor]
-    ai -->|Trigger| alert[🚨 Posture/Fall Alert]
+    ai -.->|Trigger| alert[🚨 Posture/Fall Alert]
     
     style Hardware fill:#f4f4f4,stroke:#333,stroke-width:2px
     style bram fill:#ff9,stroke:#333,stroke-width:2px
-    style ai fill:#bbf,stroke:#333,stroke-width:3px
+    style ai fill:#bbf,stroke:#333,stroke-width:3px,stroke-dasharray: 5 5
 ```
 
 ## 📂 Repository Structure
