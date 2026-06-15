@@ -1,17 +1,17 @@
 # 📂 Project Documentation (`/docs`)
 
-תיקייה זו מרכזת את כל התיעוד הטכני, מפרטי החומרה, והמדריכים של מערכת גילוי הנפילות בזמן אמת (Fall Detection System). התיעוד מחולק למספר קבצים ייעודיים כדי לאפשר תחזוקה קלה וסנכרון מלא בעבודת הצוות.
+This directory contains all the technical documentation, hardware specifications, and guides for the Real-Time Fall Detection System. The documentation is divided into dedicated files to allow for easy maintenance and seamless team synchronization.
 
-## 🗺️ מבנה תיקיית התיעוד
+## 🗺️ Documentation Structure
 
-* **`SETUP.md`** - מדריך הקמת סביבת העבודה (Vivado Setup) והפעלת הפרויקט מאפס באמצעות סקריפטים של Tcl, כולל הגדרות תוכנת ה-Edge AI.
-* **`hardware_architecture.md`** (יש ליצור) - פירוט ארכיטקטורת החומרה על גבי כרטיס ה-Artix-7, תיאור רכיב ה-Top Level, ומימוש רכיבי ה-VHDL השונים (בקר המצלמה, רכיבי הזיכרון ומערכת הבקרה).
-* **`camera_interface.md`** (יש ליצור) - מפרט החיבור והפרוטוקול מול מצלמת ה-OV7670, כולל תזמונים (Signals), בקרת SCCB, וטבלאות חיווט ומיפוי פינים (XDC Constraints).
-* **`edge_ai_integration.md`** (יש ליצור) - תיאור ה-Proof of Concept (PoC), מודל ה-MobileNet-SSD, וממשק התקשורת בין עיבוד התמונה בחומרה לבין מערכת התוכנה והבקרה.
+* **`SETUP.md`** - Workspace setup guide (Vivado project generation) using Tcl scripts, including Edge AI software configuration.
+* **`hardware_architecture.md`** *(To be created)* - Detailed hardware architecture on the Artix-7 board, Top-Level description, and implementations of various VHDL modules (Camera Controller, Memory blocks, and Control system).
+* **`camera_interface.md`** *(To be created)* - Connection specifications and protocol for the OV7670 camera, including timing diagrams, SCCB configuration, and pin mapping (XDC Constraints).
+* **`edge_ai_integration.md`** *(To be created)* - Description of the Proof of Concept (PoC), MobileNet-SSD model implementation, and the communication interface between the hardware processing unit and the software controller.
 
-## 🔄 שגרת עדכון התיעוד
+## 🔄 Documentation Update Routine
 
-כדי להבטיח שהתיעוד תמיד משקף את המצב הנוכחי של הקוד והחומרה:
-1. **עדכון שינויים מבניים:** בכל פעם שמתווסף רכיב חומרה חדש, יש לעדכן את קובץ התיעוד המתאים (למשל, הוספת רכיב בקרת שעון תתועד ב-`hardware_architecture.md`).
-2. **תאימות ל-XDC:** שינויים במיקומי פינים עבור המצלמה או רכיבי הפריפריה יתועדו במדריך המצלמה ובקובץ האילוצים הראשי.
-3. **קריאות קוד:** מומלץ לשמור על שמות קבצים אחידים ותואמים בין התיעוד לבין קובצי ה-VHDL והפייתון בריפוזיטורי.
+To ensure the documentation always reflects the current state of the code and hardware:
+1. **Structural Updates:** Whenever a new hardware component is added, the corresponding documentation file must be updated (e.g., adding a clock controller should be documented in `hardware_architecture.md`).
+2. **XDC Compatibility:** Any changes to pin assignments for the camera or peripherals must be updated in the camera guide and the main constraints file.
+3. **Naming Conventions:** Maintain consistent file naming between the documentation and the actual VHDL/Python source files in the repository.
