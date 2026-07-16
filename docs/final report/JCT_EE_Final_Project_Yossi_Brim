@@ -1,0 +1,340 @@
+\documentclass[12pt, a4paper]{article}
+
+% --- Packages for Hebrew and English ---
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{hebrew}
+\setotherlanguage{english}
+\newfontfamily\hebrewfont[Script=Hebrew]{David CLM} 
+\newfontfamily\englishfont{Times New Roman}
+
+% --- Packages for Graphics, Math, and Formatting ---
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds}
+
+\begin{document}
+
+% --- Cover Page (No Page Number) ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Large \textbf{המרכז האקדמי לב}} \\
+    \vspace{0.5cm}
+    {\large \textbf{הפקולטה להנדסה ומדעי המחשב}} \\
+    {\large \textbf{החוג להנדסת חשמל ואלקטרוניקה}} \\
+    
+    \vspace{3cm}
+    {\Huge \textbf{פרויקט גמר באלקטרוניקה}} \\
+    \vspace{1.5cm}
+    {\huge \textbf{מערכת משובצת לזיהוי נפילות בזמן אמת:}} \\
+    \vspace{0.5cm}
+    {\LARGE \textbf{אימות חומרה (RTL) והוכחת התכנות מבוססת Edge AI}} \\
+    \vspace{0.5cm}
+    {\Large Edge AI Fall Detection System: Hardware Verification \& Software PoC} \\
+    
+    \vspace{4cm}
+    \begin{flushright}
+    \textbf{מגיש:} יוסי ברים \\
+    \textbf{מנחה:} מר ערן שלום \\
+    \end{flushright}
+    
+    \vfill
+    ירושלים, אלול תשפ"ו
+\end{titlepage}
+
+% --- Acknowledgements and Abstract ---
+\pagenumbering{arabic}
+\setcounter{page}{2}
+
+\section*{תודות}
+[כאן יבואו התודות למנחה, למשפחה ולכל מי שתמך בך במהלך התואר...]
+\newpage
+
+\section*{תקציר (Abstract)}
+[תקציר הפרויקט בעברית המחולק ל-4 פסקאות: רקע, שיטות, תוצאות ומשמעות...]
+
+\vspace{1cm}
+\begin{english}
+[English Abstract...]
+\end{english}
+\newpage
+
+% --- Table of Contents ---
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+% ==========================================
+% CHAPTER 1: INTRODUCTION
+% ==========================================
+\section{מבוא}
+
+\subsection{רקע ומוטיבציה}
+אוכלוסיית העולם המבוגרת גדלה בקצב מהיר, ועימה עולה שיעור האנשים המתמודדים עם בעיות זיכרון וירידה ביכולות הקוגניטיביות. אחת הבעיות המשמעותיות באוכלוסייה זו היא הקושי בהתנהלות בטוחה בסביבה הביתית. תופעה מסוכנת נפוצה היא עמידה ממושכת ללא שימת לב לעייפות המצטברת, מה שעלול להוביל לניסיון התיישבות פתאומי ללא ודאות שקיים כיסא מאחור, וכתוצאה מכך – לנפילות ופציעות חמורות. במקרים רבים, ההשלכות הפיזיות של נפילות אלו פוגעות באיכות החיים בצורה אנושה. 
+
+קיים אפוא צורך מהותי בפיתוח מערכות ניטור אוטומטיות, אשר לא ידרשו מהמטופל לשאת חיישנים לבישים (Wearables), אלא יתבססו על ניתוח המרחב באמצעות מצלמות ועיבוד תמונה מתקדם בשולי הרשת (Edge Computing).
+
+\subsection{מערכת החומרה הבסיסית ומגבלותיה}
+נקודת המוצא של פרויקט זה היא מערכת חומרתית קיימת שפותחה על גבי כרטיס Nexys A7-100T מבוסס Artix-7 FPGA. המערכת הבסיסית כוללת פייפליין וידאו חומרתי: קליטת תמונה ממצלמת OV7670 דרך אפיק מקבילי, שמירת נתוני הפיקסלים בזיכרון פנימי (BRAM), ושידור התמונה למסך באמצעות בקר VGA קלאסי. 
+
+על אף שהמערכת מצליחה להזרים וידאו, ניתוח הנדסי העלה כי היא לוקה בחסר בשני היבטים מרכזיים המונעים ממנה לתפקד כמערכת התרעה אמינה:
+\begin{itemize}
+    \item \textbf{בעיות סנכרון ואמינות נתונים:} חוסר סנכרון הרמטי בין תדר הקליטה מהמצלמה לתדר השידור למסך מוביל לתופעות של "קריעת תמונה" (Tearing) והצגת מידע משובש, מה שמכשיל כל ניסיון לעיבוד תמונה עוקב.
+    \item \textbf{עיבוד תמונה בסיסי ורגישות לרעשים:} מנגנון הזיהוי הקודם התבסס על חלוקת המסך לאזורים ובחינת עוצמת התאורה בהם. שיטה זו רגישה לתנאי תאורה משתנים ואינה מסוגלת להבחין בצורה אמינה בין אדם לעצם זר.
+\end{itemize}
+
+\subsection{מטרת הפרויקט}
+מטרת הפרויקט הנוכחי מתחלקת לשני אפיקים הנדסיים עיקריים:
+\begin{enumerate}
+    \item \textbf{אימות וחקירת חומרה (RTL Verification):} ביצוע הנדסה לאחור (Reverse Engineering) למערכת הבסיס, והרצת סימולציות מקור (Source-Level RTL) לבקר ה-VGA ומערך הזיכרון. המטרה היא להציג את התנהגות האותות לפני שלב ההשמה והניתוב (Place \& Route), לאתר כשלים בסנכרון, ולהגדיר את הדרישות לשדרוג.
+    \item \textbf{הוכחת התכנות (PoC) מבוססת בינה מלאכותית:} פיתוח פתרון תוכנתי מבוסס Edge AI המסוגל לזהות בני אדם ולסנן רעשים באופן יציב. פתרון זה מיושם על גבי מיקרו-מחשב (Raspberry Pi) כמודל להשוואה מול גישת החומרה, וכבסיס לארכיטקטורה עתידית.
+\end{enumerate}
+
+\subsection{גישה לפתרון והצעת יישום (HW/SW Co-Design)}
+כדי להתגבר על מגבלות עיבוד התמונה המסורתי, פותחה מערכת מבוססת תוכנה על גבי Raspberry Pi 3. המערכת דוגמת וידאו באופן ישיר מהחומרה (Picamera2), ומריצה מודל רשתות נוירונים (MobileNet-SSD) לזיהוי אובייקטים וחילוץ תיבות תוחמות (Bounding Boxes) של בני אדם. 
+
+במקום רשתות מורכבות לזיהוי פעולות, יושמה לוגיקה גיאומטרית דטרמיניסטית הבוחנת את יחס הממדים של התיבה התוחמת. כדי להתמודד עם רעשים טמפורליים (Temporal Noise), פותחה מכונת מצבים (FSM) בתוכנה הדורשת זיהוי עקבי לאורך מספר פריימים (Debounce) לפני הפעלת התרעה חומרתית דרך אפיק ה-I2C למסך חיצוני.
+
+הוכחת תכנות זו משמשת כהצעה ארכיטקטונית ליישום עתידי משולב (SoC) ב-FPGA: בעוד שפייפליין החומרה (המתבצע בפרויקט מקביל) יהיה אחראי על הזרמת הנתונים, הלוגיקה החכמה של ה-AI ומכונת המצבים תיושם בתוכנה (C/C++) על גבי מעבד Soft-Core כדוגמת MicroBlaze.
+
+\newpage
+% ==========================================
+% CHAPTER 2: THEORETICAL BACKGROUND
+% ==========================================
+\section{רקע תיאורטי וסקירת ספרות}
+
+\subsection{ממשק התצוגה VGA ועקרונות סריקה (Raster Scan)}
+ממשק ה-VGA (Video Graphics Array) מהווה סטנדרט היסטורי ומוכח להעברת וידאו, ואף על פי שקיימים כיום תקנים דיגיטליים מודרניים, הוא נותר נפוץ מאוד במערכות משובצות ובפיתוח על גבי FPGA בזכות פשטותו ואמינותו הפיתוחית[cite: 5]. 
+
+הצגת תמונה ב-VGA מבוססת על עקרון ה"סריקה הקווית" (Raster Scan): המסך נבנה שורה אחר שורה, משמאל לימין ומלמעלה למטה[cite: 5]. כדי לנהל את הסריקה הזו, פרוטוקול ה-VGA דורש חמישה אותות מרכזיים[cite: 5]:
+\begin{itemize}
+    \item \textbf{ערוצי צבע אנלוגיים (RGB):} שלושה אותות המייצגים את עוצמת האדום, הירוק והכחול. מכיוון שה-FPGA פולט אותות דיגיטליים טהורים, נעשה שימוש בממיר דיגיטל לאנלוג (DAC) חומרתי, לרוב בתצורת רשת נגדים (R2R Ladder), כדי להמיר את הרמות הלוגיות למתח אנלוגי בתחום של $0V$ עד $0.7V$[cite: 5].
+    \item \textbf{סנכרון אופקי (HSYNC):} אות דיגיטלי המורה למסך לסיים את סריקת השורה הנוכחית ולהחזיר את "קרן הכתיבה" (או בקרת הפיקסלים במסכי LCD) לתחילת השורה הבאה[cite: 5].
+    \item \textbf{סנכרון אנכי (VSYNC):} אות דיגיטלי המורה למסך כי סריקת כלל השורות (הפריים השלם) הסתיימה, ויש לחזור לפינה השמאלית העליונה לתחילת הפריים הבא[cite: 5].
+\end{itemize}
+
+\subsubsection*{תזמונים ו"מרווחי השהיה" (Porches)}
+אחד האתגרים המרכזיים בתכנון בקר VGA ב-FPGA הוא עמידה מדויקת בתזמונים[cite: 5]. בין סיום הצגת הנתונים של שורה אחת לתחילת השורה הבאה, ישנו פרק זמן שבו אסור לשדר מידע ויזואלי[cite: 5]. תקופה "ריקה" זו מחולקת לשלושה שלבים עבור כל ציר (אופקי ואנכי)[cite: 5]:
+\begin{enumerate}
+    \item \textbf{Front Porch:} מרווח ההמתנה מרגע סיום שידור הפיקסל האחרון ועד לירידת פולס הסנכרון[cite: 5].
+    \item \textbf{Sync Pulse:} משך הזמן שבו אות הסנכרון (HSYNC/VSYNC) מוחזק במצב נמוך (Active Low) כדי לאתחל את המסך[cite: 5].
+    \item \textbf{Back Porch:} מרווח ההמתנה מסיום פולס הסנכרון ועד לתחילת שידור הפיקסל הראשון של השורה (או הפריים) הבאה[cite: 5].
+\end{enumerate}
+מרווחים אלו נועדו היסטורית לאפשר לקרן האלקטרונים במסכי CRT זמן פיזי לחזור לתחילת המסך, אך הם נשמרו כסטנדרט מחייב גם במסכי LCD מודרניים כדי לאפשר לבקר המסך זמן לעיבוד האותות[cite: 5].
+
+\subsubsection*{חישוב ה-Pixel Clock}
+בפרויקט זה, יעד התצוגה הוא רזולוציה של $640 \times 480$ פיקסלים בקצב רענון של $60Hz$[cite: 5]. כדי להשיג זאת, עלינו לקחת בחשבון את הפיקסלים ה"סמויים" המשודרים במהלך ה-Porches[cite: 5]:
+\begin{itemize}
+    \item \textbf{סך פיקסלים אופקיים בשורה:} $640 \text{ (Active)} + 16 \text{ (FP)} + 96 \text{ (Sync)} + 48 \text{ (BP)} = 800 \text{ Pixels}$[cite: 5].
+    \item \textbf{סך שורות אנכיות בפריים:} $480 \text{ (Active)} + 10 \text{ (FP)} + 2 \text{ (Sync)} + 29 \text{ (BP)} = 521 \text{ Lines}$[cite: 5].
+\end{itemize}
+מכאן, שמספר "מחזורי השעון" הנדרשים לשידור פריים שלם אחד הוא $800 \times 521 = 416,800$[cite: 5]. כדי לשדר 60 פריימים בשנייה ($60Hz$), תדר הפיקסלים (Pixel Clock) הנדרש הוא:
+$$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
+הבנה מדויקת של תזמונים אלו היא קריטית, שכן כל סטייה של מחזורי שעון בודדים תוביל ל"ריצוד" (Flicker), להסטת התמונה, או לחוסר סנכרון מוחלט במסך[cite: 5].
+
+\subsection{חיישן התמונה OV7670 ופרוטוקולי תקשורת}
+מצלמת ה-OV7670 היא חיישן תמונה מסוג CMOS המספק פתרון מלא לצילום תמונות בפורמט VGA (רזולוציה של $640 \times 480$) וכולל יכולות עיבוד אותות בתוך שבב יחיד (System-on-Chip)[cite: 5]. מצלמה זו נבחרה לפרויקט בזכות צריכת ההספק הנמוכה שלה והיכולת לשלוט באופן מלא על פרמטרי הצילום והפורמט[cite: 5].
+
+המצלמה מעבירה את נתוני התמונה ל-FPGA באמצעות אפיק נתונים מקבילי בן 8 סיביות (D0-D7), המגובה בשלושה אותות סנכרון מרכזיים המכתיבים את קצב ומיקום הנתונים[cite: 5]:
+\begin{itemize}
+    \item \textbf{PCLK (Pixel Clock):} שעון הפיקסלים שבאמצעותו נדגמים הנתונים[cite: 5].
+    \item \textbf{HREF (Horizontal Reference):} אות המציין שורה פעילה. כאשר האות בגובה לוגי '1', נתוני הפיקסלים הנשלחים הם חוקיים[cite: 5].
+    \item \textbf{VSYNC (Vertical Sync):} אות המסמן את תחילתו (או סיומו) של פריים שלם[cite: 5].
+\end{itemize}
+
+בפרויקט זה המצלמה הוגדרה לעבוד בפורמט RGB444, בו כל פיקסל מיוצג על ידי 12 סיביות (4 סיביות לכל ערוץ צבע: אדום, ירוק וכחול)[cite: 5]. מכיוון שאפיק הנתונים הוא בן 8 סיביות בלבד, העברת כל פיקסל דורשת שני מחזורי שעון של PCLK (תחילה הבית הגבוה ולאחריו הבית הנמוך), אותם ה-FPGA צריך לקלוט, לשרשר, ולשמור בזיכרון ה-BRAM[cite: 5].
+
+כדי להגדיר את פורמט הפלט, קצב הרענון ופרמטרים נוספים (כגון White Balance), נעשה שימוש בממשק התצורה SCCB (Serial Camera Control Bus)[cite: 5]. ממשק זה פותח על ידי חברת OmniVision והוא תואם לאחור לפרוטוקול התקשורת הטורי הסטנדרטי I2C, המאפשר כתיבה לרגיסטרים הפנימיים של המצלמה בתהליך האתחול של המערכת[cite: 5].
+
+\subsection{טכנולוגיות FPGA לעומת Edge AI}
+בעולם המערכות המשובצות המודרני, קיים מתח מתמיד בין פיתוח חומרתי טהור לבין פיתוח תוכנתי מבוסס בינה מלאכותית בקצה הרשת (Edge Computing)[cite: 7]. 
+
+\begin{itemize}
+    \item \textbf{עיבוד חומרתי (FPGA):} פלטפורמות כדוגמת Artix-7 מציעות ביצועים דטרמיניסטיים, מקביליות מוחלטת, והשהיה (Latency) אפסית. תכונות אלו אידיאליות לניהול פייפליין וידאו רציף ברמת הפיקסל[cite: 7]. עם זאת, יישום אלגוריתמים מורכבים של למידת מכונה ישירות ב-RTL (VHDL/Verilog) צורך משאבי סיליקון יקרים (כגון בלוקי DSP ו-BRAM) ומאריך משמעותית את זמן הפיתוח והאימות (Time-to-Market)[cite: 7].
+    \item \textbf{מחשוב קצה ובינה מלאכותית (Edge AI):} שימוש במיקרו-מחשבים, דוגמת Raspberry Pi, מאפשר הפעלה של מודלים עמוקים שאומנו מראש (כגון MobileNet-SSD) לזיהוי אובייקטים מתקדם[cite: 7]. היתרון המובהק של גישה זו הוא בגמישות הפיתוח ובפשטות יישום אלגוריתמיקה מורכבת[cite: 7]. החיסרון הוא התלות במערכת הפעלה (OS overhead) שעשויה לפגוע בקצב הרענון וביציבות תזמוני המערכת ביישומי זמן אמת קריטיים[cite: 7].
+\end{itemize}
+
+מערכת זיהוי נפילות אידיאלית דורשת את יתרונות שתי הגישות: מהירות ואמינות ה-FPGA לשלב קליטת הווידאו, לצד הגמישות המחשבתית של מודלי ה-AI. תובנה זו מהווה את הבסיס לארכיטקטורת המערכת המוצעת בפרויקט זה, המשלבת את שני העולמות.
+\newpage
+% ==========================================
+% CHAPTER 3: DEVELOPMENT & METHODS
+% ==========================================
+\section{פיתוח ושיטות}
+
+\subsection{ארכיטקטורת המערכת וה-Pipeline}
+הארכיטקטורה החומרתית של פרויקט זה תוכננה בגישת Top-Down מודולרית, מתוך מטרה להפריד בין שלבי רכישת הנתונים (Data Acquisition), אחסונם הזמני, ושידורם לתצוגה. הפרדה זו מאפשרת טיפול עצמאי בתדרי עבודה שונים (Clock Domains) ומונעת צווארי בקבוק בתעבורת הווידאו.
+
+\begin{figure}[h]
+\centering
+\begin{english}
+\begin{tikzpicture}[
+    auto,
+    block/.style={rectangle, draw=blue!80!black, thick, fill=blue!5, text width=2.8cm, align=center, rounded corners, minimum height=1.4cm, font=\footnotesize\bfseries},
+    hw_block/.style={rectangle, draw=green!60!black, thick, fill=green!5, text width=2.2cm, align=center, minimum height=1.4cm, font=\footnotesize},
+    mem_block/.style={rectangle, draw=red!80!black, thick, fill=red!5, text width=2.5cm, align=center, rounded corners, minimum height=2.5cm, font=\footnotesize\bfseries},
+    line/.style={draw, thick, -latex', shorten >=2pt},
+    bus/.style={draw, thick, -latex', double, shorten >=2pt},
+    clk_line/.style={draw, dashed, -latex', color=gray!80!black}
+]
+
+    % --- Nodes (Blocks) ---
+    \node [hw_block] (cam) {OV7670\\Camera Sensor};
+    \node [block, right=1.5cm of cam] (capture) {Camera Capture\\Controller};
+    \node [mem_block, right=1.5cm of capture] (bram) {Dual-Port\\BRAM\\(Frame Buffer)};
+    \node [block, right=1.5cm of bram] (vga) {VGA Display\\Controller};
+    \node [hw_block, right=1.5cm of vga] (monitor) {VGA Monitor\\(640x480 @ 60Hz)};
+    
+    \node [block, below=1.2cm of capture, fill=yellow!10, draw=yellow!80!black] (sccb) {SCCB / I2C\\Configuration};
+    \node [block, below=1.2cm of bram, fill=purple!10, draw=purple!80!black] (pll) {MMCM / PLL\\Clock Generator};
+
+    % --- Connections (Buses and Lines) ---
+    % Camera to Capture
+    \path [bus] (cam) -- node[above, font=\scriptsize] {D[7:0]} (capture);
+    \path [line] (cam.south east) -- node[below, font=\tiny] {PCLK, HREF, VSYNC} (capture.south west);
+    
+    % Capture to BRAM
+    \path [bus] (capture.east) |- node[above, font=\scriptsize, near start] {RGB[11:0]} (bram.160);
+    \path [line] (capture.east) |- node[below, font=\scriptsize, near start] {waddr, we} (bram.190);
+
+    % BRAM to VGA
+    \path [bus] (bram.20) -- node[above, font=\scriptsize] {RGB[11:0]} (vga.160);
+    \path [line] (vga.190) -- node[below, font=\scriptsize] {raddr} (bram.340);
+
+    % VGA to Monitor
+    \path [bus] (vga) -- node[above, font=\scriptsize] {RGB (DAC)} (monitor);
+    \path [line] (vga.south east) -- node[below, font=\tiny] {HSYNC, VSYNC} (monitor.south west);
+
+    % SCCB to Camera
+    \path [line] (sccb.west) -| node[left, font=\scriptsize] {SIOC, SIOD} (cam.south);
+
+    % Clocks
+    \node [left=0.8cm of pll, font=\scriptsize\bfseries] (sysclk) {100MHz Clk};
+    \path [line] (sysclk) -- (pll);
+    \path [clk_line] (pll.west) -| node[near start, below, font=\tiny] {24MHz} (cam.south east);
+    \path [clk_line] (pll.north) -- node[right, font=\tiny] {Write Clk (24MHz)} (bram.south);
+    \path [clk_line] (pll.east) -| node[near start, below, font=\tiny] {25MHz} (vga.south);
+
+    % --- Background Boxes for Clock Domains ---
+    \begin{scope}[on background layer]
+        \node [draw=blue!30, fill=blue!2, rounded corners, fit=(cam) (capture) (sccb), label={[font=\scriptsize\bfseries, color=blue!60!black]above:24MHz Write Domain}] {};
+        \node [draw=green!30, fill=green!2, rounded corners, fit=(vga) (monitor), label={[font=\scriptsize\bfseries, color=green!60!black]above:25MHz Read Domain}] {};
+    \end{scope}
+
+\end{tikzpicture}
+\end{english}
+\caption{דיאגרמת מלבנים של ארכיטקטורת פייפליין הוידאו ב-FPGA (חלוקה לדומייני שעון)}
+\label{fig:system_arch}
+\end{figure}
+
+כפי שניתן לראות באיור \ref{fig:system_arch}, זרימת הנתונים (Data Flow) במערכת מורכבת מהשלבים הבאים:
+\begin{enumerate}
+    \item \textbf{ממשק קלט (Camera Controller):} מודול זה מקושר פיזית לחיישן ה-OV7670. הוא מקבל את הנתונים באפיק מקבילי (8 סיביות) יחד עם אותות הסנכרון (VSYNC, HREF, PCLK), ומרכיב פיקסלים שלמים בפורמט RGB444 (12 סיביות לפיקסל).
+    \item \textbf{מנגנון חוצץ (BRAM Frame Buffer):} לב המערכת המגשר בין הקלט לפלט. מודול זיכרון פנימי (Block RAM) המשמש לאחסון זמני של הפריימים. כתיבת הנתונים מתבצעת בתדר המצלמה (24MHz), בעוד הקריאה מתבצעת בתדר המסך (25MHz).
+    \item \textbf{ממשק פלט (VGA Controller):} מודול זה שולף את נתוני הפיקסלים מהזיכרון בהתאם למוני שורות ועמודות (Counters), ומייצר את אותות הסנכרון התקניים (HSYNC, VSYNC) הנדרשים להצגת התמונה על מסך חיצוני.
+    \item \textbf{ניהול שעונים (Clock Generator):} שימוש ברכיב IP מסוג PLL/MMCM לקבלת שעון המערכת הראשי (100MHz), וחלוקתו להפקת התדרים המדויקים הנדרשים למצלמה ולבקר התצוגה.
+\end{enumerate}
+
+מבנה ארכיטקטוני זה יוצר "פייפליין" חומרתי רציף ויציב, המהווה את התשתית שעליה תורחב המערכת העתידית לכדי System-on-Chip (SoC) בשילוב מעבד Soft-Core לאנליזת הנתונים.
+
+\subsection{ניתוח והנדסה לאחור של מערכת הבסיס (Reverse Engineering)}
+% ניתוח החיבורים, מכונת המצבים של הקליטה מהמצלמה, ומבנה בקר ה-VGA המקורי.
+
+\subsection{תכנון חומרה: ניהול זיכרון וסנכרון תזמונים}
+% התמודדות עם Clock Domains שונים (24MHz מול 25MHz), אסטרטגיית Double Buffering.
+
+\subsection{הוכחת התכנות (PoC): מימוש Edge AI על Raspberry Pi}
+% מעבר מזיהוי פיקסלים פשוט לזיהוי אדם מבוסס AI. 
+% שימוש ב-Picamera2, חילוץ Bounding Boxes, ולוגיקה גיאומטרית לזיהוי נפילה.
+
+\subsection{הצעת יישום משולב: ארכיטקטורת System-on-Chip}
+% תכנון השילוב העתידי ב-FPGA: פייפליין חומרה מול מעבד Soft-Core (MicroBlaze) המריץ C/C++.
+
+\newpage
+% ==========================================
+% CHAPTER 4: RESULTS
+% ==========================================
+\section{תוצאות}
+
+\subsection{אימות לוגי: סימולציות RTL (ModelSim/Vivado)}
+% הצגת צורות הגלים של ה-Testbenches (קריאת פיקסלים, אותות סנכרון למסך).
+
+\subsection{אימות חומרה פיזי (Hardware Verification)}
+% תוצאות מדידות אוסילוסקופ על פיני היציאה (PCLK, VSYNC, HSYNC) לאימות התדרים.
+
+\subsection{ניצולת משאבים וניתוח תזמונים (Utilization \& Timing Reports)}
+% טבלאות ניצולת של LUTs, BRAM, דוחות Setup/Hold Times ו-Worst Negative Slack.
+
+\subsection{ביצועי הוכחת התכנות (PoC Results)}
+% תוצאות זיהוי הנפילות ברזברי פאי, התמודדות עם תאורה, ויציבות מכונת המצבים (Debounce).
+
+\newpage
+% ==========================================
+% CHAPTER 5: DISCUSSION
+% ==========================================
+\section{דיונים}
+
+\subsection{ניתוח בעיות סנכרון ואתגרי Clock Domain Crossing}
+% ביקורת על בעיית כפילות המסך וה-Tearing במערכת המקורית, ואיך ארכיטקטורה נכונה פותרת זאת.
+
+\subsection{השוואה ארכיטקטונית: חומרה ייעודית (FPGA) מול תוכנת קצה (Edge AI)}
+% השוואה של זמן פיתוח, צריכת הספק, גמישות עדכון אלגוריתמים, וביצועים דטרמיניסטיים.
+
+\newpage
+% ==========================================
+% CHAPTER 6: CONCLUSIONS
+% ==========================================
+\section{מסקנות וסיכום}
+
+\subsection{עמידה ביעדי הפרויקט}
+% סיכום ההישגים באימות החומרה ובהצלחת ה-PoC של הבינה המלאכותית.
+
+\subsection{כיווני פיתוח עתידיים}
+% המלצות לשלב הבא: הטמעת מאיץ חומרה ל-AI בתוך ה-FPGA, שיפור רזולוציה, וחיבור לענן.
+
+\newpage
+% ==========================================
+% REFERENCES
+% ==========================================
+\begin{english}
+\renewcommand{\refname}{References}
+\begin{thebibliography}{99}
+
+\bibitem{ov7670_datasheet}
+OmniVision Technologies, ``OV7670/OV7171 CMOS VGA (640x480) CameraChip Sensor,'' Datasheet, 2006.
+
+\bibitem{nexys_a7}
+Digilent Inc., ``Nexys A7 FPGA Trainer Board Reference Manual,'' 2019.
+
+\bibitem{mobilenet}
+A. G. Howard et al., ``MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications,'' \textit{arXiv preprint arXiv:1704.04861}, 2017.
+
+\end{thebibliography}
+\end{english}
+
+\newpage
+% ==========================================
+% APPENDICES
+% ==========================================
+\appendix
+\section{נספח א': קוד המקור - בקר תצוגה (VHDL)}
+% [כאן ישולב הקוד הרלוונטי]
+
+\section{נספח ב': קוד המקור - אימות סימולציה (Testbench)}
+% [כאן ישולב קוד ה-TB]
+
+\section{נספח ג': קוד לוגיקת ה-AI (Python)}
+% [כאן ישולב קוד הרזברי פאי]
+
+\end{document}
