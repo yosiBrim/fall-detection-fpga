@@ -109,6 +109,27 @@
 
 הוכחת תכנות זו משמשת כהצעה ארכיטקטונית ליישום עתידי משולב (SoC) ב-FPGA: בעוד שפייפליין החומרה (המתבצע בפרויקט מקביל) יהיה אחראי על הזרמת הנתונים, הלוגיקה החכמה של ה-AI ומכונת המצבים תיושם בתוכנה (C/C++) על גבי מעבד Soft-Core כדוגמת MicroBlaze.
 
+\subsection{אבולוציית המערכת וחלוקת העבודה בפרויקט}
+פרויקט זה מבוצע כחלק ממערך פיתוח מערכתי רחב לזיהוי נפילות, המשלב בין הנדסת חומרה (RTL), אימות לוגי ופיזי בצריבה על שבב (Silicon Verification), ומחשוב קצה מבוסס בינה מלאכותית (Edge AI). אבולוציית המערכת מורכבת משלושה רבדים משלימים:
+
+\begin{enumerate}
+    \item \textbf{תשתית החומרה המקורית ומגבלותיה:} 
+    נקודת המוצא הייתה ארכיטקטורה בסיסית וראשונית (שפותחה בעבר על ידי סטודנט קודם), אשר מימשה חיבורים אלמנטריים בין מצלמת OV7670, זיכרון BRAM ומסך VGA. בפועל, תשתית זו לא תיפקדה בצורה יציבה וסבלה מכשלים תזמוניים ומחוסר יכולת לעיבוד נתונים.
+    
+    \item \textbf{פיתוח ליבת עיבוד תמונה חומרתית :} 
+    כפרויקט חומרה מקביל ומשלים (המבוצע על ידי אלעד אסבג), תוכנן ומומש מחדש פייפליין וידאו בלוגיקה קשיחה (RTL). ליבה זו דואגת לייצוב התמונה,  , ומבצעת עיבוד תמונה מרחבי לזיהוי פיזי של שינויים ותנועה (Motion/Change Detection) על גבי המסך.
+    
+    \item \textbf{אימות פיזי, הנדסת מערכת וארכיטקטורת SoC (החלק הממוקד בדוח זה):} 
+    רובד הפיתוח והאינטגרציה המוגש בדוח זה מתמקד באתגר אימות החומרה ובקפיצה הארכיטקטונית מ"זיהוי תנועה" ל"זיהוי אדם ונפילה", ומתחלק לשלושה צירים מרכזיים:
+    \begin{itemize}
+        \item \textbf{אימות ופיזיקל דיזיין (Hardware & Silicon Verification):} אחריות מלאה על חיווט המערכת, תזמונים, ניתוח דפי נתונים ודיבוג בזמן אמת על גבי הסיליקון באמצעות נתח לוגי פנימי Vivado ILA (ChipScope), במטרה לוודא את תקינות זרימת הנתונים והסנכרון במערכת החומרה שפותחה.
+        \item \textbf{זיהוי תקרת הזכוכית האלגוריתמית ופיתוח PoC:} זיהוי שינויים במרחב החומרתי אינו מספיק כדי להבחין בין אדם לבין עצם זר הנע בחדר. בעקבות ניתוח הנדסי והתייעצות עם מומחי אלגוריתמיקה מעולם הראייה הממוחשבת בתעשייה הביטחונית, פותחה הוכחת תכנות תוכנתית (PoC) על Raspberry Pi 3. המערכת מריצה מודל רשתות נוירונים (MobileNet-SSD) לסינון וזיהוי אדם בלבד, ומיישמת לוגיקה גיאומטרית ומכונת מצבים (Debounce FSM) למניעת התרעות שווא.
+        \item \textbf{תפיסה ארכיטקטונית מלמעלה (SoC HW/SW Co-Design):} ההבנה כי מימוש אלגוריתמיקה סמנטית של זיהוי אובייקטים ישירות בלוגיקת RTL יהיה כבד, בזבזני ולא אלגנטי, הובילה להצעת היישום של פרויקט זה: שילוב מעבד Soft-Core (MicroBlaze) כ-IP בתוך שבב ה-FPGA, המחובר באפיק AXI4-Lite לפייפליין החומרה. ארכיטקטורה זו מאפשרת ליהנות מחוזקות החומרה של אלעד (קליטה וזיקוק וידאו מהיר) לצד אלגנטיות וגמישות התוכנה (החלטה ואנליזה במעבד).
+    \end{itemize}
+\end{enumerate} 
+
+חלוקה זו מבטיחה הפרדה הנדסית ברורה בין העיבוד החומרתי המקבילי לבין לוגיקת ההחלטה והאינטגרציה המערכתית, ומאפשרת בחינה מעמיקה של כל נדבך בארכיטקטורה.
+
 \newpage
 % ==========================================
 % CHAPTER 2: THEORETICAL BACKGROUND
@@ -177,7 +198,7 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 \subsection{ארכיטקטורת המערכת וה-Pipeline}
 הארכיטקטורה החומרתית של פרויקט זה תוכננה בגישת Top-Down מודולרית, מתוך מטרה להפריד בין שלבי רכישת הנתונים (Data Acquisition), אחסונם הזמני, ושידורם לתצוגה. הפרדה זו מאפשרת טיפול עצמאי בתדרי עבודה שונים (Clock Domains) ומונעת צווארי בקבוק בתעבורת הווידאו.
 
-% --- דיאגרמת בלוקים מותאמת מדויק לרוחב העמוד ---
+% --- איור 1: דיאגרמת בלוקים של המערכת ---
 \begin{figure}[htbp]
 \centering
 \begin{english}
@@ -275,12 +296,7 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 \end{itemize}
 מסקנות אלו מתהליך ההנדסה לאחור הובילו לתפיסת התכנון החדשה: אימות ושדרוג פייפליין הווידאו החומרתי, לצד העברת כובד המשקל של עיבוד התמונה (Edge AI) לתוכנה רציפה וגמישה.
 
-\subsection{תכנון חומרה: ניהול זיכרון וסנכרון תזמונים}
-% התמודדות עם Clock Domains שונים (24MHz מול 25MHz), אסטרטגיית Double Buffering.
-
 \subsection{הוכחת התכנות (PoC): מימוש Edge AI על Raspberry Pi}
-% מעבר מזיהוי פיקסלים פשוט לזיהוי אדם מבוסס AI. 
-% שימוש ב-Picamera2, חילוץ Boundi\subsection{הוכחת התכנות (PoC): מימוש Edge AI על Raspberry Pi}
 כדי לבסס את היתכנות האלגוריתם ולייצר מודל ייחוס תוכנתי (Software Golden Model) להשוואה מול פתרון החומרה, פותחה מערכת הוכחת התכנות (PoC) על גבי מיקרו-מחשב מסוג Raspberry Pi 3. שיטה זו אפשרה לבחון את יציבות זיהוי האדם, לנתח את הדינמיקה של נפילה בזמן אמת, ולפתח לוגיקה דטרמיניסטית שניתן יהיה לתרגם בעתיד לקוד C קליל עבור מעבד ה-MicroBlaze.
 
 \subsubsection*{ארכיטקטורת מערכת התוכנה ורכישת הווידאו}
@@ -294,10 +310,9 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
     $$ \{X_{min}, Y_{min}, X_{max}, Y_{max}\} $$
 \end{enumerate}
 
-\subsection{לוגיקת זיהוי נפילות ומכונת מצבים זמנית (Temporal FSM)}
+\subsubsection*{לוגיקת זיהוי נפילות ומכונת מצבים זמנית (Temporal FSM)}
 במקום שימוש ברשתות נוירונים כבדות ומורכבות לניתוח וידאו רציף (המצריכות כוח חישוב עצום), המערכת מיישמת לוגיקה גיאומטרית דטרמיניסטית קלה המבוססת על יחס הממדים (Aspect Ratio) של התיבה התוחמת, בשילוב מכונת מצבים המונעת התרעות שווא.
 
-\subsubsection*{הלוגיקה הגיאומטרית}
 עבור התיבה התוחמת שחולצה, המערכת מחשבת את גובה התיבה ($Height$) ורוחבה ($Width$):
 $$ Height = Y_{max} - Y_{min}, \quad Width = X_{max} - X_{min} $$
 על בסיס ערכים אלו, מחושב יחס הממדים ($AR$ - Aspect Ratio):
@@ -308,22 +323,7 @@ $$ AR = \frac{Height}{Width} $$
 \subsubsection*{מניעת התרעות שווא באמצעות מכונת מצבים (Temporal Debounce FSM)}
 שימוש ביחס הממדים בלבד אינו מספיק, שכן מצבים יומיומיים כגון התכופפות לקשירת שרוכים, ישיבה על שטיח או מעבר זמני מאחורי רהיט עלולים לייצר זיהוי רגע של $AR < 1.0$. כדי לפתור זאת, יושמה מכונת מצבים טמפורלית (Debounce FSM) בתוכנה:
 
-\begin{figure}[h]
-    \centering
-    % מקום לשרטוט מכונת המצבים בהמשך
-    \caption{דיאגרמת מצבים (FSM) לניהול זמני ההתרעה ומניעת התרעות שווא}
-    \label{fig:fsm_debounce}
-\end{figure}
-
-מכונת המצבים מורכבת משלושה מצבים עיקריים:
-\begin{itemize}
-    \item \textbf{Normal State (מצב יציב):} מצב ברירת המחדל שבו המשתמש מזוהה כעומד ($AR \ge 1.0$).
-    \item \textbf{Pre-Alert State (חשד לנפילה):} ברגע שמזוהה פריים בודד עם $AR < 1.0$, המערכת עוברת למצב זה ומפעילה מונה פנימי (Counter). המערכת נדרשת לראות זיהוי עקבי ורציף של נפילה לאורך מספר מוגדר של פריימים (למשל, 30 פריימים עוקבים, השקולים לכשנייה וחצי של וידאו בקצב של 20FPS). אם במהלך הספירה זוהה פריים תקין, המונה מתאפס והמערכת חוזרת למצב Normal.
-    \item \textbf{Alert State (התרעה פעילה):} במידה והמונה הגיע ליעדו ללא הפרעה, המערכת קובעת בוודאות כי התרחשה נפילה. היא נועלת את מצב ההתרעה, מדליקה נורת התרעה חומרתית (דרך ממשק ה-GPIO או אפיק I2C), ויכולה לשלוח פקודה לציור ריבוע אדום בולט סביב הדמות על גבי פלט הווידאו.
-\end{itemize}
-לוגיקה קלה זו דורשת משאבי עיבוד זניחים לחלוטין ($O(1)$) וניתן לממש אותה בקלות רבה בקוד C/C++ סיקונסיאלי על גבי ה-MicroBlaze, תוך הסתמכות על כך שמאיץ החומרה עושה את העבודה הכבדה של זיהוי האדם וחילוץ התיבה.ng Boxes, ולוגיקה גיאומטרית לזיהוי נפילה.
-
-% --- המחשה ויזואלית: שרטוט TikZ של מכונת המצבים בתוכנה (Debounce FSM) ---
+% --- איור 2: שרטוט TikZ של מכונת המצבים בתוכנה ---
 \begin{figure}[htbp]
 \centering
 \begin{english}
@@ -364,8 +364,178 @@ $$ AR = \frac{Height}{Width} $$
 \label{fig:fsm_debounce}
 \end{figure}
 
-\subsection{הצעת יישום משולב: ארכיטקטורת System-on-Chip}
-% תכנון השילוב העתידי ב-FPGA: פייפליין חומרה מול מעבד Soft-Core (MicroBlaze) המריץ C/C++.
+מכונת המצבים מורכבת משלושה מצבים עיקריים:
+\begin{itemize}
+    \item \textbf{Normal State (מצב יציב):} מצב ברירת המחדל שבו המשתמש מזוהה כעומד ($AR \ge 1.0$).
+    \item \textbf{Pre-Alert State (חשד לנפילה):} ברגע שמזוהה פריים בודד עם $AR < 1.0$, המערכת עוברת למצב זה ומפעילה מונה פנימי (Counter). המערכת נדרשת לראות זיהוי עקבי ורציף של נפילה לאורך מספר מוגדר של פריימים (למשל, 30 פריימים עוקבים, השקולים לכשנייה וחצי של וידאו בקצב של 20FPS). אם במהלך הספירה זוהה פריים תקין, המונה מתאפס והמערכת חוזרת למצב Normal.
+    \item \textbf{Alert State (התרעה פעילה):} במידה והמונה הגיע ליעדו ללא הפרעה, המערכת קובעת בוודאות כי התרחשה נפילה. היא נועלת את מצב ההתרעה, מדליקה נורת התרעה חומרתית (דרך ממשק ה-GPIO או אפיק I2C), ויכולה לשלוח פקודה לציור ריבוע אדום בולט סביב הדמות על גבי פלט הווידאו.
+\end{itemize}
+לוגיקה קלה זו דורשת משאבי עיבוד זניחים לחלוטין ($O(1)$) וניתן לממש אותה בקלות רבה בקוד C/C++ סיקונסיאלי על גבי ה-MicroBlaze, תוך הסתמכות על כך שמאיץ החומרה עושה את העבודה הכבדה של זיהוי האדם וחילוץ התיבה.
+
+\subsection{הצעת יישום ארכיטקטונית: מעבר מ-PoC למערכת SoC משולבת ב-FPGA}
+הצלחת הוכחת התכנות (PoC) על גבי מערכת הקצה, לצד חקירת ואימות פייפליין הווידאו החומרתי המקורי, הובילו להגדרת ארכיטקטורת יעד למערכת עצמאית בזמן אמת (System-on-Chip). מטרת היישום המוצע היא לאחד את קליטת הווידאו, סנכרון התזמונים, אינטגרציית בלוק עיבוד התמונה, ולוגיקת ההתרעה לתוך שבב Artix-7 יחיד, תוך עמידה באילוצי תזמון קשיחים של חומרה ומימוש פיזי (Physical Implementation).
+
+\subsubsection*{ארכיטקטורת אינטגרציה וניהול תדרים (Clock Domain \& FIFO Routing)}
+האתגר ההנדסי המרכזי במימוש הפיזי של מערכת ה-SoC הוא גישור אסינכרוני בין קצבי עבודה שונים (Clock Domain Crossing) ומניעת כשלים בתזמון (Setup \& Hold Violations):
+\begin{enumerate}
+    \item \textbf{ניהול וחלוקת תדרים (MMCM/PLL):} שעון המקור של הכרטיס ($100\text{ MHz}$) מחולק לתוצרי תדר מדויקים: תדר דגימה של $24\text{ MHz}$ עבור חיישן ה-OV7670, ותדר שידור של $25\text{ MHz}$ עבור תצוגת ה-VGA המקומית.
+    \item \textbf{חציית דומייני שעון (Asynchronous FIFO \& Double Buffering):} כדי לגשר בין תדר הכתיבה של המצלמה לתדר הקריאה של התצוגה ושל מודול עיבוד התמונה (המשולב במערכת כמודול RTL מקבילי), ממומש מערך חוצצים מבוסס BRAM ו-FIFO אסינכרוני. תכנון פיזי זה מבטיח שלמות נתונים מוחלטת ומונע לחלוטין את תופעת קריעת התמונה (Screen Tearing).
+    \item \textbf{אינטגרציית פרוטוקולים:} פייפליין החומרה מנהל ישירות את פרוטוקול התצורה SCCB (תואם I2C) מול חיישן התמונה, את ממשק קליטת הפיקסלים המקבילי, ואת תקשורת ה-AXI4-Lite מול המעבד הפנימי.
+\end{enumerate}
+
+\subsubsection*{שילוב מעבד Soft-Core (MicroBlaze) ומימוש האלגוריתם}
+בתוך השטח הפיזי של ה-FPGA יוטמע מעבד Soft-Core מסוג MicroBlaze, אשר ישמש כבקר ההחלטה הראשי של המערכת:
+\begin{itemize}
+    \item \textbf{ממשק נתונים יעיל:} המעבד לא יעסוק בעיבוד פיקסלים גולמי (פעולה המבוצעת בחומרה המקבילית ובמודול עיבוד התמונה הייעודי), אלא יקבל לידיו ישירות את נתוני התיבה התוחמת ($X_{min}, Y_{min}, X_{max}, Y_{max}$) דרך אפיק ה-AXI4.
+    \item \textbf{לוגיקת החלטה ו-Debounce FSM:} על גבי המעבד תורץ שגרת קוד C/C++ קלילה המיישמת את האלגוריתם הגיאומטרי שהוכח בשלב ה-PoC (חישוב יחס הממדים $AR = Height / Width$). המעבד ינהל את מכונת המצבים הטמפורלית, וידרוש רצף פריימים עקבי של מצב "נפילה" ($AR < 1.0$) בטרם קביעת החלטה.
+    \item \textbf{מחולל פסיקות ובקרת יציאות:} עם אימות מצב הנפילה, המעבד ייזום פסיקת חומרה (Interrupt) ויכתוב לרגיסטרי הפלט הפיזיים לצורך הפעלת התרעה קולית/חזותית וציור סימון ויזואלי על מסך התצוגה דרך בקר ה-VGA.
+\end{itemize}
+ארכיטקטורה זו מציגה תכנון הנדסי שלם ומוקפד, המשלב בין שליטה פיזית ברמת הסיליקון והתזמונים לבין גמישות אלגוריתמית במעבד משובץ.
+
+\subsubsection*{השוואה ארכיטקטונית של מנגנון הגישה לנתונים}
+כדי להמחיש את ההבדל הפיזיקל דיזיין והחומרה בין מימוש ה-PoC על גבי ה-Raspberry Pi לבין הארכיטקטורה המוצעת בתוך שבב ה-FPGA, איור \ref{fig:memory_map_comparison} מציג השוואה בין המנגנונים הפיזיים של העברת הקואורדינטות למכונת המצבים (FSM).
+
+% --- איור 4: השוואה ארכיטקטונית ומרחב זיכרון TikZ ---
+\begin{figure}[htbp]
+\centering
+\begin{english}
+\resizebox{0.95\linewidth}{!}{%
+\begin{tikzpicture}[
+    node distance=2.5cm, auto, thick,
+    block/.style={rectangle, draw=black!80, fill=gray!10, rounded corners, minimum width=3cm, minimum height=1.2cm, align=center, font=\scriptsize},
+    cpu_block/.style={rectangle, draw=blue!80!black, fill=blue!10, rounded corners, minimum width=3cm, minimum height=1.2cm, align=center, font=\scriptsize\bfseries},
+    mem_block/.style={rectangle, draw=red!80!black, fill=red!10, minimum width=3.2cm, minimum height=2.5cm, align=center, font=\scriptsize},
+    bus_line/.style={draw, double, -latex', thick, blue!80!black},
+    phys_line/.style={draw, -latex', thick, green!60!black},
+    os_line/.style={draw, -latex', dashed, thick, red!80!black}
+]
+
+    % ================= LEFT SIDE: RASPBERRY PI (SOFTWARE APPROACH) =================
+    \node[font=\footnotesize\bfseries] (pi_title) at (0, 2) {Raspberry Pi PoC (Software OS GP-Bus)};
+    
+    \node[block, below of=pi_title, node distance=1.2cm] (pi_cam) {Camera Sensor\\(Picamera2 / DMA)};
+    \node[block, below of=pi_cam, fill=yellow!10, draw=yellow!80!black] (pi_ai) {MobileNet-SSD\\Running on CPU / OS};
+    \node[cpu_block, below of=pi_ai] (pi_fsm) {Python FSM\\User Space App};
+    
+    % Memory Map of Pi
+    \node[mem_block, below of=pi_fsm, node distance=2.5cm] (pi_mem) {Virtual Memory Map\\(OS Managed)\\
+    \hrule \vspace{0.1cm}
+    \texttt{0x7FFF...} (Kernel)\\
+    \texttt{0x4000...} (Shared RAM)\\
+    \texttt{0x0000...} (App Space)
+    };
+    
+    % Connections Left
+    \path[phys_line] (pi_cam) -- node[right, font=\tiny] {Zero-Copy DMA} (pi_ai);
+    \path[os_line] (pi_ai) -- node[right, font=\tiny] {OS Context Switch} (pi_fsm);
+    \path[os_line] (pi_fsm) -- node[right, font=\tiny] {Indirect Virtual Access} (pi_mem);
+
+
+    % ================= RIGHT SIDE: FPGA SoC (PROPOSED HARDWARE APPROACH) =================
+    \node[font=\footnotesize\bfseries] (fpga_title) at (8, 2) {Proposed Artix-7 SoC (Hardware Memory-Mapped)};
+    
+    \node[block, below of=fpga_title, node distance=1.2cm] (fpga_rtl) {Custom RTL Module\\(BBox Registers)};
+    \node[cpu_block, below of=fpga_rtl, node distance=2.2cm] (fpga_ub) {MicroBlaze\\Soft-Core CPU};
+    
+    % Memory Map of FPGA
+    \node[mem_block, below of=fpga_ub, node distance=2.7cm, draw=green!80!black, fill=green!5] (fpga_mem) {Physical Memory Map\\(Direct HW Address)\\
+    \hrule \vspace{0.15cm}
+    \texttt{0x44000008} (slv\_reg2 - Alarm)\\
+    \texttt{0x44000004} (slv\_reg1 - Ymax/Xmax)\\
+    \texttt{0x44000000} (slv\_reg0 - Ymin/Xmin)
+    };
+    
+    % Connections Right
+    \path[bus_line] (fpga_ub) -- node[left, font=\tiny\bfseries] {AXI4-Lite Bus} (fpga_rtl);
+    \path[phys_line] (fpga_rtl) |- node[near start, right, font=\tiny] {Direct Physical Mapping} (fpga_mem.140);
+    \path[phys_line] (fpga_ub) -- node[right, font=\tiny] {Direct Register Read/Write} (fpga_mem);
+
+
+    % --- Divider Line ---
+    \draw[dashed, gray!50] (4, 2.5) -- (4, -6.2);
+
+\end{tikzpicture}%
+}
+\end{english}
+\caption{השוואה ארכיטקטונית בין הגישה הווירטואלית ב-Raspberry Pi לבין הגישה הפיזית ב-SoC המוצע ב-FPGA}
+\label{fig:memory_map_comparison}
+\end{figure}
+
+\subsection{תכנון חומרה ומימוש פיזי (Physical Implementation \& Timing Analysis)}
+מימליזציה של מערכת זמן-אמת על גבי שבב ה-FPGA דורשת מעבר מתכנון לוגי מופשט (RTL) למימוש פיזי (Physical Design) מוקפד. באחריות תכנון זה נכללים חיווט קווי השעון, ניהול מנגנוני סינכרון לחציית דומיינים (Clock Domain Crossing), ובקרת זמנים קריטית להבטחת יציבות האותות בלוגיקה המקבילית.
+
+\subsubsection*{מכונת המצבים החומרתית לבקרת קליטה וכתיבה (Capture FSM)}
+כדי לנהל את המרת אפיק הנתונים מ-8 סיביות ל-12 סיביות בפורמט RGB444 וכתיבתם לזיכרון ה-BRAM ללא אובדן מידע, ממומשת בחומרה מכונת מצבים סדרתית סינכרונית (FSM). מנגנון זה מופעל ישירות על ידי תדר הדגימה של המצלמה ($PCLK \approx 24\text{ MHz}$).
+
+% --- איור 3: שרטוט TikZ של מכונת המצבים בחומרה ---
+\begin{figure}[htbp]
+\centering
+\begin{english}
+\resizebox{0.9\linewidth}{!}{%
+\begin{tikzpicture}[
+    ->, >=stealth', shorten >=1pt, auto, node distance=3.5cm, thick,
+    state/.style={circle, draw=blue!80!black, fill=blue!5, thick, minimum size=2.2cm, text width=2cm, align=center, font=\scriptsize\bfseries},
+    edge_label/.style={font=\tiny, text=black, fill=white, inner sep=1pt}
+]
+
+    % --- States ---
+    \node[state] (idle) {IDLE\\(Wait VSYNC)};
+    \node[state, right of=idle] (wait_href) {WAIT\_HREF\\(Line Active)};
+    \node[state, below of=wait_href] (byte1) {SAMPLE\_HIGH\\(RGB[11:4])};
+    \node[state, left of=byte1] (byte2) {SAMPLE\_LOW\\(RGB[3:0])};
+    \node[state, below of=idle] (write) {WRITE\_RAM\\(Assert WE)};
+
+    % --- Transitions ---
+    \path[every node/.style={edge_label}]
+        (idle) edge [loop above] node {VSYNC='1'} (idle)
+        (idle) edge node [above] {VSYNC='0'} (wait_href)
+        
+        (wait_href) edge [loop above] node {HREF='0'} (wait_href)
+        (wait_href) edge node [right] {HREF='1' \& PCLK$\uparrow$} (byte1)
+        
+        (byte1) edge node [above] {PCLK$\uparrow$} (byte2)
+        
+        (byte2) edge node [left] {PCLK$\uparrow$} (write)
+        
+        (write) edge [bend left=20] node [right] {HREF='1'} (byte1)
+        (write) edge [bend left=40] node [left] {HREF='0' (Line End)} (wait_href)
+        (write) edge [bend left=60] node [left] {VSYNC='1' (Frame End)} (idle);
+
+    % --- Background Annotation ---
+    \begin{scope}[on background layer]
+        \node [draw=gray!30, fill=gray!2, rounded corners, fit=(idle) (wait_href) (byte1) (byte2) (write), label={[font=\scriptsize\bfseries, color=gray!60!black]above:OV7670 Capture Controller FSM (24MHz Clock Domain)}] {};
+    \end{scope}
+
+\end{tikzpicture}%
+}
+\end{english}
+\caption{דיאגרמת מצבים (FSM) חומרתית לניהול דגימת הפיקסלים וכתיבתם לזיכרון}
+\label{fig:hw_capture_fsm}
+\end{figure}
+
+כמתואר באיור \ref{fig:hw_capture_fsm}, מכונת המצבים מורכבת משישה מעברים לוגיים קריטיים המבטיחים שכל פיקסל נדגם בדיוק בזמן התקף של אות ה-`HREF`, ומייצרים פולס כתיבה (`WE`) מבוקר רק לאחר הרכבת 12 הסיביות המלאות.
+
+\subsubsection*{חציית דומייני שעון (CDC) ומניעת מטא-סטביליות}
+העברת נתונים בין תדר הקליטה מהמצלמה ($24\text{ MHz}$) לתדר הקריאה של המסך ($25\text{ MHz}$) או תדר המעבד ($100\text{ MHz}$) יוצרת אתגר קריטי של חציית דומייני שעון (Clock Domain Crossing). דגימת אות אסינכרוני עלולה להפר את זמני ההכנה וההחזקה של הדלגלגים, ולהוביל למצב לא מוגדר (Metastability).
+
+כדי לפתור זאת במימוש הפיזי, יושמו שני מנגנונים חומרתיים:
+\begin{enumerate}
+    \item \textbf{סינכרונייזרים דו-דרגתיים (Two-Flop Synchronizer):} עבור אותות בקרה ופסיקות אסינכרוניות (כגון אותות ה-`VSYNC` וה-`HSYNC`), האות מועבר דרך זוג דלגלגים (D-FF) המחוברים בטור ומוזנים משעון היעד. מנגנון זה מעניק זמן דעיכה (Resolution Time) אופטימלי ומפחית את ההסתברות לכשל מטא-סטבילי לאפס באופן מעשי.
+    \item \textbf{זיכרון FIFO אסינכרוני (Dual-Clock FIFO):} עבור אפיקי נתונים רחבים (כגון אפיק ה-RGB בן 12 הסיביות), נעשה שימוש בבלוק זיכרון המנוהל על ידי מוני קוד גדיי (Gray Code Counters). שימוש בקוד זה מבטיח כי בכל מחזור שעון משתנה אך ורק סיבית אחת בכתובת הזיכרון, דבר המונע קריאת ערכי ביניים שגויים בזמן קפיצת תדרים.
+\end{enumerate}
+
+\subsubsection*{סגירת זמנים וניתוח Setup \& Hold (Timing Closure)}
+כחלק מתהליך הפיזיקל דיזיין ואימות החומרה בסביבת Xilinx Vivado, הוגדרו אילוצי תזמון קשיחים בקובץ ה-XDC (Xilinx Design Constraints). האילוצים מגדירים את תדרי השעון הראשיים ואת יחסי הפאזה ביניהם מול מודול ה-MMCM.
+
+בניתוח המסלול הקריטי (Critical Path Analysis) של הלוגיקה, נבחנה עמידה בשני תנאים יסודיים עבור כל דלגלג במערכת:
+\begin{itemize}
+    \item \textbf{זמן הכנה (Setup Time - $T_{setup}$):} הזמן המינימלי שבו נתון הפיקסל במבוא הדלגלג חייב להיות יציב \textit{לפני} עליית השעון הפעיל:
+    $$ T_{cycle} \ge T_{co} + T_{comb} + T_{setup} - T_{skew} $$
+    \item \textbf{זמן החזקה (Hold Time - $T_{hold}$):} הזמן המינימלי שבו הנתון חייב להישאר יציב \textit{אחרי} עליית השעון, כדי למנוע דריסה על ידי הנתון הבא:
+    $$ T_{co} + T_{comb} \ge T_{hold} + T_{skew} $$
+\end{itemize}
+באמצעות חלוקה נכונה של הלוגיקה המשולבת (Combinational Logic) והוספת דרגות פייפליין (Pipelining Registers) בצמתים העמוסים, הבטחנו כי מרווח הזמנים השלילי המקסימלי (WNS - Worst Negative Slack) ומרווח ההחזקה (WHS) יישמרו חיובים לאורך כל מסלולי המערכת, דבר המבטיח צריבה עובדת ויציבה על כרטיס ה-Nexys A7.
+
 
 \newpage
 % ==========================================
