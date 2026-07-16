@@ -168,6 +168,7 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 
 מערכת זיהוי נפילות אידיאלית דורשת את יתרונות שתי הגישות: מהירות ואמינות ה-FPGA לשלב קליטת הווידאו, לצד הגמישות המחשבתית של מודלי ה-AI. תובנה זו מהווה את הבסיס לארכיטקטורת המערכת המוצעת בפרויקט זה, המשלבת את שני העולמות.
 \newpage
+
 % ==========================================
 % CHAPTER 3: DEVELOPMENT & METHODS
 % ==========================================
@@ -176,14 +177,16 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 \subsection{ארכיטקטורת המערכת וה-Pipeline}
 הארכיטקטורה החומרתית של פרויקט זה תוכננה בגישת Top-Down מודולרית, מתוך מטרה להפריד בין שלבי רכישת הנתונים (Data Acquisition), אחסונם הזמני, ושידורם לתצוגה. הפרדה זו מאפשרת טיפול עצמאי בתדרי עבודה שונים (Clock Domains) ומונעת צווארי בקבוק בתעבורת הווידאו.
 
-\begin{figure}[h]
+% --- דיאגרמת בלוקים מותאמת מדויק לרוחב העמוד ---
+\begin{figure}[htbp]
 \centering
 \begin{english}
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
     auto,
-    block/.style={rectangle, draw=blue!80!black, thick, fill=blue!5, text width=2.8cm, align=center, rounded corners, minimum height=1.4cm, font=\footnotesize\bfseries},
-    hw_block/.style={rectangle, draw=green!60!black, thick, fill=green!5, text width=2.2cm, align=center, minimum height=1.4cm, font=\footnotesize},
-    mem_block/.style={rectangle, draw=red!80!black, thick, fill=red!5, text width=2.5cm, align=center, rounded corners, minimum height=2.5cm, font=\footnotesize\bfseries},
+    block/.style={rectangle, draw=blue!80!black, thick, fill=blue!5, text width=2.6cm, align=center, rounded corners, minimum height=1.4cm, font=\footnotesize\bfseries},
+    hw_block/.style={rectangle, draw=green!60!black, thick, fill=green!5, text width=2.2cm, align=center, minimum height=1.4cm, font=\footnotesize\bfseries},
+    mem_block/.style={rectangle, draw=red!80!black, thick, fill=red!5, text width=2.4cm, align=center, rounded corners, minimum height=2.4cm, font=\footnotesize\bfseries},
     line/.style={draw, thick, -latex', shorten >=2pt},
     bus/.style={draw, thick, -latex', double, shorten >=2pt},
     clk_line/.style={draw, dashed, -latex', color=gray!80!black}
@@ -191,18 +194,18 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 
     % --- Nodes (Blocks) ---
     \node [hw_block] (cam) {OV7670\\Camera Sensor};
-    \node [block, right=1.5cm of cam] (capture) {Camera Capture\\Controller};
-    \node [mem_block, right=1.5cm of capture] (bram) {Dual-Port\\BRAM\\(Frame Buffer)};
-    \node [block, right=1.5cm of bram] (vga) {VGA Display\\Controller};
-    \node [hw_block, right=1.5cm of vga] (monitor) {VGA Monitor\\(640x480 @ 60Hz)};
+    \node [block, right=0.9cm of cam] (capture) {Camera Capture\\Controller};
+    \node [mem_block, right=0.9cm of capture] (bram) {Dual-Port\\BRAM\\(Frame Buffer)};
+    \node [block, right=0.9cm of bram] (vga) {VGA Display\\Controller};
+    \node [hw_block, right=0.9cm of vga] (monitor) {VGA Monitor\\(640x480 @ 60Hz)};
     
-    \node [block, below=1.2cm of capture, fill=yellow!10, draw=yellow!80!black] (sccb) {SCCB / I2C\\Configuration};
-    \node [block, below=1.2cm of bram, fill=purple!10, draw=purple!80!black] (pll) {MMCM / PLL\\Clock Generator};
+    \node [block, below=1.1cm of capture, fill=yellow!10, draw=yellow!80!black] (sccb) {SCCB / I2C\\Configuration};
+    \node [block, below=1.1cm of bram, fill=purple!10, draw=purple!80!black] (pll) {MMCM / PLL\\Clock Generator};
 
     % --- Connections (Buses and Lines) ---
     % Camera to Capture
     \path [bus] (cam) -- node[above, font=\scriptsize] {D[7:0]} (capture);
-    \path [line] (cam.south east) -- node[below, font=\tiny] {PCLK, HREF, VSYNC} (capture.south west);
+    \path [line] (cam.south east) -- node[below=0.1cm, font=\tiny] {PCLK, HREF, VSYNC} (capture.south west);
     
     % Capture to BRAM
     \path [bus] (capture.east) |- node[above, font=\scriptsize, near start] {RGB[11:0]} (bram.160);
@@ -214,13 +217,13 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 
     % VGA to Monitor
     \path [bus] (vga) -- node[above, font=\scriptsize] {RGB (DAC)} (monitor);
-    \path [line] (vga.south east) -- node[below, font=\tiny] {HSYNC, VSYNC} (monitor.south west);
+    \path [line] (vga.south east) -- node[below=0.1cm, font=\tiny] {HSYNC, VSYNC} (monitor.south west);
 
     % SCCB to Camera
     \path [line] (sccb.west) -| node[left, font=\scriptsize] {SIOC, SIOD} (cam.south);
 
     % Clocks
-    \node [left=0.8cm of pll, font=\scriptsize\bfseries] (sysclk) {100MHz Clk};
+    \node [left=0.6cm of pll, font=\scriptsize\bfseries] (sysclk) {100MHz Clk};
     \path [line] (sysclk) -- (pll);
     \path [clk_line] (pll.west) -| node[near start, below, font=\tiny] {24MHz} (cam.south east);
     \path [clk_line] (pll.north) -- node[right, font=\tiny] {Write Clk (24MHz)} (bram.south);
@@ -232,7 +235,8 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
         \node [draw=green!30, fill=green!2, rounded corners, fit=(vga) (monitor), label={[font=\scriptsize\bfseries, color=green!60!black]above:25MHz Read Domain}] {};
     \end{scope}
 
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \end{english}
 \caption{דיאגרמת מלבנים של ארכיטקטורת פייפליין הוידאו ב-FPGA (חלוקה לדומייני שעון)}
 \label{fig:system_arch}
@@ -249,14 +253,116 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 מבנה ארכיטקטוני זה יוצר "פייפליין" חומרתי רציף ויציב, המהווה את התשתית שעליה תורחב המערכת העתידית לכדי System-on-Chip (SoC) בשילוב מעבד Soft-Core לאנליזת הנתונים.
 
 \subsection{ניתוח והנדסה לאחור של מערכת הבסיס (Reverse Engineering)}
-% ניתוח החיבורים, מכונת המצבים של הקליטה מהמצלמה, ומבנה בקר ה-VGA המקורי.
+כשלב מקדים לפיתוח המערכת המשובצת ולמערך הסימולציות, בוצע תהליך הנדסה לאחור (Reverse Engineering) למערכת חומרה בסיסית קיימת שפותחה על גבי כרטיס Nexys A7-100T. מטרת הניתוח הייתה למפות את מסלולי הנתונים (Data Path), להבין את הלוגיקה המקורית של בקרי ה-RTL, ולאתר צווארי בקבוק ארכיטקטוניים.
+
+\subsubsection*{מיפוי ממשק הקלט ובקר ה-OV7670}
+בקר הקליטה המקורי (`ov7670_capture`) תוכנן כמכונת מצבים פשוטה המסתנכרנת לאות השורה הפעילה (`HREF`) ולאות ה-VSYNC. מכיוון שפיקסל בפורמט RGB444 דורש 12 סיביות ואילו אפיק המצלמה הוא בן 8 סיביות בלבד, הבקר מבצע דגימה בשני מחזורי שעון עוקבים של `PCLK` עבור כל פיקסל:
+\begin{enumerate}
+    \item \textbf{מחזור ראשון (High Byte):} דגימת 4 הסיביות של ערוץ האדום (Red) ו-4 הסיביות של ערוץ הירוק (Green).
+    \item \textbf{מחזור שני (Low Byte):} דגימת 4 הסיביות של ערוץ הכחול (Blue) ושמירת נתון ריק/התעלמות מ-4 הסיביות הנותרות.
+\end{enumerate}
+עם השלמת קליטת הבית השני, הבקר מציב את 12 הסיביות המשולבות על אפיק הפלט, מרים את אות הכתיבה לזיכרון (`we`), ומקדם את מונה כתובת הזיכרון (`waddr`).
+
+\subsubsection*{מיפוי זיכרון ה-BRAM וממשק התצוגה}
+לצורך אחסון הפריים, המערכת המקורית השתמשה בבלוק זיכרון פנימי מסוג Dual-Port BRAM. בקר ה-VGA המקורי (`vga`) פעל בתדר של $25MHz$ וניהל שני מונים ייעודיים: מונה אופקי מ-0 עד 799 ומונה אנכי מ-0 עד 521. על בסיס מונים אלו, הבקר חישב את כתובת הקריאה (`raddr`), משך את פיקסל ה-RGB מהזיכרון, והוציא אותו למסך במקביל לייצור אותות ה-`HSYNC` וה-`VSYNC`.
+
+\subsubsection*{איתור כשלים הנדסיים ומגבלות ארכיטקטוניות}
+במהלך הנדסה לאחור ובחינת המערכת, זוהו שלושה כשלים הנדסיים קריטיים במערכת הבסיס, שהיוו את המוטיבציה לשדרוג הארכיטקטוני בפרויקט זה:
+\begin{itemize}
+    \item \textbf{חוסר סנכרון הרמטי בחציית דומייני שעון (CDC):} כתיבת הפיקסלים לזיכרון מנוהלת על ידי שעון המצלמה ($PCLK \approx 24MHz$), בעוד שקריאת הפיקסלים מנוהלת על ידי שעון המסך ($VGA\_CLK = 25MHz$). מכיוון שהתדרים אינם זהים ואין מנגנון Double Buffering (אחסון שני פריימים בנפרד והחלפה ביניהם ב-VSYNC), בקר ה-VGA קורא נתונים מאותו אזור זיכרון שא אליו המצלמה כותבת באותו רגע. תופעה זו גורמת ל"קריעת תמונה" (Screen Tearing) חמורה ולעיוות פריימים בזמן תנועה מהירה.
+    \item \textbf{רגישות לסביבה והיעדר אינטליגנציה:} בקר החומרה המקורי העביר נתונים גולמיים ללא כל שלב של עיבוד תמונה מקדים, סינון רעשים טמפורלי (Temporal Filtering), או הבנה סמנטית של המרחב (זיהוי אדם לעומת עצם דומם). ללא יכולת זו, מערכת החומרה אינה מסוגלת להתריע על נפילות בצורה אמינה.
+    \item \textbf{ניצול לא יעיל של משאבי סיליקון:} מימוש לוגיקת זיהוי מתקדמת ישירות בלוגיקה קשיחה (RTL) על גבי ה-FPGA היה מוביל לכליון מהיר של בלוקי ה-DSP וה-BRAM, ומקשה מאוד על ביצוע עדכונים ואימותים מורכבים.
+\end{itemize}
+מסקנות אלו מתהליך ההנדסה לאחור הובילו לתפיסת התכנון החדשה: אימות ושדרוג פייפליין הווידאו החומרתי, לצד העברת כובד המשקל של עיבוד התמונה (Edge AI) לתוכנה רציפה וגמישה.
 
 \subsection{תכנון חומרה: ניהול זיכרון וסנכרון תזמונים}
 % התמודדות עם Clock Domains שונים (24MHz מול 25MHz), אסטרטגיית Double Buffering.
 
 \subsection{הוכחת התכנות (PoC): מימוש Edge AI על Raspberry Pi}
 % מעבר מזיהוי פיקסלים פשוט לזיהוי אדם מבוסס AI. 
-% שימוש ב-Picamera2, חילוץ Bounding Boxes, ולוגיקה גיאומטרית לזיהוי נפילה.
+% שימוש ב-Picamera2, חילוץ Boundi\subsection{הוכחת התכנות (PoC): מימוש Edge AI על Raspberry Pi}
+כדי לבסס את היתכנות האלגוריתם ולייצר מודל ייחוס תוכנתי (Software Golden Model) להשוואה מול פתרון החומרה, פותחה מערכת הוכחת התכנות (PoC) על גבי מיקרו-מחשב מסוג Raspberry Pi 3. שיטה זו אפשרה לבחון את יציבות זיהוי האדם, לנתח את הדינמיקה של נפילה בזמן אמת, ולפתח לוגיקה דטרמיניסטית שניתן יהיה לתרגם בעתיד לקוד C קליל עבור מעבד ה-MicroBlaze.
+
+\subsubsection*{ארכיטקטורת מערכת התוכנה ורכישת הווידאו}
+תשתית התוכנה נכתבה בשפת Python תוך שימוש בספריית הגישה הישירה למצלמה `Picamera2`, המאפשרת דגימת פריימים ישירות לתוך חוצצי זיכרון משותפים (Zero-Copy DMA) ללא תקורה מיותרת של מערכת ההפעלה. 
+
+תהליך עיבוד התמונה מבוסס על שלבים סדרתיים הבאים:
+\begin{enumerate}
+    \item \textbf{קליטת פריים מותאם (Pre-processed Input):} המצלמה דוגמת תמונה, ובאמצעות חומרה ייעודית מובנית ב-Raspberry Pi מבוצע שינוי קנה מידה (Spatial Downsampling) לרזולוציה אופטימלית של $300 \times 300$ פיקסלים בגווני אפור (Grayscale) או RGB, דבר המקטין את רוחב הפס הנדרש ביותר מ-70\% ומאיץ את קצב ההסקה.
+    \item \textbf{הרצת מודל ההסקה (Inference):} שימוש בספריית OpenCV ובמודול ה-DNN (Deep Neural Networks) להפעלת רשת קונבולוציה קלה מסוג MobileNet-SSD. הרשת סורקת את הפריים ומחלצת רשימת אובייקטים המזוהים ברמת ודאות הניתנת להגדרה (Confidence Threshold).
+    \item \textbf{סינון ומיון (Object Filtering):} המערכת מתעלמת מכלל מחלקות הזיהוי (Classes) ומחפשת אך ורק אובייקטים השייכים למחלקת "אדם" (Class ID 15). עבור כל אדם שזוהה, נשלפות הקואורדינטות הנורמליזמיות של התיבה התוחמת (Bounding Box):
+    $$ \{X_{min}, Y_{min}, X_{max}, Y_{max}\} $$
+\end{enumerate}
+
+\subsection{לוגיקת זיהוי נפילות ומכונת מצבים זמנית (Temporal FSM)}
+במקום שימוש ברשתות נוירונים כבדות ומורכבות לניתוח וידאו רציף (המצריכות כוח חישוב עצום), המערכת מיישמת לוגיקה גיאומטרית דטרמיניסטית קלה המבוססת על יחס הממדים (Aspect Ratio) של התיבה התוחמת, בשילוב מכונת מצבים המונעת התרעות שווא.
+
+\subsubsection*{הלוגיקה הגיאומטרית}
+עבור התיבה התוחמת שחולצה, המערכת מחשבת את גובה התיבה ($Height$) ורוחבה ($Width$):
+$$ Height = Y_{max} - Y_{min}, \quad Width = X_{max} - X_{min} $$
+על בסיס ערכים אלו, מחושב יחס הממדים ($AR$ - Aspect Ratio):
+$$ AR = \frac{Height}{Width} $$
+
+כאשר אדם נמצא במצב עמידה או הליכה רגילה, הגובה של התיבה התוחמת גדול משמעותית מרוחבה, ולכן יחס הממדים יהיה גדול מ-1 (לרוב $AR \ge 1.5$). לעומת זאת, בעת נפילה והשתטחות על הרצפה, רוחב התיבה גדל באופן דרסטי ביחס לגובהה, ויחס הממדים צונח אל מתחת ל-1 ($AR < 1.0$).
+
+\subsubsection*{מניעת התרעות שווא באמצעות מכונת מצבים (Temporal Debounce FSM)}
+שימוש ביחס הממדים בלבד אינו מספיק, שכן מצבים יומיומיים כגון התכופפות לקשירת שרוכים, ישיבה על שטיח או מעבר זמני מאחורי רהיט עלולים לייצר זיהוי רגע של $AR < 1.0$. כדי לפתור זאת, יושמה מכונת מצבים טמפורלית (Debounce FSM) בתוכנה:
+
+\begin{figure}[h]
+    \centering
+    % מקום לשרטוט מכונת המצבים בהמשך
+    \caption{דיאגרמת מצבים (FSM) לניהול זמני ההתרעה ומניעת התרעות שווא}
+    \label{fig:fsm_debounce}
+\end{figure}
+
+מכונת המצבים מורכבת משלושה מצבים עיקריים:
+\begin{itemize}
+    \item \textbf{Normal State (מצב יציב):} מצב ברירת המחדל שבו המשתמש מזוהה כעומד ($AR \ge 1.0$).
+    \item \textbf{Pre-Alert State (חשד לנפילה):} ברגע שמזוהה פריים בודד עם $AR < 1.0$, המערכת עוברת למצב זה ומפעילה מונה פנימי (Counter). המערכת נדרשת לראות זיהוי עקבי ורציף של נפילה לאורך מספר מוגדר של פריימים (למשל, 30 פריימים עוקבים, השקולים לכשנייה וחצי של וידאו בקצב של 20FPS). אם במהלך הספירה זוהה פריים תקין, המונה מתאפס והמערכת חוזרת למצב Normal.
+    \item \textbf{Alert State (התרעה פעילה):} במידה והמונה הגיע ליעדו ללא הפרעה, המערכת קובעת בוודאות כי התרחשה נפילה. היא נועלת את מצב ההתרעה, מדליקה נורת התרעה חומרתית (דרך ממשק ה-GPIO או אפיק I2C), ויכולה לשלוח פקודה לציור ריבוע אדום בולט סביב הדמות על גבי פלט הווידאו.
+\end{itemize}
+לוגיקה קלה זו דורשת משאבי עיבוד זניחים לחלוטין ($O(1)$) וניתן לממש אותה בקלות רבה בקוד C/C++ סיקונסיאלי על גבי ה-MicroBlaze, תוך הסתמכות על כך שמאיץ החומרה עושה את העבודה הכבדה של זיהוי האדם וחילוץ התיבה.ng Boxes, ולוגיקה גיאומטרית לזיהוי נפילה.
+
+% --- המחשה ויזואלית: שרטוט TikZ של מכונת המצבים בתוכנה (Debounce FSM) ---
+\begin{figure}[htbp]
+\centering
+\begin{english}
+\resizebox{0.95\linewidth}{!}{%
+\begin{tikzpicture}[
+    ->, >=stealth', shorten >=1pt, auto, node distance=4.5cm, thick,
+    state/.style={rectangle, rounded corners, draw=blue!80!black, fill=blue!5, thick, minimum height=1.6cm, minimum width=2.6cm, text width=2.4cm, align=center, font=\scriptsize\bfseries},
+    alert_state/.style={rectangle, rounded corners, draw=red!80!black, fill=red!10, thick, minimum height=1.6cm, minimum width=2.6cm, text width=2.4cm, align=center, font=\scriptsize\bfseries},
+    edge_label/.style={font=\tiny\bfseries, text=black, fill=white, inner sep=1.5pt}
+]
+
+    % --- States ---
+    \node[state] (normal) {NORMAL\\STATE\\(Standing: AR $\ge$ 1.0)};
+    \node[state, right of=normal, fill=yellow!10, draw=yellow!80!black] (pre) {PRE-ALERT\\(Suspected Fall)\\Counter++};
+    \node[alert_state, right of=pre] (alert) {ALERT\\STATE\\(Confirmed Fall)\\Trigger I2C/UI};
+
+    % --- Transitions ---
+    \path[every node/.style={edge_label}]
+        (normal) edge [loop above] node {AR $\ge$ 1.0\\(Normal Frame)} (normal)
+        (normal) edge [bend left=20] node [above] {AR $<$ 1.0\\(Start Counter)} (pre)
+        
+        (pre) edge [loop above] node {AR $<$ 1.0 \&\\Count $<$ 30} (pre)
+        (pre) edge [bend left=20] node [below] {AR $\ge$ 1.0\\(False Alarm / Reset)} (normal)
+        (pre) edge [bend left=20] node [above] {Count $\ge$ 30\\($\sim$1.5 Sec Continuous)} (alert)
+        
+        (alert) edge [loop above] node {Latched Alarm} (alert)
+        (alert) edge [bend left=30] node [below] {Manual Reset / Recovery} (normal);
+
+    % --- Background Box ---
+    \begin{scope}[on background layer]
+        \node [draw=blue!30, fill=blue!2, rounded corners, fit=(normal) (pre) (alert), label={[font=\scriptsize\bfseries, color=blue!60!black]above:Software Temporal Debounce FSM (Python / MicroBlaze C Engine)}] {};
+    \end{scope}
+
+\end{tikzpicture}%
+}
+\end{english}
+\caption{דיאגרמת מצבים (FSM) תוכנתית לסינון רעשים טמפורלי ואימות נפילה בוודאות גבוהה}
+\label{fig:fsm_debounce}
+\end{figure}
 
 \subsection{הצעת יישום משולב: ארכיטקטורת System-on-Chip}
 % תכנון השילוב העתידי ב-FPGA: פייפליין חומרה מול מעבד Soft-Core (MicroBlaze) המריץ C/C++.
