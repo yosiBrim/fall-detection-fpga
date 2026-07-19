@@ -207,7 +207,7 @@ BEGIN
             start => sw(0),
             VGA_HS_O => VGA_HS_O,
             VGA_VS_O => VGA_VS_O,
-            VGA_R => VFA_R,
+            VGA_R => VGA_R,
             VGA_G => VGA_G,
             VGA_B => VGA_B,
             --frame_finished_in => frame_finished_in,
@@ -215,4 +215,4 @@ BEGIN
             doutb => doutb
         );
 
-END ARCHITECTURE;D
+END ARCHITECTURE;

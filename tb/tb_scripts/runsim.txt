@@ -1,23 +1,42 @@
+# =========================================================================
+# Professional RTL Verification Waveform Script - VGA Subsystem
+# =========================================================================
 
-# הגדרת ספריות עבודה
-vlib work
-vmap work work
+# ניקוי והכנת סביבת הגלים
+view wave
+delete wave *
 
-# קומפילציה של הקבצים
-vcom common_pkg.vhd
-vcom debounce.vhd
-vcom debounce_rst.vhd
-vcom i2c_master.vhd
-vcom sccb_master.vhd
-vcom vga_controller_2.vhd
-vcom ov7670_fsm.vhd
+# 1. System & Control
+add wave -noupdate -divider -height 22 "1. System & Control"
+add wave -noupdate -color "Yellow" /vga_controller_tb/clk
+add wave -noupdate -color "Red"    /vga_controller_tb/rst
+add wave -noupdate -color "Green"  /vga_controller_tb/vga_start
 
-vcom ov7670_configuration.vhd
-vcom ov7670_capture_2.vhd
-vcom top_2.vhd
-vcom vga_controller_tb.vhd
-# סימולציה
-vsim -voptargs=+acc=lprn vga_controller_tb
+# 2. VGA Internal Coordinates (DECIMAL FORMAT FOR PROOF OF TIMING)
+add wave -noupdate -divider -height 22 "2. Pixel Coordinates (0..799 x 0..524)"
+add wave -noupdate -radix decimal -color "Cyan" /vga_controller_tb/DUT/display_x
+add wave -noupdate -radix decimal -color "Cyan" /vga_controller_tb/DUT/display_y
 
-# הפעלת סימולציה (לדוגמה 1000 ננו-שניות)
-#run 1000ns
+# 3. Active Area & Milestones
+add wave -noupdate -divider -height 22 "3. Blanking & Display Area Control"
+add wave -noupdate -color "White" /vga_controller_tb/DUT/in_display_area
+add wave -noupdate -color "Gold"  /vga_controller_tb/DUT/line_finished
+
+# 4. BRAM Memory Interface (Chip to Screen Link)
+add wave -noupdate -divider -height 22 "4. BRAM Read Interface"
+add wave -noupdate -radix unsigned -color "Orange" /vga_controller_tb/addrb
+add wave -noupdate -radix hex      -color "Orange" /vga_controller_tb/doutb
+
+# 5. Physical VGA Output Pins
+add wave -noupdate -divider -height 22 "5. Physical VGA Pins (Screen Out)"
+add wave -noupdate -color "White"  /vga_controller_tb/DUT/VGA_HS_O
+add wave -noupdate -color "White"  /vga_controller_tb/DUT/VGA_VS_O
+add wave -noupdate -radix hex -color "Magenta" /vga_controller_tb/DUT/VGA_R
+add wave -noupdate -radix hex -color "Magenta" /vga_controller_tb/DUT/VGA_G
+add wave -noupdate -radix hex -color "Magenta" /vga_controller_tb/DUT/VGA_B
+
+# הרצה לזמן של 2.5 שורות מסך (כדי לראות 2 מחזורי HSYNC מושלמים ומעבר שורה)
+run 80us
+
+# התאמה אופטימלית לחלון (Zoom Full)
+wave zoom full
