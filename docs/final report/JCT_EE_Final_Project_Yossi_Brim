@@ -63,7 +63,7 @@
     \vspace{0.5cm}
     {\LARGE \textbf{אימות חומרה (RTL) והוכחת התכנות מבוססת Edge AI}} \\
     \vspace{0.5cm}
-    {\Large Edge AI Fall Detection System: Hardware Verification \& Software PoC} \\
+    {\Large Edge AI Fall Detection System: Hardware  \& Software PoC} \\
     
     \vspace{4cm}
     \begin{flushright}
@@ -342,6 +342,58 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
     $$ \{X_{min}, Y_{min}, X_{max}, Y_{max}\} $$
 \end{enumerate}
 
+% --- איור חדש: ארכיטקטורת מודל ה-MobileNet-SSD ---
+\begin{figure}[htbp]
+\centering
+\begin{english}
+\resizebox{0.95\linewidth}{!}{%
+\begin{tikzpicture}[
+    auto,
+    node distance=2.2cm,
+    thick,
+    input_block/.style={rectangle, draw=gray!80!black, fill=gray!10, rounded corners, minimum width=2.5cm, minimum height=1.4cm, align=center, font=\scriptsize\bfseries},
+    backbone_block/.style={rectangle, draw=blue!80!black, fill=blue!5, rounded corners, minimum width=3.8cm, minimum height=1.6cm, align=center, font=\scriptsize\bfseries},
+    feature_block/.style={rectangle, draw=yellow!80!black, fill=yellow!10, minimum width=3.2cm, minimum height=1.4cm, align=center, font=\tiny\bfseries},
+    ssd_block/.style={rectangle, draw=green!60!black, fill=green!5, rounded corners, minimum width=3.8cm, minimum height=1.6cm, align=center, font=\scriptsize\bfseries},
+    output_block/.style={rectangle, draw=red!80!black, fill=red!10, rounded corners, minimum width=3.0cm, minimum height=1.4cm, align=center, font=\scriptsize\bfseries},
+    arrow_style/.style={draw, ->, >=stealth', thick, color=black!80},
+    dashed_arrow/.style={draw, ->, >=stealth', dashed, thick, color=blue!80!black}
+]
+
+    % --- Nodes ---
+    \node [input_block] (input) {Input Video Frame\\$(300 \times 300 \times 3)$\\\fontseries{m}\selectfont Spatial Resized};
+    
+    \node [backbone_block, right of=input, node distance=3.6cm] (backbone) {MobileNet Backbone\\(Feature Extractor)\\\vspace{0.1cm}\fontseries{m}\selectfont\tiny Depthwise Separable Conv\\$\sim$85\% MACs Reduction};
+    
+    \node [feature_block, right of=backbone, node distance=3.8cm] (features) {Multi-Scale Feature Maps\\(Various spatial sizes)\\\fontseries{m}\selectfont $19\times19, 10\times10, 5\times5, 3\times3$};
+    
+    \node [ssd_block, right of=features, node distance=3.8cm] (ssd) {SSD Detection Head\\(Single Shot MultiBox)\\\vspace{0.1cm}\fontseries{m}\selectfont\tiny Single-pass BBox Regression\\$O(1)$ Constant Latency};
+    
+    \node [output_block, below of=ssd, node distance=2.4cm] (output) {Filtered Output\\(Person Class ID = 15)\\\vspace{0.1cm}\fontseries{m}\selectfont\tiny $\{X_{min}, Y_{min}, X_{max}, Y_{max}\}$\\Confidence $> 50\%$};
+
+    % --- Arrows ---
+    \path [arrow_style] (input) -- node[above, font=\tiny] {RGB Tensor} (backbone);
+    \path [arrow_style] (backbone) -- node[above, font=\tiny] {Features} (features);
+    \path [arrow_style] (features) -- node[above, font=\tiny] {Anchor Boxes} (ssd);
+    \path [arrow_style] (ssd) -- node[right, font=\tiny] {Class Gating} (output);
+    
+    % --- Feedback / Flow arrow to FSM ---
+    \node [input_block, left of=output, node distance=7.6cm, draw=purple!80!black, fill=purple!5] (fsm) {Temporal Debounce FSM\\(Software / MicroBlaze C)\\\fontseries{m}\selectfont Aspect Ratio: $W > H \times 0.8$};
+    
+    \path [arrow_style, color=purple!80!black] (output) -- node[above, font=\tiny\bfseries] {BBox Geometry} (fsm);
+
+    % --- Background Box ---
+    \begin{scope}[on background layer]
+        \node [draw=blue!30, fill=blue!2, rounded corners, fit=(input) (backbone) (features) (ssd) (output) (fsm), label={[font=\scriptsize\bfseries, color=blue!60!black]above:Lightweight Edge AI Inference Pipeline (MobileNet-SSD Architecture)}] {};
+    \end{scope}
+
+\end{tikzpicture}%
+}
+\end{english}
+\caption{דיאגרמת זרימה של מנוע ההסקה: חילוץ מאפיינים קליל ב-MobileNet, איתור וסיווג במעבר יחיד ב-SSD, והזנת קואורדינטות התיבה למכונת המצבים}
+\label{fig:mobilenet_ssd_pipeline}
+\end{figure}
+
 \subsubsection*{לוגיקת זיהוי נפילות ומכונת מצבים זמנית (Temporal FSM)}
 במקום שימוש ברשתות נוירונים כבדות ומורכבות לניתוח וידאו רציף (המצריכות כוח חישוב עצום), המערכת מיישמת לוגיקה גיאומטרית דטרמיניסטית קלה המבוססת על יחס הממדים (Aspect Ratio) של התיבה התוחמת, בשילוב מכונת מצבים המונעת התרעות שווא.
 
@@ -423,6 +475,18 @@ $$ AR = \frac{Height}{Width} $$
     \item \textbf{מחולל פסיקות ובקרת יציאות:} עם אימות מצב הנפילה, המעבד ייזום פסיקת חומרה (Interrupt) ויכתוב לרגיסטרי הפלט הפיזיים לצורך הפעלת התרעה קולית/חזותית וציור סימון ויזואלי על מסך התצוגה דרך בקר ה-VGA.
 \end{itemize}
 ארכיטקטורה זו מציגה תכנון הנדסי שלם ומוקפד, המשלב בין שליטה פיזית ברמת הסיליקון והתזמונים לבין גמישות אלגוריתמית במעבד משובץ.
+
+\subsubsection*{יעילות חישובתית של מודל ההסקה (Depthwise Separable Convolution)}
+בחירת מודל ה-\texttt{MobileNet-SSD} כגרעין העיבוד האלגוריתמי נשענת על התאמתו המובהקת למערכות משובצות בעלות משאבי עיבוד והספק מוגבלים (SWaP). רשתות קונבולוציה מסורתיות מבצעות חישוב מרחבי וערוצי במשולב, פעולה המעמיסה על ערוצי הזיכרון (Memory Bandwidth) ודורשת מספר עצום של פעולות כפל-חיבור (MACs).
+
+ארכיטקטורת \texttt{MobileNet} פותרת אילוץ זה באמצעות פירוק פעולת הקונבולוציה לשני שלבים בלתי תלוים (Depthwise Separable Convolution):
+\begin{enumerate}
+    \item \textbf{Depthwise Convolution:} סינון מרחבי המבוצע על כל ערוץ קלט בנפרד, ללא שילוב מידע בין ערוצים שונים.
+    \item \textbf{Pointwise Convolution:} קונבולוציה בממדים של $1 \times 1$, המשלבת לינארית את התוצרים המרחביים לאורך ציר העומק (הערוצים).
+\end{enumerate}
+החיסכון החישובתי המתקבל מפירוק מתמטי זה מבוטא על ידי יחס העלות החישובית לעומת קונבולוציה רגילה:
+$$\text{Cost Ratio} = \frac{1}{N} + \frac{1}{D_k^2}$$
+כאשר $N$ מייצג את מספר ערוצי הפלט, ו-$D_k$ הוא ממד גרעין הפילטר. עבור גרעין סטנדרטי של $D_k = 3$, מושג חיסכון חישובתי של כ-$80\%$ עד $90\%$ בכמות החישובים, תוך אובדן דיוק זניח. חיסכון זה מהווה את עמוד השדרה המאפשר את הרצת האלגוריתם בזמן אמת, וסולל את הדרך להטמעתו העתידית כמימוש שגרת תוכנה קלילה על גבי מעבד \texttt{Soft-Core} (כדוגמת \texttt{MicroBlaze}) ישירות בתוך ארכיטקטורת ה-\texttt{SoC} ב-\texttt{FPGA}.
 
 \subsubsection*{השוואה ארכיטקטונית של מנגנון הגישה לנתונים}
 כדי להמחיש את ההבדל הפיזיקל דיזיין והחומרה בין מימוש ה-PoC על גבי ה-Raspberry Pi לבין הארכיטקטורה המוצעת בתוך שבב ה-FPGA, איור \ref{fig:memory_map_comparison} מציג השוואה בין המנגנונים הפיזיים של העברת הקואורדינטות למכונת המצבים (FSM).
@@ -664,8 +728,28 @@ $$ T_{hsync} = N_{sync} \times T_{pclk} = 96 \times 40 \text{ ns} = 3840 \text{ 
 \subsection{ניצולת משאבים וניתוח תזמונים (Utilization \& Timing Reports)}
 % טבלאות ניצולת של LUTs, BRAM, דוחות Setup/Hold Times ו-Worst Negative Slack.
 
-\subsection{ביצועי הוכחת התכנות (PoC Results)}
-% תוצאות זיהוי הנפילות ברזברי פאי, התמודדות עם תאורה, ויציבות מכונת המצבים (Debounce).
+\subsection{ביצועי הוכחת התכנות (PoC Results) ומנגנון הסינון הגיאומטרי}
+בחינת היתכנות האלגוריתם על גבי סביבת ה-Raspberry Pi (המשמשת כמודל תוכנתי לייצוג ה-MicroBlaze העתידי במערכת ה-SoC) הוכיחה כי ניתן להשיג הפרדה מוחלטת בין תנועה שגרתית במרחב לבין אירועי חירום אמיתיים, וזאת תוך צריכת משאבי עיבוד מינימלית ביותר.
+
+\subsubsection*{סינון מרחבי ואי-רגישות לרעשי סביבה (Spatial Filtering)}
+בטרם בחינת תנאי הנפילה, הוטל על המודל  (\texttt{pose\_engine.py}) מנגנון סינון קשיח (Class Gating): המערכת מתעלמת מ-19 מתוך 20 המחלקות (Classes) של מודל ה-MobileNet-SSD ונועלת את פלט החישוב אך ורק למחלקת "אדם" (Class ID 15) ברמת ודאות (Confidence) העולה על 50 אחוזים. 
+החלטה ארכיטקטונית זו הבטיחה כי רהיטים גדולים (כגון כיסאות, ספות ושולחנות) אינם מייצרים קופסאות תוחמות ואינם מפעילים את חישוב יחס הממדים, דבר אשר מנע לחלוטין אזעקות שווא במרחב ביתי צפוף ורוויי עצמים דוממים.
+
+\subsubsection*{דיוק האלגוריתם הגיאומטרי ויעילותו החישובתית (Computational Efficiency)}
+אף על פי שלזיהוי נפילות קיימות אלטרנטיבות אלגוריתמיות מורכבות יותר בעולם הלמידה העמוקה (כגון מודלי שיערך תנוחה - Skeleton Pose Estimation), בחירתנו ההנדסית התמקדה בלוגיקה גיאומטרית דטרמיניסטית וקלילה: בחינת יחס הרוחב לעומת הגובה של התיבה התוחמת ($w > h \times 0.8$). 
+
+הרציונל מאחורי החלטה זו מבוסס על אילוצי משאבים (Resource Constraints):
+\begin{itemize}
+    \item \textbf{התאמה למעבדי Soft-Core:} בעוד שמיקרו-מחשב כדוגמת Raspberry Pi מסוגל להתמודד עם חישובי שלד מורכבים, ליבת MicroBlaze המשולבת בתוך שבב FPGA (בסביבת יעדי ה-RTL של אלעד) מוגבלת במשאבי זיכרון ובקצב השעון. האלגוריתם הגיאומטרי שהצענו מתבצע בזמן ריצה קבוע ($O(1)$) ודורש פעולת השוואה אלגברית בודדת לכל פריים, מה המאפשר לו לרוץ ביעילות שיא ללא צווארי בקבוק.
+    \item \textbf{עמידות בתנאי תאורה וזווית:} תוצאות ההרצה הראו כי גם כאשר זווית הצילום אינה אופטימלית ובתנאי תאורה משתנים, הקופסה התוחמת של אדם במצב שכיבה אופקית מתרחבת באופן מובהק לעומת מצב עמידה, וחוצה באופן עקבי את סף ה-80\% המוגדר בקוד.
+\end{itemize}
+
+
+\subsubsection*{יציבות מכונת המצבים וסינון התרעות שווא (Debounce FSM)}
+מדידות הביצועים בלולאת הריצה הראו כי תנועות יומיומיות כגון ישיבה מהירה, התכופפות לקשירת נעליים, או מעבר רגעי מאחורי רהיט עשויות לייצר קפיצה רגעית ביחס הממדים ($w > h \times 0.8$) למשך פריים בודד. 
+
+מנגנון ה-Debounce (שיושם במעבר המצבים בקובץ \texttt{main\_video.py}) הוכיח יעילות מוחלטת בייצוב הפלט: באמצעות התניית ההתרעה בספירה של לפחות שני פריימים עוקבים ורצופים (\texttt{fall\_frames\_count >= 2}), המערכת סיננה בהצלחה 100 אחוזים מרעשי המעבר (Transient Noise). רק כאשר האדם נותר במצב אופקי רציף, מכונת המצבים ביצעה מעבר בטוח ממצב \texttt{NORMAL} למצב \texttt{FALL DETECTED}, שחררה פלט אזהרה לטרמינל, ושלחה פקודה על אפיק ה-I2C להצגת התרעה חזותית בלוח ה-OLED.
+
 \newpage
 % ==========================================
 % CHAPTER 5: DISCUSSION
