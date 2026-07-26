@@ -1,0 +1,23 @@
+# Vivado project files and directories to ignore
+*.xpr
+*.jou
+*.log
+*.str
+*.pb
+*.wdb
+*.dir/
+.Xil/
+ip_user_files/
+project_*/
+*.cache/
+*.hw/
+*.sim/
+*.runs/
+
+# Do NOT ignore the build script, sources, constraints, and docs
+!build_project.tcl
+!rtl/
+!constraints/
+!tb/
+!docs/
+!report/
