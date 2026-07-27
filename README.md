@@ -1,6 +1,7 @@
 # 🏃‍♂️ Real-Time Fall Detection System (FPGA SoC)
 
-**Final Engineering Project | JCT (Jerusalem College of Technology)** **Team:** Yossi Brim & Elad Asbag  
+**Final Engineering Project | JCT (Jerusalem College of Technology)**  
+**Team:** Yossi Brim & Elad Asbag  
 **Target Board:** Nexys A7 (Artix-7 xc7a100tcsg324-1)
 
 ---
@@ -57,16 +58,29 @@ The repository is organized according to industry-standard RTL project hierarchi
 
 **🛑 IMPORTANT:** Do NOT track, commit, or transfer Vivado `.xpr` files. 
 
-This project uses a Tcl-based generation system to prevent merge conflicts and broken absolute paths.
+This project uses a Tcl-based generation system to prevent merge conflicts, broken absolute paths, and to allow seamless development across different PCs (e.g., college labs vs. personal computers).
 
+### Initial Setup (Any PC)
 1. Clone this repository to your local machine.
 2. Open Vivado (do not create or open a project).
-3. Open the **Tcl Console** and navigate to the repository's root directory.
-4. Run the build script to automatically generate the complete project environment:
+3. Open the **Tcl Console** and navigate to the repository's root directory:
+   ```tcl
+   cd <path_to_your_cloned_repo>
+   ```
+4. Run the build script to automatically generate the complete project environment locally:
    ```tcl
    source build_project.tcl
    ```
 5. Run the standard flow: `Synthesis` → `Implementation` → `Generate Bitstream`.
+
+### Daily Workflow & Saving Updates
+* **Editing Source Files:** Any edits to files within the `src/` directory are automatically saved in the correct place.
+* **Adding IPs:** Always explicitly save new Vivado IPs to the `src/ip/` directory, not the default Vivado workspace.
+* **Updating the TCL Script:** At the end of the day, or when adding new files/IPs, update the master script using relative paths to ensure cross-PC compatibility. Run this in the Tcl Console:
+  ```tcl
+  write_project_tcl -force -no_copy_sources -paths_relative_to [pwd] build_project.tcl
+  ```
+* Upload **only** the updated `src/` folder and the `build_project.tcl` script to GitHub.
 
 *For complete workflow instructions, team synchronization rules, and Tcl script updates, please read [docs/SETUP.md](./docs/SETUP.md).*
 
