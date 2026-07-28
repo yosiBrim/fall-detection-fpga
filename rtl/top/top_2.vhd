@@ -93,15 +93,31 @@ ARCHITECTURE rtl OF top IS
         );
     END COMPONENT;
 
+    -- VGA controller component
+    COMPONENT vga_controller
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            pxl_clk : IN STD_LOGIC;
+            VGA_HS_O : OUT STD_LOGIC;
+            VGA_VS_O : OUT STD_LOGIC;
+            VGA_R : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+            VGA_B : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+            VGA_G : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+            start : IN STD_LOGIC;
+            addrb : OUT STD_LOGIC_VECTOR(18 DOWNTO 0);
+            doutb : IN STD_LOGIC_VECTOR(11 DOWNTO 0)
+        );
+    END COMPONENT;
+
 BEGIN
 
-    -- Map LEDs to status signals
+-- Map LEDs to status signals
     led(0) <= sw(0);
     led(1) <= config_finished;
-    led(1) <= posture_change_detected;  -- LED to indicate posture change
-    led(2) <= current_posture;          -- LED to indicate current posture ('0' for standing, '1' for sitting)
-	ov7670_pwdn <= '0';
-  
+    led(3) <= '0';  -- posture_change_detected bypassed
+    led(2) <= '0';  -- current_posture bypassed
+    
   -- Clock generator
     clk_generator: clk_wiz_0
         port map (
@@ -168,20 +184,20 @@ BEGIN
     -- Generate pixel_valid signal from wea
     pixel_valid <= wea(0);
 
-    -- Posture detector instance
-    posture_detector_inst : posture_detector
-    PORT MAP(
-        clk => clk,
-        rst => rst,
-        frame_finished => frame_finished_in,
-        pixel_data => dina,
-        pixel_valid => pixel_valid,
-        pixel_x => pixel_x,
-        pixel_y => pixel_y,
-		sw => sw(1),
-        posture_change_detected => posture_change_detected,
-        current_posture => current_posture
-    );
+-- Posture detector instance (BYPASSED FOR TIMING CLOSURE)
+    -- posture_detector_inst : posture_detector
+    -- PORT MAP(
+    --     clk => clk,
+    --     rst => rst,
+    --     frame_finished => frame_finished_in,
+    --     pixel_data => dina,
+    --     pixel_valid => pixel_valid,
+    --     pixel_x => pixel_x,
+    --     pixel_y => pixel_y,
+    --     sw => sw(1),
+    --     posture_change_detected => posture_change_detected,
+    --     current_posture => current_posture
+    -- );
 
     -- Edge detector for buttons
     EDGE_DETECT : ENTITY work.debounce(Behavioral) PORT MAP(
@@ -198,8 +214,8 @@ BEGIN
         edge => rst
     );
 
-    -- VGA controller
-    vga_controller : ENTITY work.vga_controller(rtl)
+    -- VGA controller (החיבור המעודכן)
+    vga_controller_inst : vga_controller
         PORT MAP(
             clk => clk,
             rst => rst,
@@ -210,7 +226,6 @@ BEGIN
             VGA_R => VGA_R,
             VGA_G => VGA_G,
             VGA_B => VGA_B,
-            --frame_finished_in => frame_finished_in,
             addrb => addrb,
             doutb => doutb
         );
