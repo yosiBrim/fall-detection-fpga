@@ -217,3 +217,13 @@ set_property -dict { PACKAGE_PIN B12   IOSTANDARD LVCMOS33 } [get_ports { VGA_VS
 ## Configuration options, can be used for all designs
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 set_property CFGBVS VCCO [current_design]
+
+## Configuration options, can be used for all designs
+set_property CONFIG_VOLTAGE 3.3 [current_design]
+set_property CFGBVS VCCO [current_design]
+
+## -----------------------------------------------------------------------------
+## OV7670 Camera Clock Constraints & Overrides
+## -----------------------------------------------------------------------------
+create_clock -add -name ov7670_pclk_pin -period 41.67 -waveform {0 20.83} [get_ports {ov7670_pclk}];
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {ov7670_pclk_IBUF}];           
