@@ -226,4 +226,5 @@ set_property CFGBVS VCCO [current_design]
 ## OV7670 Camera Clock Constraints & Overrides
 ## -----------------------------------------------------------------------------
 create_clock -add -name ov7670_pclk_pin -period 41.67 -waveform {0 20.83} [get_ports {ov7670_pclk}];
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {ov7670_pclk_IBUF}];           
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {ov7670_pclk}];
+set_clock_groups -asynchronous -group [get_clocks ov7670_pclk_pin] -group [get_clocks sys_clk_pin]          
