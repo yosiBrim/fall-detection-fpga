@@ -50,6 +50,8 @@ ARCHITECTURE rtl OF top IS
     SIGNAL posture_change_detected : STD_LOGIC:= '0';
     SIGNAL current_posture : STD_LOGIC:= '0';
     
+ 
+    
     component clk_wiz_0 
         port
          (-- Clock in ports
@@ -117,6 +119,9 @@ BEGIN
     led(1) <= config_finished;
     led(3) <= '0';  -- posture_change_detected bypassed
     led(2) <= '0';  -- current_posture bypassed
+
+-- Keep camera powered on
+    ov7670_pwdn <= '0';
     
   -- Clock generator
     clk_generator: clk_wiz_0
