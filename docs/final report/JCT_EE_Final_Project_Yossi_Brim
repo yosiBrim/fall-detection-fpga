@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper]{article}
+\documentclass[12pt, a4paper, draft]{article}
 
 % --- Packages for Hebrew and English ---
 \usepackage{fontspec}
@@ -6,8 +6,8 @@
 \setdefaultlanguage{hebrew}
 \setotherlanguage{english}
 \newfontfamily\hebrewfont[Script=Hebrew]{David CLM} 
+\newfontfamily\hebrewfonttt[Script=Hebrew]{David CLM}
 \newfontfamily\englishfont{Times New Roman}
-
 
 
 % --- Packages for Graphics, Math, and Formatting ---
@@ -344,7 +344,7 @@ $$ f_{pixel} = 416,800 \times 60 \approx 25 \text{ MHz} $$
 כשלב מקדים לפיתוח המערכת המשובצת ולמערך הסימולציות, בוצע תהליך הנדסה לאחור (Reverse Engineering) למערכת חומרה בסיסית קיימת שפותחה על גבי כרטיס Nexys A7-100T. מטרת הניתוח הייתה למפות את מסלולי הנתונים (Data Path), להבין את הלוגיקה המקורית של בקרי ה-RTL, ולאתר צווארי בקבוק ארכיטקטוניים.
 
 \subsubsection*{מיפוי ממשק הקלט ובקר ה-OV7670}
-בקר הקליטה המקורי (`ov7670_capture`) תוכנן כמכונת מצבים פשוטה המסתנכרנת לאות השורה הפעילה (`HREF`) ולאות ה-VSYNC. מכיוון שפיקסל בפורמט RGB444 דורש 12 סיביות ואילו אפיק המצלמה הוא בן 8 סיביות בלבד, הבקר מבצע דגימה בשני מחזורי שעון עוקבים של `PCLK` עבור כל פיקסל:
+בקר הקליטה המקורי (`ov7670\_capture`) תוכנן כמכונת מצבים פשוטה המסתנכרנת לאות השורה הפעילה (`HREF`) ולאות ה-VSYNC. מכיוון שפיקסל בפורמט RGB444 דורש 12 סיביות ואילו אפיק המצלמה הוא בן 8 סיביות בלבד, הבקר מבצע דגימה בשני מחזורי שעון עוקבים של `PCLK` עבור כל פיקסל:
 \begin{enumerate}
     \item \textbf{מחזור ראשון (High Byte):} דגימת 4 הסיביות של ערוץ האדום (Red) ו-4 הסיביות של ערוץ הירוק (Green).
     \item \textbf{מחזור שני (Low Byte):} דגימת 4 הסיביות של ערוץ הכחול (Blue) ושמירת נתון ריק/התעלמות מ-4 הסיביות הנותרות.
@@ -454,13 +454,13 @@ $$ AR = \frac{Height}{Width} $$
     edge_label/.style={font=\tiny\bfseries, text=black, fill=white, inner sep=1.5pt}
 ]
 
-    % --- States ---
-    \node[state] (normal) {NORMAL\\STATE\\(Standing: AR $\ge$ 1.0)};
-    \node[state, right of=normal, fill=yellow!10, draw=yellow!80!black] (pre) {PRE-ALERT\\(Suspected Fall)\\Counter++};
-    \node[alert_state, right of=pre] (alert) {ALERT\\STATE\\(Confirmed Fall)\\Trigger I2C/UI};
+   % --- States ---
+    \node[state, align=center] (normal) {NORMAL\\STATE\\(Standing: AR $\ge$ 1.0)};
+    \node[state, align=center, right of=normal, fill=yellow!10, draw=yellow!80!black] (pre) {PRE-ALERT\\(Suspected Fall)\\Counter++};
+    \node[alert_state, align=center, right of=pre] (alert) {ALERT\\STATE\\(Confirmed Fall)\\Trigger I2C/UI};
 
     % --- Transitions ---
-    \path[every node/.style={edge_label}]
+    \path[every node/.style={edge_label, align=center}]
         (normal) edge [loop above] node {AR $\ge$ 1.0\\(Normal Frame)} (normal)
         (normal) edge [bend left=20] node [above] {AR $<$ 1.0\\(Start Counter)} (pre)
         
@@ -607,51 +607,48 @@ $$\text{Cost Ratio} = \frac{1}{N} + \frac{1}{D_k^2}$$
     phys_line/.style={draw, -latex', thick, green!60!black},
     os_line/.style={draw, -latex', dashed, thick, red!80!black}
 ]
-
-    % ================= LEFT SIDE: RASPBERRY PI (SOFTWARE APPROACH) =================
-    \node[font=\footnotesize\bfseries] (pi_title) at (0, 2) {Raspberry Pi PoC (Software OS GP-Bus)};
+% ================= LEFT SIDE: RASPBERRY PI (SOFTWARE APPROACH) =================
+    \node[font=\footnotesize\bfseries, align=center] (pi_title) at (0, 2) {Raspberry Pi PoC (Software OS GP-Bus)};
     
-    \node[block, below of=pi_title, node distance=1.2cm] (pi_cam) {Camera Sensor\\(Picamera2 / DMA)};
-    \node[block, below of=pi_cam, fill=yellow!10, draw=yellow!80!black] (pi_ai) {MobileNet-SSD\\Running on CPU / OS};
-    \node[cpu_block, below of=pi_ai] (pi_fsm) {Python FSM\\User Space App};
+    \node[block, align=center, below of=pi_title, node distance=1.2cm] (pi_cam) {Camera Sensor\\(Picamera2 / DMA)};
+    \node[block, align=center, below of=pi_cam, fill=yellow!10, draw=yellow!80!black] (pi_ai) {MobileNet-SSD\\Running on CPU / OS};
+    \node[cpu_block, align=center, below of=pi_ai] (pi_fsm) {Python FSM\\User Space App};
     
     % Memory Map of Pi
-    \node[mem_block, below of=pi_fsm, node distance=2.5cm] (pi_mem) {Virtual Memory Map\\(OS Managed)\\
-    \hrule \vspace{0.1cm}
+    \node[mem_block, align=center, below of=pi_fsm, node distance=2.5cm] (pi_mem) {Virtual Memory Map\\(OS Managed)\\[0.1cm]
+    \rule{4cm}{0.4pt} \\[0.1cm]
     \texttt{0x7FFF...} (Kernel)\\
     \texttt{0x4000...} (Shared RAM)\\
     \texttt{0x0000...} (App Space)
     };
     
     % Connections Left
-    \path[phys_line] (pi_cam) -- node[right, font=\tiny] {Zero-Copy DMA} (pi_ai);
-    \path[os_line] (pi_ai) -- node[right, font=\tiny] {OS Context Switch} (pi_fsm);
-    \path[os_line] (pi_fsm) -- node[right, font=\tiny] {Indirect Virtual Access} (pi_mem);
-
-
-    % ================= RIGHT SIDE: FPGA SoC (PROPOSED HARDWARE APPROACH) =================
-    \node[font=\footnotesize\bfseries] (fpga_title) at (8, 2) {Proposed Artix-7 SoC (Hardware Memory-Mapped)};
+    \path[phys_line] (pi_cam) -- node[right, font=\tiny, align=center] {Zero-Copy DMA} (pi_ai);
+    \path[os_line] (pi_ai) -- node[right, font=\tiny, align=center] {OS Context Switch} (pi_fsm);
+    \path[os_line] (pi_fsm) -- node[right, font=\tiny, align=center] {Indirect Virtual Access} (pi_mem);
     
-    \node[block, below of=fpga_title, node distance=1.2cm] (fpga_rtl) {Custom RTL Module\\(BBox Registers)};
-    \node[cpu_block, below of=fpga_rtl, node distance=2.2cm] (fpga_ub) {MicroBlaze\\Soft-Core CPU};
+% ================= RIGHT SIDE: FPGA SoC (PROPOSED HARDWARE APPROACH) =================
+    \node[font=\footnotesize\bfseries, align=center] (fpga_title) at (8, 2) {Proposed Artix-7 SoC (Hardware Memory-Mapped)};
+    
+    \node[block, align=center, below of=fpga_title, node distance=1.2cm] (fpga_rtl) {Custom RTL Module\\(BBox Registers)};
+    \node[cpu_block, align=center, below of=fpga_rtl, node distance=2.2cm] (fpga_ub) {MicroBlaze\\Soft-Core CPU};
     
     % Memory Map of FPGA
-    \node[mem_block, below of=fpga_ub, node distance=2.7cm, draw=green!80!black, fill=green!5] (fpga_mem) {Physical Memory Map\\(Direct HW Address)\\
-    \hrule \vspace{0.15cm}
+    \node[mem_block, align=center, below of=fpga_ub, node distance=2.7cm, draw=green!80!black, fill=green!5] (fpga_mem) {Physical Memory Map\\(Direct HW Address)\\[0.15cm]
+    \rule{4cm}{0.4pt} \\[0.15cm]
     \texttt{0x44000008} (slv\_reg2 - Alarm)\\
     \texttt{0x44000004} (slv\_reg1 - Ymax/Xmax)\\
     \texttt{0x44000000} (slv\_reg0 - Ymin/Xmin)
     };
     
     % Connections Right
-    \path[bus_line] (fpga_ub) -- node[left, font=\tiny\bfseries] {AXI4-Lite Bus} (fpga_rtl);
-    \path[phys_line] (fpga_rtl) |- node[near start, right, font=\tiny] {Direct Physical Mapping} (fpga_mem.140);
-    \path[phys_line] (fpga_ub) -- node[right, font=\tiny] {Direct Register Read/Write} (fpga_mem);
+    \path[bus_line] (fpga_ub) -- node[left, font=\tiny\bfseries, align=center] {AXI4-Lite Bus} (fpga_rtl);
+    \path[phys_line] (fpga_rtl) |- node[near start, right, font=\tiny, align=center] {Direct Physical Mapping} (fpga_mem.140);
+    \path[phys_line] (fpga_ub) -- node[right, font=\tiny, align=center] {Direct Register Read/Write} (fpga_mem);
 
 
     % --- Divider Line ---
     \draw[dashed, gray!50] (4, 2.5) -- (4, -6.2);
-
 \end{tikzpicture}%
 }
 \end{english}
@@ -842,16 +839,62 @@ $$ T_{hsync} = N_{sync} \times T_{pclk} = 96 \times 40 \text{ ns} = 3840 \text{ 
 \label{fig:vga_blanking}
 \end{figure}
 
-\subsection{אימות חומרה פיזי (Hardware Verification)}
+\subsection{אימות חומרה פיזי בסביבת הסיליקון (In-System Physical Verification)}
 % תוצאות מדידות אוסילוסקופ על פיני היציאה (PCLK, VSYNC, HSYNC) לאימות התדרים.
+
+לאחר שהוכחה תקינות התזמונים בסביבת הסימולציה הווירטואלית (ModelSim), השלב הקריטי הבא היה אימות המערכת בעולם הפיזי, על גבי שבב ה-Artix-7 בכרטיס ה-Nexys A7. גבולות הגזרה (\textenglish{Scope}) שהוגדרו לאימות זה מתמקדים בלעדית בתת-מערכת התצוגה: מרגע שליפת נתוני הפיקסלים מחוצץ הזיכרון (BRAM), דרך בקר ה-VGA, ועד ליצירת אותות הסנכרון והצבע הנשלחים אל המסך החיצוני.
+
+\subsubsection{מתודולוגיית אימות פנימי ורשת הדיבוג (JTAG Debug Hub)}
+המטרה המרכזית בשלב אימות החומרה (\textenglish{Post-Silicon Validation}) היא להוכיח כי ההתנהגות הלוגית שנצפתה בסביבת הסימולציה מתקיימת הלכה למעשה בתוך שבב הסיליקון. לאחר צריבת התכנון, ה-FPGA הופך הלכה למעשה ל"קופסה שחורה", מה שמציב אתגר הנדסי משמעותי של נראות (\textenglish{Visibility}). רוב תעבורת הנתונים הקריטית במערכת התצוגה – כגון תהליך שליפת הפיקסלים מאפיק ה-RGB, קידום מוני התצוגה וגישה לכתובות הזיכרון – מתבצעת לחלוטין בתוך המארז. חיבור ציוד צב"ד חיצוני (כדוגמת אוסילוסקופ) לפיני ה-I/O מוגבל לאותות הקצה בלבד, ואינו מסוגל לדגום אפיקים פנימיים רחבים בזמן אמת ובקצב תצוגה מהיר.
+
+כדי להתגבר על מגבלת הנראות ולפתוח "חלון" לתוך השבב, הוחלט ליישם מתודולוגיית אימות פנימי מבוססת Vivado ILA (Integrated Logic Analyzer). ה-ILA הוא רכיב חומרה (Soft-Core) המושתל לתוך הלוגיקה, דוגם את האותות הפנימיים בסנכרון מלא לשעון המערכת, ומאחסן אותם בזיכרון ה-BRAM. מודול מערכתי נוסף בשם "Debug Hub" משנע לאחר מכן את הנתונים החוצה מהשבב אל עמדת הבדיקה (Host PC) דרך אפיק ה-JTAG הסטנדרטי. האינטגרציה בוצעה בשיטת "Mark Debug", המבטיחה שקוד המקור נותר נקי (Production Ready) וללא שינויי RTL.
+
+\subsubsection{הערה תיאורטית: חלוקה לדומייני שעון (Clock Domain Probing)}
+במבט עתידי של אימות המערכת השלמה (כולל שלב הקליטה מהמצלמה), האתגר המרכזי בשימוש ב-ILA הוא התמודדות עם מספר תדרי עבודה שונים (\textenglish{Clock Domains}). מכיוון ש-ILA הוא רכיב סינכרוני, הוא חייב להיות מוזן בדיוק מאותו שעון שמניע את האותות הנדגמים, אחרת ייווצרו שגיאות דגימה (\textenglish{Metastability}) וקריאת ערכי ביניים שגויים. משמעות הדבר היא שוולידציה מערכתית מלאה דורשת הקמת מספר רשתות ILA נפרדות לחלוטין.
+
+\subsubsection{אילוצי משאבים ומיקוד תדר התצוגה (25MHz Domain)}
+בפרויקט הנוכחי ובתכולת דוח זה, השימוש ב-ILA נתקל באילוץ סיליקון קשיח: רכיב ה-ILA דורש הקצאה של משאבי זיכרון (BRAM) לאחסון הדגימות. כפי שנותח בפרק ניצולת המשאבים, מערך ה-Frame Buffer הראשי כבר צורך כ-77\% ממשאבי ה-BRAM הזמינים בשבב, מה שהותיר כמות זיכרון מזערית עבור כלי הדיבוג.
+
+כדי לנהל נכון אילוץ זה ולמקד את האימות בנתיב התצוגה בלבד, הוגדרו הצעדים הבאים:
+\begin{enumerate}
+    \item \textbf{שיוך מדויק לדומיין התצוגה וסנכרון השעונים:} הוקמה רשת ILA אחת בלבד ששויכה באופן מפורש לדומיין השעון הייעודי של התצוגה (\textenglish{\texttt{vga\_pll}} בתדר $25\text{ MHz}$). האותות שנדגמו חולצו ישירות מאוגרי המקור הפנימיים של בקר התצוגה (מוני המיקום \textenglish{\texttt{hsync\_reg\_reg}} ו-\textenglish{\texttt{vsync\_reg\_reg}}, וכן אוגר הנתונים \textenglish{\texttt{pxl\_data\_reg}}), על מנת לקבל תמונת מצב אמינה ומדויקת יותר מאשר דגימת פיני הקצה הפיזיים.
+    \item \textbf{עומק דגימה (\textenglish{Sample Depth}) אופטימלי וחסכוני:} לאור המחסור ב-BRAM, הוגדר ל-ILA עומק הקלטה של 1024 מחזורי שעון בלבד. תצורה זו מונעת חריגה ממשאבי הסיליקון הפנויים ומבטיחה תהליך אימפלמנטציה חלק, אך מחייבת תכנון מוקפד של מנגנון הטריגר כדי ללכוד חלון זמן רלוונטי של שידור וידאו.
+\end{enumerate}
+
+\subsubsection{הגדרת טריגרים (Triggering) ומדידות חומרה בזמן אמת}
+כדי לנצל את חלון הזיכרון המצומצם ביעילות ולתפוס את הרגע המדויק שבו בקר ה-VGA מתחיל לצייר פיקסלים על המסך, הוגדר טריגר פנימי ממוקד:
+במקום שימוש בפונקציות Advanced Trigger מתקדמות הדורשות רכיבי לוגיקה (LUTs) נוספים ומעמיסות על המערכת, ה-ILA נדרך והונחה להמתין לעליית הדגל הפנימי \textenglish{\texttt{in\_display\_area}} ל-'1'. דגל זה מסמן את כניסת המערכת לאזור התצוגה האקטיבי, ומבטיח שההקלטה בת 1024 המחזורים תכיל נתוני וידאו תקפים הנשלפים מהזיכרון, ולא אזורי סנכרון ריקים (\textenglish{Blanking}).
+
+להלן תוצאות הדגימה הפיזית מתוך הסיליקון בזמן אמת, כפי שחולצו אל Vivado Hardware Manager:
+
+% --- Placeholder for Trigger Settings Screenshot ---
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.9\linewidth]{ila_trigger_setup.png}
+    \vspace{4cm} % Temporary space, remove this line when adding the image
+    \caption{הגדרת חלון הטריגר ב-Vivado: התניית ההקלטה בעליית האות \textenglish{\texttt{in\_display\_area}} תוך ניצול יעיל של עומק זיכרון ה-BRAM המוגבל (1024 דגימות)}
+    \label{fig:ila_trigger_setup}
+\end{figure}
+
+מהתבוננות בצורות הגלים שחולצו אל מחשב הבדיקה, ניתן לאמת את התנהגות הלוגיקה ברמת השבב עצמו:
+% --- Placeholder for ILA Waveform Screenshot ---
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=1.0\linewidth]{ila_waveform_vga.png}
+    \vspace{6cm} % Temporary space, remove this line when adding the image
+    \caption{דגימת ILA חיה בתדר 25MHz בתוך ה-FPGA: אימות התאפסות מוני הפיקסלים (X,Y) ושליפת ערכי ה-RGB מהזיכרון במועד התקני.}
+    \label{fig:ila_waveform}
+\end{figure}
+
+תוצאות אימות פנימי אלו מוכיחות כי נתיב התצוגה פועל בחומרה הפיזית כהלכה ובהתאמה מלאה למודל התיאורטי ולסימולציית ה-RTL.
 
 \subsection{ניצולת משאבים וניתוח תזמונים (Utilization \& Timing Reports)}
 
 לאחר השלמת אימות הלוגיקה בסימולציה, בוצע תהליך סינתזה ומימוש פיזי (Implementation) מלא בסביבת Xilinx Vivado 2025.1. 
-חשוב להדגיש כי הנתונים המוצגים בסעיף זה מתייחסים לארכיטקטורת תשתית התצוגה המבודדת (VGA Subsystem). כפי שנדון בפרק 3.5, יחידת עיבוד התמונה החומרתית המקורית יצרה עומס קומבינטורי חריג שמנע הגעה לסגירת זמנים (Timing Closure) ולכן נעקפה לחלוטין. ניתוק זה אפשר לנו לאמת את יציבות זרימת הנתונים דרך חוצצי ה-FIFO ואת מנגנוני ה-CDC כפלטפורמה נקייה, המוכנה לקליטת מעבד ה-MicroBlaze בשלבי האינטגרציה הבאים.
+חשוב להדגיש כי הנתונים המוצגים בסעיף זה מתייחסים לארכיטקטורת תשתית התצוגה המבודדת (VGA Subsystem). כפי שנדון בפרק 3.5, יחידת עיבוד התמונה החומרתית המקורית יצרה עומס קומבינטורי חריג שמנע הגעה לסגירת זמנים (\textenglish{Timing Closure}) ולכן נעקפה לחלוטין. ניתוק זה אפשר את אימות יציבות זרימת הנתונים דרך חוצצי ה-FIFO ואת מנגנוני ה-CDC כפלטפורמה נקייה, המוכנה לקליטת מעבד ה-MicroBlaze בשלבי האינטגרציה הבאים.
 
 \subsubsection*{סגירת תזמונים (Timing Closure)}
-ניתוח המסלול הקריטי במערכת מוכיח עמידה מלאה באילוצי ה-Setup וה-Hold עבור כלל דומייני השעון הפעילים במערכת ($100\text{ MHz}$ של המערכת, $25\text{ MHz}$ של בקר התצוגה ו-$24\text{ MHz}$ של המצלמה). 
+ניתוח המסלול הקריטי במערכת מוכיח עמידה מלאה באילוצי ה-\textenglish{Setup} וה-\textenglish{Hold} עבור כלל דומייני השעון הפעילים במערכת ($100\text{ MHz}$ של המערכת, $25\text{ MHz}$ של בקר התצוגה ו-$24\text{ MHz}$ של המצלמה). 
 
 % --- איור דוח תזמונים מ-Vivado ---
 \begin{figure}[htbp]
@@ -863,16 +906,16 @@ $$ T_{hsync} = N_{sync} \times T_{pclk} = 96 \times 40 \text{ ns} = 3840 \text{ 
 
 כפי שניתן לראות באיור \ref{fig:vivado_timing_summary}, הגדרת אילוצי תזמון נכונים בקובץ ה-XDC (כולל התעלמות מנתיבים אסינכרוניים חוצי-דומיינים שזכו לטיפול לוגי) הבטיחה כי:
 \begin{itemize}
-    \item \textbf{Worst Negative Slack (WNS):} $1.012\text{ ns}$ (הבטחת Setup תקין).
-    \item \textbf{Worst Hold Slack (WHS):} $0.116\text{ ns}$ (מניעת דריסת נתונים מהירה מדי).
-    \item \textbf{Total Negative Slack (TNS):} $0.000\text{ ns}$ (אפס שגיאות תזמון מצטברות במערכת).
+    \item \textbf{\textenglish{Worst Negative Slack (WNS)}:} $1.012\text{ ns}$ (הבטחת \textenglish{Setup} תקין).
+    \item \textbf{\textenglish{Worst Hold Slack (WHS)}:} $0.116\text{ ns}$ (מניעת דריסת נתונים מהירה מדי).
+    \item \textbf{\textenglish{Total Negative Slack (TNS)}:} $0.000\text{ ns}$ (אפס שגיאות תזמון מצטברות במערכת).
 \end{itemize}
 
 \subsubsection*{ניצולת משאבי סיליקון (Hardware Utilization)}
 המימוש הפיזי של המערכת נותח כדי להבטיח הקצאה יעילה של משאבי שבב ה-Artix-7. טבלה \ref{tab:fpga_utilization} מרכזת את הצריכה הפיזית של הבלוקים הלוגיים המרכזיים.
 
 % --- טבלת ניצולת משאבים ---
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \begin{english}
 \resizebox{0.7\textwidth}{!}{%
@@ -899,8 +942,7 @@ DSPs & 3 & 240 & 1.25\% \\ \hline
 \end{figure}
 
 מהנתונים עולה מסקנה ארכיטקטונית מובהקת: ניצולת הזיכרון (BRAM) עומדת על קרוב ל-77\%, דבר המהווה פועל יוצא ישיר של ההחלטה לממש זיכרון חוצץ (Frame Buffer) עצמאי ועמוק לאחסון פריימים ברזולוציית VGA בפורמט RGB444.
-לעומת זאת, דרישות הלוגיקה המשולבת (LUTs) ואוגרי המצב (Registers) מסתכמות בפחות מ-2\% מסך משאבי הרכיב. יחס קיצוני זה הוא אידיאלי לארכיטקטורת ה-SoC המתוכננת, שכן הוא מותיר שטח סיליקון (Fabric) נרחב ופנוי לחלוטין עבור הטמעת מעבד ה-MicroBlaze ומאיצי החישוב העתידיים הנדרשים לזיהוי האדם.
-
+לעומת זאת, דרישות הלוגיקה המשולבת (LUTs) ואוגרי המצב (Registers) מסתכמות בפחות מ-2\% מסך משאבי הרכיב. יחס קיצוני זה הוא אידיאלי לארכיטקטורת ה-SoC המתוכננת, שכן הוא מותיר שטח סיליקון (Fabric) נרחב ופנוי לחלוטין עבור הטמעת מעבד ה-MicroBlaze ומאיצי החישוב העתידיים.
 % =========================================================================
 % תזכורת: ודא שהשורות הבאות מופיעות בתחילת המסמך (Preamble) לפני \begin{document}:
 % \usepackage{tikz}
@@ -1068,7 +1110,7 @@ Video Electronics Standards Association (VESA), \emph{VESA and Industry Standard
 Xilinx Inc. (AMD), \emph{MicroBlaze Processor Reference Guide}, UG984 (v2021.2), 2021.
 
 \bibitem{cdc_design}
-C. E. Cummings, ``Clock Domain Crossing (CDC) Design & Verification Techniques Using SystemVerilog,'' \emph{in Proc. SNUG (Synopsys Users Group)}, Boston, 2008.
+C. E. Cummings, ``Clock Domain Crossing (CDC) Design \& Verification Techniques Using SystemVerilog,'' \emph{in Proc. SNUG (Synopsys Users Group)}, Boston, 2008.
 
 \bibitem{picamera2}
 Raspberry Pi Ltd., \emph{Picamera2 Library Documentation: Python Interface for Raspberry Pi Camera Modules}, 2023. [Online]. Available: \texttt{https://github.com/raspberrypi/picamera2}
