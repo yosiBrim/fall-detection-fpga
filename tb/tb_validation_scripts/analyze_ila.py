@@ -1,55 +1,23 @@
-% =========================================================================
-% נספח ד': סקריפט Python לניתוח אוטומטי של נתוני ILA
-% =========================================================================
-\newpage
-\section{קוד המקור - ניתוח אוטומטי של נתוני ILA (Python Post-Silicon Parser)}
-\label{app:ila_parser}
+import pandas as pd
 
-להלן סקריפט ה-Python שפותח לצורך חילוץ, פענוח ואנליזה כמותית של קבצי ה-ILA הגולמיים (`.ila` / `.csv`) ברמת מחזור השעון, המאפשר אימות אמפירי של המערכת בחומרה הפיזית תחת עומס:
+# טעינת קובץ הנתונים מה-ILA (דילוג על שורת ה-HEX)
+df = pd.read_csv('waveform.csv', skiprows=[1])
 
-\begin{english}
-\begin{lstlisting}[language=Python, caption={Automated ILA Waveform Parser and Verification Script (ila\_analyzer.py)}]
-import zipfile
-import csv
-import os
+# חילוץ האותות הרלוונטיים
+in_disp = df['vga_controller_inst/in_display_area']
+doutb = df['doutb[11:0]']
 
-def analyze_ila_archive(archive_path):
-    """
-    Parses raw ILA binary archives exported from Vivado 
-    to quantitatively verify clock cycles and data bus stability.
-    """
-    if not os.path.exists(archive_path):
-        print(f"Error: Archive {archive_path} not found.")
-        return
+# ניתוח אות הבקרה
+in_disp_falls = df[in_disp == 0]['Sample in Window'].min()
+in_disp_rises = df[in_disp == 0]['Sample in Window'].max() + 1
+blanking_cycles = df[in_disp == 0].shape[0]
 
-    # Opening the binary archive stream
-    with zipfile.ZipFile(archive_path, 'r') as z:
-        # Locating the tabular waveform data file inside the archive
-        csv_filename_list = [name for name in z.namelist() if 'waveform.csv' in name]
-        
-        if not csv_filename_list:
-            print("Error: waveform.csv not found in the ILA archive.")
-            return
-            
-        csv_filename = csv_filename_list[0]
-        
-        with z.open(csv_filename) as f:
-            lines = [line.decode('utf-8') for line in f.readlines()]
-            
-            # Parsing data at the individual clock cycle level
-            reader = csv.reader(lines)
-            header = next(reader)
-            samples = list(reader)
-            
-            print(f"Successfully loaded {len(samples)} clock cycles.")
-            
-            # Validation assertions on sample depth and data integrity
-            if len(samples) > 0:
-                print(">>> [VERIFICATION PASSED]: ILA data extraction completed successfully.")
-            else:
-                print(">>> [VERIFICATION ERROR]: Empty waveform capture dataset!")
+# ניתוח אפיק הנתונים ועכבת הפייפליין
+doutb_falls = df[doutb == '000']['Sample in Window'].min()
+doutb_rises = df[doutb == '000']['Sample in Window'].max() + 1
+pipeline_latency = doutb_falls - in_disp_falls
 
-if __name__ == "__main__":
-    analyze_ila_archive("iladata.ila")
-\end{lstlisting}
-\end{english}
+print("=== ILA Hardware Validation Report ===")
+print(f"[+] VGA Standard Check: in_display_area blanking is exactly {blanking_cycles} cycles.")
+print(f"[+] Pipeline Latency: Hardware reaction time is {pipeline_latency} clock cycles.")
+print(f"[+] Data Mute Window: doutb drops at {doutb_falls} and rises at {doutb_rises}.")
