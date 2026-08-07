@@ -60,6 +60,17 @@ ARCHITECTURE rtl OF vga_controller IS
     SIGNAL in_display_area_delayed : STD_LOGIC := '0';
 	
 	SIGNAL pxl_data_reg : STD_LOGIC_VECTOR(11 DOWNTO 0) := (OTHERS => '0');
+	
+	-- אותות פנימיים לדיבוג שרשרת הנתונים וההשתקה
+    SIGNAL vga_r_int, vga_g_int, vga_b_int : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    
+    -- קיבוע האותות ל-ILA (כפיית חומרה)
+    ATTRIBUTE mark_debug : STRING;
+    ATTRIBUTE mark_debug OF vga_r_int : SIGNAL IS "true";
+    ATTRIBUTE mark_debug OF vga_g_int : SIGNAL IS "true";
+    ATTRIBUTE mark_debug OF vga_b_int : SIGNAL IS "true";
+    ATTRIBUTE mark_debug OF in_display_area_delayed : SIGNAL IS "true";
+	
 BEGIN
 
 
@@ -151,14 +162,24 @@ END PROCESS;
 		END IF;
 	END PROCESS;
 
-	VGA_R <= pxl_data_reg(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
-	VGA_G <= pxl_data_reg(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
-	VGA_B <= pxl_data_reg(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
+	--VGA_R <= pxl_data_reg(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
+	--VGA_G <= pxl_data_reg(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
+	--VGA_B <= pxl_data_reg(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
 
     -- שנה את יציאות RGB:
     --VGA_R <= doutb(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
     --VGA_G <= doutb(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
     --VGA_B <= doutb(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
+    
+    -- שומר הסף מחליט איזה מידע להעביר לשגרירים (האותות הפנימיים שיידגמו ב-ILA)
+    vga_r_int <= pxl_data_reg(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
+    vga_g_int <= pxl_data_reg(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
+    vga_b_int <= pxl_data_reg(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
+
+    -- יציאת השגרירים הפיזיים למסך
+    VGA_R <= vga_r_int;
+    VGA_G <= vga_g_int;
+    VGA_B <= vga_b_int;
     
 PROCESS (pxl_clk, rst)
 BEGIN
