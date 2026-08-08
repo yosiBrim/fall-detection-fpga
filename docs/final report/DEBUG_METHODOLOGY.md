@@ -28,40 +28,31 @@
 * **פעולה:** לאחר סינתזה, פתח את **Synthesized Design**.
 * **מדידה (Tcl Console):** הרץ את הפקודה הבאה כדי לשלוף את כל הרשתות המסומנות לדיבוג:
   ```tcl
-  get_nets -hierarchical * -filter {MARK_DEBUG == 1}
+  get_nets -hierarchical -filter {MARK_DEBUG == "TRUE"}
+  ```
+* **✅ מבחן קבלה (Pass):** הפקודה מחזירה רשימה הכוללת את האותות הרלוונטיים (למשל `doutb`, `in_display_area_delayed`, ואותות ה-`VGA`).
+* **❌ טיפול בכשל (Fail):** האותות נמחקו או לא סומנו. יש למצוא אותם ידנית בעץ ה-Netlist תחת התיקייה `Nets`, ולסמן אותם: `Right Click -> Mark Debug`.
 
-  ✅ מבחן קבלה (Pass): הפקודה מחזירה רשימה הכוללת את האותות הרלוונטיים (למשל doutb, in_display_area_delayed, ואותות ה-VGA).
-
-❌ טיפול בכשל (Fail): האותות נמחקו או לא סומנו. יש למצוא אותם ידנית בעץ ה-Netlist תחת התיקייה Nets, ולסמן אותם: Right Click -> Mark Debug.
-
-שלב 2: אימות יצירת ליבת ה-ILA (XDC Constraints Check)
+### שלב 2: אימות יצירת ליבת ה-ILA (XDC Constraints Check)
 מטרה: לוודא ש-Vivado שמר את הגדרות אשף ה-ILA כהנחיות קשיחות לניתוב.
 
-פעולה: פתח את קובץ ה-XDC של הפרויקט (תחת constrs_1).
+* **פעולה:** פתח את קובץ ה-XDC של הפרויקט (תחת `constrs_1`).
+* **מדידה (חיפוש טקסט):** חפש בקובץ את הפקודות `create_debug_core` או `connect_debug_port`.
+* **✅ מבחן קבלה (Pass):** קיימות שורות המקשרות בין פורטים ב-ILA לבין הרשתות שלנו (למשל `connect_debug_port u_ila_0/probe0 ...`).
+* **❌ טיפול בכשל (Fail):** ההגדרות לא נשמרו. יש להריץ את אשף ה-**Set Up Debug** מחדש ולשמור את הפרויקט (`Ctrl+S`) לפני הרצת Implementation.
 
-מדידה (חיפוש טקסט): חפש בקובץ את הפקודות create_debug_core או connect_debug_port.
-
-✅ מבחן קבלה (Pass): קיימות שורות המקשרות בין פורטים ב-ILA לבין הרשתות שלנו (למשל connect_debug_port u_ila_0/probe0 ...).
-
-❌ טיפול בכשל (Fail): ההגדרות לא נשמרו. יש להריץ את אשף ה-Set Up Debug מחדש ולשמור את הפרויקט (Ctrl+S) לפני הרצת Implementation.
-
-שלב 3: חותמת הזהב - אימות ה-LTX (Post-Implementation Check)
+### שלב 3: חותמת הזהב - אימות ה-LTX (Post-Implementation Check)
 מטרה: הוכחה מוחלטת שהאותות קובצו לתוך ליבת הדיבוג הפיזית לפני שמתחברים לכרטיס. זהו השלב החשוב ביותר למניעת בזבוז זמן במעבדה.
 
-פעולה: לאחר סיום ה-Implementation ויצירת ה-Bitstream, נווט במחשב לנתיב הריצה:
-<Project_Name>.runs/impl_1/
+* **פעולה:** לאחר סיום ה-Implementation ויצירת ה-Bitstream, נווט במחשב לנתיב הריצה:
+  `<Project_Name>.runs/impl_1/`
+* **מדידה:** פתח את הקובץ שמסתיים ב-`.ltx` (לרוב `debug_nets.ltx` או `top.ltx`) בעזרת פנקס רשימות (Notepad), וחפש (`Ctrl+F`) את שם אחד האותות (למשל `VGA_R`).
+* **✅ מבחן קבלה (Pass):** שמות האותות מופיעים במפורש בתוך ה-XML של הקובץ.
+* **❌ טיפול בכשל (Fail):** האופטימיזציה של ה-Implementation מחקה את האותות (Silent Optimization). יש לבדוק את דוח ה-Warnings על העלמת אותות, לטפל, ולהריץ Implementation מחדש.
 
-מדידה: פתח את הקובץ שמסתיים ב-.ltx (לרוב debug_nets.ltx או top.ltx) בעזרת פנקס רשימות (Notepad), וחפש (Ctrl+F) את שם אחד האותות (למשל VGA_R).
-
-✅ מבחן קבלה (Pass): שמות האותות מופיעים במפורש בתוך ה-XML של הקובץ.
-
-❌ טיפול בכשל (Fail): האופטימיזציה של ה-Implementation מחקה את האותות (Silent Optimization). יש לבדוק את דוח ה-Warnings על העלמת אותות, לטפל, ולהריץ Implementation מחדש.
-
-שלב 4: צריבה וטעינת Probes כפויה (Hardware Manager)
+### שלב 4: צריבה וטעינת Probes כפויה (Hardware Manager)
 מטרה: לעקוף את מנגנון ה-Cache של Vivado ולהכריח טעינה של האותות המעודכנים.
 
-פעולה: פתח את ה-Hardware Manager ולחץ Program Device.
-
-מדידה: בחלון הצריבה, ודא כי שדה ה-Debug Probes File מצביע ידנית וספציפית לקובץ ה-.ltx המדויק שנבדק בשלב 3, ולא לתיקיית .hw נסתרת.
-
-✅ מבחן קבלה (Pass): הלוח נצרב, חלונית ה-Waveform נפתחת, ובחלונית ה-Debug Probes מופיעים כל האותות, מוכנים להגדרת הטריגר.
+* **פעולה:** פתח את ה-Hardware Manager ולחץ **Program Device**.
+* **מדידה:** בחלון הצריבה, ודא כי שדה ה-**Debug Probes File** מצביע *ידנית וספציפית* לקובץ ה-`.ltx` המדויק שנבדק בשלב 3, ולא לתיקיית `.hw` נסתרת.
+* **✅ מבחן קבלה (Pass):** הלוח נצרב, חלונית ה-Waveform נפתחת, ובחלונית ה-Debug Probes מופיעים כל האותות, מוכנים להגדרת הטריגר.
