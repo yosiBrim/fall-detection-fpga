@@ -137,42 +137,44 @@ else:
     error_p.text = "[שגיאה: תמונת שלבי התצוגה לא נמצאה ב-assets]"
     error_p.font.color.rgb = RGBColor(255, 0, 0)
     error_p.alignment = PP_ALIGN.CENTER
-# ==========================================
-# שקף 4: הסבר VGA (2/3) - פיזיקה ושליטה
-# ==========================================
+
 # ==========================================
 # שקף 4: ממשק ה-VGA - לוגיקה אנלוגית לדיגיטלית
 # ==========================================
 slide4 = prs.slides.add_slide(prs.slide_layouts[5])
 
+# כותרת ראשית עם ירידת שורה
 title4 = slide4.shapes.title
 title4.text = "ממשק ה-VGA:\nמהלוגיקה האנלוגית לדיגיטלית"
 set_rtl(title4.text_frame.paragraphs[0])
 title4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-# יצירת תיבת טקסט עם 3 בולטים (נקודות)
+# יצירת תיבת טקסט עם בולטים (נקודות)
 txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.5), Inches(9), Inches(1.5))
 tf_text4 = txBox_text4.text_frame
 
-# בולט 1
-p1_s4 = tf_text4.add_paragraph()
-p1_s4.text = "שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים על המסך."
-p1_s4.font.size = Pt(16); p1_s4.alignment = PP_ALIGN.RIGHT; set_rtl(p1_s4)
+# פונקציית עזר להוספת בולט
+def add_bullet(tf, text):
+    p = tf.add_paragraph()
+    p.text = text
+    p.font.size = Pt(18)
+    p.alignment = PP_ALIGN.RIGHT
+    set_rtl(p)
+    return p
 
-# בולט 2
-p2_s4 = tf_text4.add_paragraph()
-p2_s4.text = "אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן."
-p2_s4.font.size = Pt(16); p2_s4.alignment = PP_ALIGN.RIGHT; set_rtl(p2_s4)
+add_bullet(tf_text4, "• שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים על המסך.")
+add_bullet(tf_text4, "• אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן.")
+add_bullet(tf_text4, "• באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים.")
 
-# בולט 3
-p3_s4 = tf_text4.add_paragraph()
-p3_s4.text = "באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים."
-p3_s4.font.size = Pt(16); p3_s4.alignment = PP_ALIGN.RIGHT; set_rtl(p3_s4)
-
-# הוספת התמונה האנלוגית
+# הוספת התמונה
+# וודא שהקובץ נמצא ב: docs/presentation/assets/vga_analog_cathode_ray_concept.png
 image_path4 = "docs/presentation/assets/vga_analog_cathode_ray_concept.png"
 if os.path.exists(image_path4):
-    slide4.shapes.add_picture(image_path4, Inches(2.2), Inches(3.2), width=Inches(5.0))
+    slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.2), width=Inches(4.5))
+else:
+    # הדפסת שגיאה על השקף אם התמונה לא נמצאה
+    err_box = slide4.shapes.add_textbox(Inches(2.5), Inches(3.5), Inches(4.5), Inches(1))
+    err_box.text = "Error: Image vga_analog_cathode_ray_concept.png not found"
 # ==========================================
 # שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
 # ==========================================
