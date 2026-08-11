@@ -32,6 +32,13 @@ p_desc.font.size = Pt(20)
 p_desc.alignment = PP_ALIGN.CENTER
 set_rtl(p_desc)
 
+# הוספת שורה שנייה עם ירידת שורה מפורשת
+p_desc2 = txBox_desc.text_frame.add_paragraph()
+p_desc2.text = "על מנת לאפשר עיבוד תמונה לזיהויי עמידה ממושכת לחולי דמנציה."
+p_desc2.font.size = Pt(17)
+p_desc2.alignment = PP_ALIGN.CENTER
+set_rtl(p_desc2)
+
 # שליפת תמונת הבורד ישירות מהנתיב המלא בפרויקט
 image_path1 = "docs/presentation/assets/artix_board.png"
 
@@ -46,7 +53,7 @@ else:
     fallback_p.alignment = PP_ALIGN.CENTER
 txBox_details = slide1.shapes.add_textbox(Inches(0.5), Inches(6.3), Inches(9), Inches(0.5))
 p_details = txBox_details.text_frame.paragraphs[0]
-p_details.text = "מגיש: יוסי ברים | הנדסת חשמל שנה ד', המרכז האקדמי לב"
+p_details.text = "מגיש: יוסי ברים | הנדסת חשמל שנה ד| המרכז האקדמי לב"
 p_details.font.size = Pt(22)
 p_details.font.bold = True
 p_details.alignment = PP_ALIGN.CENTER
