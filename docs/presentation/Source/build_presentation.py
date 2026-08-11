@@ -140,55 +140,39 @@ else:
 # ==========================================
 # שקף 4: הסבר VGA (2/3) - פיזיקה ושליטה
 # ==========================================
+# ==========================================
+# שקף 4: ממשק ה-VGA - לוגיקה אנלוגית לדיגיטלית
+# ==========================================
 slide4 = prs.slides.add_slide(prs.slide_layouts[5])
 
 title4 = slide4.shapes.title
-title4.text = "ממשק ה-VGA: שליטה חומרתית ופיזיקה"
+title4.text = "ממשק ה-VGA:\nמהלוגיקה האנלוגית לדיגיטלית"
 set_rtl(title4.text_frame.paragraphs[0])
+title4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(1.2))
+# יצירת תיבת טקסט עם 3 בולטים (נקודות)
+txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.5), Inches(9), Inches(1.5))
 tf_text4 = txBox_text4.text_frame
 
-b1_s4 = tf_text4.add_paragraph()
-b1_s4.text = "שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים (Cathode ray) על המסך."
-b1_s4.font.size = Pt(15); b1_s4.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s4)
+# בולט 1
+p1_s4 = tf_text4.add_paragraph()
+p1_s4.text = "שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים על המסך."
+p1_s4.font.size = Pt(16); p1_s4.alignment = PP_ALIGN.RIGHT; set_rtl(p1_s4)
 
-b2_s4 = tf_text4.add_paragraph()
-b2_s4.text = "אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן."
-b2_s4.font.size = Pt(15); b2_s4.alignment = PP_ALIGN.RIGHT; set_rtl(b2_s4)
+# בולט 2
+p2_s4 = tf_text4.add_paragraph()
+p2_s4.text = "אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן."
+p2_s4.font.size = Pt(16); p2_s4.alignment = PP_ALIGN.RIGHT; set_rtl(p2_s4)
 
-b3_s4 = tf_text4.add_paragraph()
-b3_s4.text = "באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים (Electron guns)."
-b3_s4.font.size = Pt(15); b3_s4.alignment = PP_ALIGN.RIGHT; set_rtl(b3_s4)
+# בולט 3
+p3_s4 = tf_text4.add_paragraph()
+p3_s4.text = "באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים."
+p3_s4.font.size = Pt(16); p3_s4.alignment = PP_ALIGN.RIGHT; set_rtl(p3_s4)
 
-image_path4 = os.path.join(base_path, "image_4486b2_3.png")
+# הוספת התמונה האנלוגית
+image_path4 = "docs/presentation/assets/vga_analog_cathode_ray_concept.png"
 if os.path.exists(image_path4):
-    slide4.shapes.add_picture(image_path4, Inches(2.2), Inches(2.8), width=Inches(5.5))
-
-# ==========================================
-# שקף 5: הסבר VGA (3/3) - נתיב הנתונים ב-RTL
-# ==========================================
-slide5 = prs.slides.add_slide(prs.slide_layouts[5])
-
-title5 = slide5.shapes.title
-title5.text = "ממשק ה-VGA: מיקום בקר ה-VGA בנתיב הנתונים"
-set_rtl(title5.text_frame.paragraphs[0])
-
-txBox_text5 = slide5.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(1.2))
-tf_text5 = txBox_text5.text_frame
-
-b1_s5 = tf_text5.add_paragraph()
-b1_s5.text = "הבקר מקבל שעון פיקסל (25MHz) מבלוק ניהול השעונים של המערכת."
-b1_s5.font.size = Pt(16); b1_s5.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s5)
-
-b2_s5 = tf_text5.add_paragraph()
-b2_s5.text = "המימוש הלוגי מחשב ומשדר כתובת (addrb) כדי לשלוף נתונים (doutb) ישירות מזיכרון ה-BRAM."
-b2_s5.font.size = Pt(16); b2_s5.alignment = PP_ALIGN.RIGHT; set_rtl(b2_s5)
-
-image_path5 = os.path.join(base_path, "rtl_direct_vga_path (3)_3.png")
-if os.path.exists(image_path5):
-    slide5.shapes.add_picture(image_path5, Inches(0.5), Inches(2.6), width=Inches(9))
-
+    slide4.shapes.add_picture(image_path4, Inches(2.2), Inches(3.2), width=Inches(5.0))
 # ==========================================
 # שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
 # ==========================================
