@@ -32,10 +32,19 @@ p_desc.font.size = Pt(20)
 p_desc.alignment = PP_ALIGN.CENTER
 set_rtl(p_desc)
 
-image_path1 = os.path.join(base_path, "image_464ced.jpg")
+# שליפת תמונת הבורד מתיקיית ה-assets המקומית
+image_path1 = os.path.join(base_path, "assets", "artix_board.png")
 if os.path.exists(image_path1):
     slide1.shapes.add_picture(image_path1, Inches(2.5), Inches(2.0), width=Inches(5))
-
+else:
+    # תיקיית גיבוי אם התמונה טרם הועתקה ל-assets
+    fallback_box = slide1.shapes.add_textbox(Inches(2.5), Inches(3.0), Inches(5), Inches(1))
+    fallback_p = fallback_box.text_frame.paragraphs[0]
+    fallback_p.text = "[שגיאה: התמונה artix_board.png לא נמצאה בתיקיית assets]"
+    fallback_p.font.size = Pt(14)
+    fallback_p.font.color.rgb = RGBColor(255, 0, 0)
+    fallback_p.alignment = PP_ALIGN.CENTER
+    
 txBox_details = slide1.shapes.add_textbox(Inches(0.5), Inches(6.3), Inches(9), Inches(0.5))
 p_details = txBox_details.text_frame.paragraphs[0]
 p_details.text = "מגיש: יוסי ברים | הנדסת חשמל שנה ד', המרכז האקדמי לב"
