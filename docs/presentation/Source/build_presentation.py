@@ -177,30 +177,38 @@ else:
     err_box.text = "Error: Image vga_analog_cathode_ray_concept.png not found"
 
 # ==========================================
-# שקף א' מתוך ה-3: תזמונים ורזולוציה
+# שקף א' מתוך ה-3: תזמונים, רזולוציה ומונים
 # ==========================================
 slide_t1 = prs.slides.add_slide(prs.slide_layouts[5])
 title_t1 = slide_t1.shapes.title
-title_t1.text = "ממשק ה-VGA: תזמונים ורזולוציה"
+title_t1.text = "ממשק ה-VGA: תזמונים ומונים"
 set_rtl(title_t1.text_frame.paragraphs[0])
 title_t1.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_t1 = slide_t1.shapes.add_textbox(Inches(0.8), Inches(1.8), Inches(8.5), Inches(4.0))
+# טקסט בצד ימין
+tx_t1 = slide_t1.shapes.add_textbox(Inches(5.2), Inches(1.5), Inches(4.3), Inches(5.0))
 tf_t1 = tx_t1.text_frame
 
 def add_clean_bullet(tf, text):
     p = tf.add_paragraph()
     p.text = text
-    p.font.size = Pt(20)
-    p.space_after = Pt(14)
+    p.font.size = Pt(16)
+    p.space_after = Pt(10)
     p.alignment = PP_ALIGN.RIGHT
     set_rtl(p)
 
-add_clean_bullet(tf_t1, "• עבודה ברזולוציה של 640 על 480 פיקסלים.")
-add_clean_bullet(tf_t1, "• קצב רענון של 60 הרץ.")
-add_clean_bullet(tf_t1, "• דורש שעון פיקסל (Pixel Clock) בתדר של 25 מגה-הרץ.")
+add_clean_bullet(tf_t1, "• עבודה ברזולוציה של 640 על 480 פיקסלים ב-60 הרץ.")
+add_clean_bullet(tf_t1, "• דורש שעון פיקסל (Pixel Clock) בתדר של 25.175 מגה-הרץ.")
+add_clean_bullet(tf_t1, "• בלוקי ה-Horiz וה-Vert מממשים את חלוקת הפרוטוקול ל-Active, Front Porch, Sync ו-Back Porch.")
 
-
+# הוספת התמונה בצד שמאל
+image_path_t1 = "docs/presentation/assets/vga_counters_logic_flow.png"
+if os.path.exists(image_path_t1):
+    slide_t1.shapes.add_picture(image_path_t1, Inches(0.5), Inches(1.8), width=Inches(4.4))
+else:
+    err_box = slide_t1.shapes.add_textbox(Inches(0.5), Inches(3.0), Inches(4.4), Inches(1))
+    err_box.text = "[שגיאה: התמונה vga_counters_logic_flow.png לא נמצאה]"
+    
 # ==========================================
 # שקף ב' מתוך ה-3: סריקה אופקית ואנכית (מונים)
 # ==========================================
