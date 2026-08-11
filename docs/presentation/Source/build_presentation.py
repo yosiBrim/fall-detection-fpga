@@ -175,6 +175,63 @@ else:
     # הדפסת שגיאה על השקף אם התמונה לא נמצאה
     err_box = slide4.shapes.add_textbox(Inches(2.5), Inches(3.5), Inches(4.5), Inches(1))
     err_box.text = "Error: Image vga_analog_cathode_ray_concept.png not found"
+
+# ==========================================
+# שקף א' מתוך ה-3: תזמונים ורזולוציה
+# ==========================================
+slide_t1 = prs.slides.add_slide(prs.slide_layouts[5])
+title_t1 = slide_t1.shapes.title
+title_t1.text = "ממשק ה-VGA: תזמונים ורזולוציה"
+set_rtl(title_t1.text_frame.paragraphs[0])
+title_t1.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+tx_t1 = slide_t1.shapes.add_textbox(Inches(0.8), Inches(1.8), Inches(8.5), Inches(4.0))
+tf_t1 = tx_t1.text_frame
+
+def add_clean_bullet(tf, text):
+    p = tf.add_paragraph()
+    p.text = text
+    p.font.size = Pt(20)
+    p.space_after = Pt(14)
+    p.alignment = PP_ALIGN.RIGHT
+    set_rtl(p)
+
+add_clean_bullet(tf_t1, "• עבודה ברזולוציה של 640 על 480 פיקסלים.")
+add_clean_bullet(tf_t1, "• קצב רענון של 60 הרץ.")
+add_clean_bullet(tf_t1, "• דורש שעון פיקסל (Pixel Clock) בתדר של 25 מגה-הרץ.")
+
+
+# ==========================================
+# שקף ב' מתוך ה-3: סריקה אופקית ואנכית (מונים)
+# ==========================================
+slide_t2 = prs.slides.add_slide(prs.slide_layouts[5])
+title_t2 = slide_t2.shapes.title
+title_t2.text = "ממשק ה-VGA: מונים וסריקה קווית"
+set_rtl(title_t2.text_frame.paragraphs[0])
+title_t2.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+tx_t2 = slide_t2.shapes.add_textbox(Inches(0.8), Inches(1.5), Inches(8.5), Inches(4.5))
+tf_t2 = tx_t2.text_frame
+
+add_clean_bullet(tf_t2, "• סריקה אופקית (שורה): מונה ה-Horizontal סופר 800 מחזורים. רק 640 מתוכם הם תצוגה, והשאר מוקדשים להחשכה (Blanking) ולסנכרון השורה.")
+add_clean_bullet(tf_t2, "• סריקה אנכית (פרקים): מונה ה-Vertical סופר 521 שורות, מתוכן 480 פעילות. בסיום, אות הסנכרון (VSYNC) מחזיר את הקרן לראש המסך.")
+
+
+# ==========================================
+# שקף ג' מתוך ה-3: מנגנון ההשתקה והחיבור ל-BRAM
+# ==========================================
+slide_t3 = prs.slides.add_slide(prs.slide_layouts[5])
+title_t3 = slide_t3.shapes.title
+title_t3.text = "ממשק ה-VGA: מנגנון השתקה וחיבור ל-BRAM"
+set_rtl(title_t3.text_frame.paragraphs[0])
+title_t3.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+tx_t3 = slide_t3.shapes.add_textbox(Inches(0.8), Inches(1.5), Inches(8.5), Inches(4.5))
+tf_t3 = tx_t3.text_frame
+
+add_clean_bullet(tf_t3, "• מנגנון ההשתקה ב-RTL: מחוץ לאזור התצוגה הפעיל, בקר ال-VGA מאלץ את הצבעים להיות אפס (שחור).")
+add_clean_bullet(tf_t3, "• ניהול זיכרון: נתוני הפיקסל נמשכים מזיכרון ה-BRAM אך ורק כאשר הקרן נמצאה באזור המורשה (האזור הפעיל).")
+
 # ==========================================
 # שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
 # ==========================================
