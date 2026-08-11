@@ -264,8 +264,7 @@ tf_t4 = tx_t4.text_frame
 
 add_clean_bullet(tf_t4, "• מימוש מעגל המונים (Horiz & Vert) עם חיווט מלא של הפרמטרים התקניים.")
 add_clean_bullet(tf_t4, "• בקרת אותות ה-HSYNC, VSYNC וערוצי הצבע (R, G, B).")
-add_clean_bullet(tf_t4, "• הצגת פטרן בדיקה ויזואלי המוכיח סנכרון מושלם ותדר שעון יציב ברזולוציית היעד.")
-
+add_clean_bullet(tf_t4, "• הצגת תבנית בדיקה ויזואלית המוכיח סנכרון מושלם ותדר שעון יציב ברזולוציית היעד.")
 # הוספת התמונה vga_counters_logic_flow.png
 img_path_t4 = "docs/presentation/assets/vga_counters_logic_flow.png"
 if os.path.exists(img_path_t4):
