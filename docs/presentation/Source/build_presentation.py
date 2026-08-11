@@ -177,16 +177,15 @@ else:
     err_box.text = "Error: Image vga_analog_cathode_ray_concept.png not found"
 
 # ==========================================
-# שקף א' מתוך ה-3: תזמונים, רזולוציה ומונים
+# שקף א': תזמונים ורזולוציה (Active מול Blanking)
 # ==========================================
 slide_t1 = prs.slides.add_slide(prs.slide_layouts[5])
 title_t1 = slide_t1.shapes.title
-title_t1.text = "ממשק ה-VGA: תזמונים ומונים"
+title_t1.text = "ממשק ה-VGA: תזמונים ורזולוציה"
 set_rtl(title_t1.text_frame.paragraphs[0])
 title_t1.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-# טקסט בצד ימין
-tx_t1 = slide_t1.shapes.add_textbox(Inches(5.2), Inches(1.5), Inches(4.3), Inches(5.0))
+tx_t1 = slide_t1.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
 tf_t1 = tx_t1.text_frame
 
 def add_clean_bullet(tf, text):
@@ -197,49 +196,80 @@ def add_clean_bullet(tf, text):
     p.alignment = PP_ALIGN.RIGHT
     set_rtl(p)
 
-add_clean_bullet(tf_t1, "• עבודה ברזולוציה של 640 על 480 פיקסלים ב-60 הרץ.")
-add_clean_bullet(tf_t1, "• דורש שעון פיקסל (Pixel Clock) בתדר של 25.175 מגה-הרץ.")
-add_clean_bullet(tf_t1, "• בלוקי ה-Horiz וה-Vert מממשים את חלוקת הפרוטוקול ל-Active, Front Porch, Sync ו-Back Porch.")
+add_clean_bullet(tf_t1, "• עבודה ברזולוציה סטנדרטית של 640 על 480 פיקסלים בקצב של 60 הרץ.")
+add_clean_bullet(tf_t1, "• דורש שעון פיקסל (Pixel Clock) מדויק בתדר של 25.175 מגה-הרץ.")
+add_clean_bullet(tf_t1, "• חלוקת מרחב התצוגה לאזור פעיל (Active Region) ואזורי השהייה (Front/Back Porch ו-Sync).")
 
-# הוספת התמונה בצד שמאל
-image_path_t1 = "docs/presentation/assets/vga_counters_logic_flow.png"
-if os.path.exists(image_path_t1):
-    slide_t1.shapes.add_picture(image_path_t1, Inches(0.5), Inches(1.8), width=Inches(4.4))
-else:
-    err_box = slide_t1.shapes.add_textbox(Inches(0.5), Inches(3.0), Inches(4.4), Inches(1))
-    err_box.text = "[שגיאה: התמונה vga_counters_logic_flow.png לא נמצאה]"
-    
+# הוספת התמונה vga_active_vs_blanking_regions.png
+img_path_t1 = "docs/presentation/assets/vga_active_vs_blanking_regions.png"
+if os.path.exists(img_path_t1):
+    slide_t1.shapes.add_picture(img_path_t1, Inches(0.5), Inches(1.8), width=Inches(4.2))
+
+
 # ==========================================
-# שקף ב' מתוך ה-3: סריקה אופקית ואנכית (מונים)
+# שקף ב': מונים וסריקה קווית (Raster Scan & Retrace)
 # ==========================================
 slide_t2 = prs.slides.add_slide(prs.slide_layouts[5])
 title_t2 = slide_t2.shapes.title
-title_t2.text = "ממשק ה-VGA: מונים וסריקה קווית"
+title_t2.text = "ממשק ה-VGA: מונים וסריקה קווית (Raster Scan)"
 set_rtl(title_t2.text_frame.paragraphs[0])
 title_t2.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_t2 = slide_t2.shapes.add_textbox(Inches(0.8), Inches(1.5), Inches(8.5), Inches(4.5))
+tx_t2 = slide_t2.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
 tf_t2 = tx_t2.text_frame
 
-add_clean_bullet(tf_t2, "• סריקה אופקית (שורה): מונה ה-Horizontal סופר 800 מחזורים. רק 640 מתוכם הם תצוגה, והשאר מוקדשים להחשכה (Blanking) ולסנכרון השורה.")
-add_clean_bullet(tf_t2, "• סריקה אנכית (פרקים): מונה ה-Vertical סופר 521 שורות, מתוכן 480 פעילות. בסיום, אות הסנכרון (VSYNC) מחזיר את הקרן לראש המסך.")
+add_clean_bullet(tf_t2, "• תנועת זיגזג: סריקה מהירה משמאל לימין (Horizontal Retrace) שורה אחר שורה.")
+add_clean_bullet(tf_t2, "• מונה אופקי סופר 800 מחזורים (640 פעילים + 160 להחשכה וסנכרון).")
+add_clean_bullet(tf_t2, "• מונה אנכית סופר 521 שורות (480 פעילות), ובסיומן מבצע Vertical Retrace חזרה לראש המסך.")
+
+# הוספת התמונה vga_raster_scan_retrace_concept.png
+img_path_t2 = "docs/presentation/assets/vga_raster_scan_retrace_concept.png"
+if os.path.exists(img_path_t2):
+    slide_t2.shapes.add_picture(img_path_t2, Inches(0.5), Inches(1.8), width=Inches(4.2))
 
 
 # ==========================================
-# שקף ג' מתוך ה-3: מנגנון ההשתקה והחיבור ל-BRAM
+# שקף ג': ארכיטקטורת בלוקים ב-FPGA והחיבור ל-BRAM
 # ==========================================
 slide_t3 = prs.slides.add_slide(prs.slide_layouts[5])
 title_t3 = slide_t3.shapes.title
-title_t3.text = "ממשק ה-VGA: מנגנון השתקה וחיבור ל-BRAM"
+title_t3.text = "ממשק ה-VGA: ארכיטקטורה וניהול BRAM"
 set_rtl(title_t3.text_frame.paragraphs[0])
 title_t3.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_t3 = slide_t3.shapes.add_textbox(Inches(0.8), Inches(1.5), Inches(8.5), Inches(4.5))
+tx_t3 = slide_t3.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
 tf_t3 = tx_t3.text_frame
 
-add_clean_bullet(tf_t3, "• מנגנון ההשתקה ב-RTL: מחוץ לאזור התצוגה הפעיל, בקר ال-VGA מאלץ את הצבעים להיות אפס (שחור).")
-add_clean_bullet(tf_t3, "• ניהול זיכרון: נתוני הפיקסל נמשכים מזיכרון ה-BRAM אך ורק כאשר הקרן נמצאה באזור המורשה (האזור הפעיל).")
+add_clean_bullet(tf_t3, "• הפרדת רשויות: רכיב ה-vga_sync מנהל את שעוני הסנכרון והכתובת (Pixel X/Y).")
+add_clean_bullet(tf_t3, "• מנגנון ההשתקה (Blanking): מחוץ לאזור הפעיל, ערכי ה-RGB מאולצים להתאפס (שחור מוחלט).")
+add_clean_bullet(tf_t3, "• שליפת נתונים מותנית: זיכרון ה-BRAM משחרר פיקסלים אך ורק כשהקרן נמצאת באזור המורשה.")
 
+# הוספת התמונה vga_fpga_top_architecture.png
+img_path_t3 = "docs/presentation/assets/vga_fpga_top_architecture.png"
+if os.path.exists(img_path_t3):
+    slide_t3.shapes.add_picture(img_path_t3, Inches(0.5), Inches(1.8), width=Inches(4.2))
+
+
+# ==========================================
+# שקף ד': סימולציה ת 
+# ==========================================
+slide_t4 = prs.slides.add_slide(prs.slide_layouts[5])
+title_t4 = slide_t4.shapes.title
+title_t4.text = "ממשק ה-VGA: סימולציה ומימוש מעשי"
+set_rtl(title_t4.text_frame.paragraphs[0])
+title_t4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+tx_t4 = slide_t4.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
+tf_t4 = tx_t4.text_frame
+
+add_clean_bullet(tf_t4, "• מימוש מעגל המונים (Horiz & Vert) עם חיווט מלא של הפרמטרים התקניים.")
+add_clean_bullet(tf_t4, "• בקרת אותות ה-HSYNC, VSYNC וערוצי הצבע (R, G, B).")
+add_clean_bullet(tf_t4, "• הצגת פטרן בדיקה ויזואלי המוכיח סנכרון מושלם ותדר שעון יציב ברזולוציית היעד.")
+
+# הוספת התמונה vga_counters_logic_flow.png
+img_path_t4 = "docs/presentation/assets/vga_counters_logic_flow.png"
+if os.path.exists(img_path_t4):
+    slide_t4.shapes.add_picture(img_path_t4, Inches(0.5), Inches(1.8), width=Inches(4.2))
 # ==========================================
 # שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
 # ==========================================
