@@ -322,4 +322,4 @@ if os.path.exists(image_path7_2):
 # ==========================================
 output_path = os.path.join(base_path, 'VGA_Presentation_Yossi.pptx')
 prs.save(output_path)
-print(f"All 7 Slides generated and saved successfully at: {output_path}")
+print(f"All {len(prs.slides)} Slides generated and saved successfully at: {output_path}")
