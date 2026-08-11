@@ -1,20 +1,64 @@
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
+from pptx.dml.color import RGBColor
+import os
 
 def create_presentation():
     # יצירת המצגת
     prs = Presentation()
 
-    # --- שקף 1: כותרת ---
-    slide_layout_title = prs.slide_layouts[0] 
-    slide_1 = prs.slides.add_slide(slide_layout_title)
+
+# -------------------------------------------------------------
+    # שקף 1: שקף הפתיחה (כותרת, תמונת בורד באמצע, פרטי מגיש למטה)
+    # -------------------------------------------------------------
+    slide_layout = prs.slide_layouts[6] # פריסה ריקה לשליטה מלאה במיקומים
+    slide = prs.slides.add_slide(slide_layout)
     
-    title_1 = slide_1.shapes.title
-    subtitle_1 = slide_1.placeholders[1]
+    # 1. כותרת ראשית וכותרת משנה (בחלק העליון)
+    title_box = slide.shapes.add_textbox(Inches(1), Inches(0.5), Inches(11.33), Inches(1.8))
+    tf = title_box.text_frame
+    tf.word_wrap = True
     
-    title_1.text = "פיתוח מערכת מבוססת FPGA להתראת נפילה לחולי דמנציה"
-    subtitle_1.text = "קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס Artix-7.\nמגיש: יוסי ברים | הנדסת חשמל שנה ד', המרכז האקדמי לב"
+    p = tf.paragraphs[0]
+    p.text = "פיתוח מערכת מבוססת FPGA להתראות נפילה לחולי דמנציה"
+    p.font.size = Pt(28)
+    p.font.bold = True
+    p.font.color.rgb = RGBColor(15, 23, 42) # כחול כהה מקצועי
+    p.alignment = PP_ALIGN.CENTER
+    
+    p2 = tf.add_paragraph()
+    p2.text = "קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס ARTIX A7\nעל מנת לאפשר עיבוד תמונה לזיהוי עמידה ממושכת לחולי דמנציה"
+    p2.font.size = Pt(16)
+    p2.font.color.rgb = RGBColor(71, 85, 105) # אפור-כחול
+    p2.alignment = PP_ALIGN.CENTER
+    p2.space_before = Pt(8)
+
+    # 2. הוספת תמונת הבורד (באמצע)
+    # ודא שהתמונה נמצאת בתיקיית assets בשם artix_board.png (או שנה את השם פה בהתאם)
+    board_img_path = r"docs\presentation\assets\artix_board.png"
+    if os.path.exists(board_img_path):
+        # מיקום באמצע השקף: רוחב 5 אינץ', ממוקם ב-X=3.9, Y=2.5
+        slide.shapes.add_picture(board_img_path, Inches(3.9), Inches(2.5), width=Inches(5.0))
+    else:
+        # תיבת גיבוי אם התמונה עוד לא קיימת בתיקייה
+        placeholder_box = slide.shapes.add_textbox(Inches(3.9), Inches(3.5), Inches(5.0), Inches(1.5))
+        ptf = placeholder_box.text_frame
+        pp = ptf.paragraphs[0]
+        pp.text = "[כאן תופיע תמונת הבורד]\n(הכנס תמונה בשם artix_board.png לתיקיית assets)"
+        pp.font.size = Pt(14)
+        pp.font.color.rgb = RGBColor(200, 0, 0)
+        pp.alignment = PP_ALIGN.CENTER
+
+    # 3. פרטי המגיש (למטה)
+    footer_box = slide.shapes.add_textbox(Inches(1), Inches(6.0), Inches(11.33), Inches(0.8))
+    ftf = footer_box.text_frame
+    fp = ftf.paragraphs[0]
+    fp.text = "מגיש: יוסי ברים  |  הנדסת חשמל שנה ד  |  המרכז האקדמי לב"
+    fp.font.size = Pt(16)
+    fp.font.bold = True
+    fp.font.color.rgb = RGBColor(30, 41, 59)
+    fp.alignment = PP_ALIGN.CENTER
 
 
     # --- שקף 2: ארכיטקטורת המערכת ---
