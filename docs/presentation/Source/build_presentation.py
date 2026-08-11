@@ -78,9 +78,9 @@ def create_presentation():
 
 
     # שמירת הקובץ
-    output_file = "VGA_Presentation_Base_Approved.pptx"
+    output_file = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\presentation\output\VGA_Presentation_Yossi.pptx"
     prs.save(output_file)
-    print(f"המצגת נבנתה ונשמרה בהצלחה בשם: {output_file}")
+    print(f"המצגת נבנתה ונשמרה בהצלחה בנתיב:\n{output_file}")
 
 if __name__ == "__main__":
     create_presentation()
