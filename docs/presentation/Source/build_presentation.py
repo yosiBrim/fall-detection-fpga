@@ -82,7 +82,7 @@ b2_s2.font.size = Pt(18); b2_s2.alignment = PP_ALIGN.RIGHT; set_rtl(b2_s2)
 top_box = slide2.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(3.8), Inches(2.4), Inches(2.2), Inches(1.8))
 top_box.fill.solid(); top_box.fill.fore_color.rgb = RGBColor(0, 0, 0)
 top_text = top_box.text_frame.paragraphs[0]
-top_text.text = "מערכת התראת נפילה\n(Top Level)"
+top_text.text = "מערכת התראת נפילה\nמבוסס FPGA"
 top_text.font.color.rgb = RGBColor(255, 255, 255); top_text.alignment = PP_ALIGN.CENTER; set_rtl(top_text)
 
 inputs_box = slide2.shapes.add_textbox(Inches(1.2), Inches(2.1), Inches(2.5), Inches(2))
@@ -107,26 +107,36 @@ for i, b_text in enumerate(blocks):
 # ==========================================
 # שקף 3: הסבר VGA (1/3) - פרוטוקול ותזמונים
 # ==========================================
+
 slide3 = prs.slides.add_slide(prs.slide_layouts[5])
 
 title3 = slide3.shapes.title
-title3.text = "ממשק ה-VGA: פרוטוקול ותזמונים"
+title3.text = "מהו פרוטוקול VGA?"
 set_rtl(title3.text_frame.paragraphs[0])
+title3.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-txBox_text3 = slide3.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
+# כותרת משנה עם הטקסט החדש וירידת שורה
+txBox_text3 = slide3.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
 tf_text3 = txBox_text3.text_frame
-b1_s3 = tf_text3.add_paragraph()
-b1_s3.text = "הפרוטוקול מבוסס על סריקה קווית (Raster Scan) ואותות סנכרון מדויקים (HSYNC, VSYNC)."
-b1_s3.font.size = Pt(16); b1_s3.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s3)
+p1_s3 = tf_text3.paragraphs[0]
+p1_s3.text = "הפרוטוקול מבוסס על סריקה קווית (raster scan) משמאל לימין ומלמעלה למטה.\nנתוני הצבע משודרים אך ורק באזור הפעיל (active video) ומלווים באותות סינכרון."
+p1_s3.font.size = Pt(16)
+p1_s3.alignment = PP_ALIGN.RIGHT
+set_rtl(p1_s3)
 
-image_path3_1 = os.path.join(base_path, "image_4486b2_2.png")
-image_path3_2 = os.path.join(base_path, "image_44207c.png")
+# הוספת התמונה שמתארת את שלבי התצוגה וזמני השידור
+# וודא שהקובץ קיים בנתיב זה בתיקיית ה-assets שלך
+image_path3 = "docs/presentation/assets/vga_raster_scan_timing.png" 
 
-if os.path.exists(image_path3_1):
-    slide3.shapes.add_picture(image_path3_1, Inches(0.5), Inches(2.1), width=Inches(4.3))
-if os.path.exists(image_path3_2):
-    slide3.shapes.add_picture(image_path3_2, Inches(5.1), Inches(2.1), width=Inches(4.4))
-
+if os.path.exists(image_path3):
+    slide3.shapes.add_picture(image_path3, Inches(2.0), Inches(3.0), width=Inches(6.0))
+else:
+    # תיבת שגיאה למקרה שהתמונה חסרה
+    error_box = slide3.shapes.add_textbox(Inches(2.0), Inches(3.0), Inches(6.0), Inches(1.0))
+    error_p = error_box.text_frame.paragraphs[0]
+    error_p.text = "[שגיאה: תמונת שלבי התצוגה לא נמצאה ב-assets]"
+    error_p.font.color.rgb = RGBColor(255, 0, 0)
+    error_p.alignment = PP_ALIGN.CENTER
 # ==========================================
 # שקף 4: הסבר VGA (2/3) - פיזיקה ושליטה
 # ==========================================
