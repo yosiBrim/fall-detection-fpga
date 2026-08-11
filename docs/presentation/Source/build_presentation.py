@@ -1,130 +1,219 @@
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
+from pptx.enum.shapes import MSO_SHAPE
 from pptx.dml.color import RGBColor
 import os
 
-def create_presentation():
-    # יצירת המצגת
-    prs = Presentation()
+# פונקציה לקיבוע הטקסט לימין (RTL)
+def set_rtl(paragraph):
+    pPr = paragraph._p.get_or_add_pPr()
+    pPr.set('rtl', '1')
 
+prs = Presentation()
 
-# -------------------------------------------------------------
-    # שקף 1: שקף הפתיחה (כותרת, תמונת בורד באמצע, פרטי מגיש למטה)
-    # -------------------------------------------------------------
-    slide_layout = prs.slide_layouts[6] # פריסה ריקה לשליטה מלאה במיקומים
-    slide = prs.slides.add_slide(slide_layout)
-    
-    # 1. כותרת ראשית וכותרת משנה (בחלק העליון)
-    title_box = slide.shapes.add_textbox(Inches(1), Inches(0.5), Inches(11.33), Inches(1.8))
-    tf = title_box.text_frame
-    tf.word_wrap = True
-    
-    p = tf.paragraphs[0]
-    p.text = "פיתוח מערכת מבוססת FPGA להתראות נפילה לחולי דמנציה"
-    p.font.size = Pt(28)
-    p.font.bold = True
-    p.font.color.rgb = RGBColor(15, 23, 42) # כחול כהה מקצועי
-    p.alignment = PP_ALIGN.CENTER
-    
-    p2 = tf.add_paragraph()
-    p2.text = "קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס ARTIX A7\nעל מנת לאפשר עיבוד תמונה לזיהוי עמידה ממושכת לחולי דמנציה"
-    p2.font.size = Pt(16)
-    p2.font.color.rgb = RGBColor(71, 85, 105) # אפור-כחול
-    p2.alignment = PP_ALIGN.CENTER
-    p2.space_before = Pt(8)
+base_path = r"docs\presentation\output" 
+os.makedirs(base_path, exist_ok=True)
 
-    # 2. הוספת תמונת הבורד (באמצע)
-    # ודא שהתמונה נמצאת בתיקיית assets בשם artix_board.png (או שנה את השם פה בהתאם)
-    board_img_path = r"docs\presentation\assets\artix_board.png"
-    if os.path.exists(board_img_path):
-        # מיקום באמצע השקף: רוחב 5 אינץ', ממוקם ב-X=3.9, Y=2.5
-        slide.shapes.add_picture(board_img_path, Inches(3.9), Inches(2.5), width=Inches(5.0))
-    else:
-        # תיבת גיבוי אם התמונה עוד לא קיימת בתיקייה
-        placeholder_box = slide.shapes.add_textbox(Inches(3.9), Inches(3.5), Inches(5.0), Inches(1.5))
-        ptf = placeholder_box.text_frame
-        pp = ptf.paragraphs[0]
-        pp.text = "[כאן תופיע תמונת הבורד]\n(הכנס תמונה בשם artix_board.png לתיקיית assets)"
-        pp.font.size = Pt(14)
-        pp.font.color.rgb = RGBColor(200, 0, 0)
-        pp.alignment = PP_ALIGN.CENTER
+# ==========================================
+# שקף 1: שער ומטרת הפרויקט
+# ==========================================
+slide1 = prs.slides.add_slide(prs.slide_layouts[5])
 
-    # 3. פרטי המגיש (למטה)
-    footer_box = slide.shapes.add_textbox(Inches(1), Inches(6.0), Inches(11.33), Inches(0.8))
-    ftf = footer_box.text_frame
-    fp = ftf.paragraphs[0]
-    fp.text = "מגיש: יוסי ברים  |  הנדסת חשמל שנה ד  |  המרכז האקדמי לב"
-    fp.font.size = Pt(16)
-    fp.font.bold = True
-    fp.font.color.rgb = RGBColor(30, 41, 59)
-    fp.alignment = PP_ALIGN.CENTER
+title1 = slide1.shapes.title
+title1.text = "פיתוח מערכת מבוססת FPGA להתראת נפילה לחולי דמנציה"
+set_rtl(title1.text_frame.paragraphs[0])
+title1.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
+txBox_desc = slide1.shapes.add_textbox(Inches(0.5), Inches(1.3), Inches(9), Inches(0.5))
+p_desc = txBox_desc.text_frame.paragraphs[0]
+p_desc.text = "קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס Artix-7."
+p_desc.font.size = Pt(20)
+p_desc.alignment = PP_ALIGN.CENTER
+set_rtl(p_desc)
 
-    # --- שקף 2: ארכיטקטורת המערכת ---
-    slide_layout_content = prs.slide_layouts[1] # שקף עם כותרת ותוכן
-    slide_2 = prs.slides.add_slide(slide_layout_content)
-    
-    slide_2.shapes.title.text = "ארכיטקטורת המערכת"
-    tf_2 = slide_2.shapes.placeholders[1].text_frame
-    tf_2.text = "נתוני התמונה הגולמיים נקלטים מהמצלמה ונאגרים בזיכרון ה-BRAM."
-    tf_2.add_paragraph().text = "בקר ה-VGA שולף את הנתונים ומעביר לממיר D to A לקבלת אות אנלוגי פיזי למסך."
-    
-    # תוספת פירוט הבלוקים והאותות
-    p = tf_2.add_paragraph()
-    p.text = "מערכת התראת נפילה (Top Level):"
-    p.level = 0
-    tf_2.add_paragraph().text = "Inputs: clk, reset, ov7670_vsync, href, pclk, ov7670_data[7:0], btn[1:0], sw[1:0], scl, sda"
-    tf_2.add_paragraph().text = "Outputs: VGA_HS_O, VGA_VS_O, VGA_R[3:0], G[3:0], B[3:0], ov7670_xclk, pwdn, reset, led[3:0]"
-    tf_2.add_paragraph().text = "מודולים פנימיים: ov7670_capture, frame_buffer, vga_controller, D to A Converter"
+image_path1 = os.path.join(base_path, "image_464ced.jpg")
+if os.path.exists(image_path1):
+    slide1.shapes.add_picture(image_path1, Inches(2.5), Inches(2.0), width=Inches(5))
 
+txBox_details = slide1.shapes.add_textbox(Inches(0.5), Inches(6.3), Inches(9), Inches(0.5))
+p_details = txBox_details.text_frame.paragraphs[0]
+p_details.text = "מגיש: יוסי ברים | הנדסת חשמל שנה ד', המרכז האקדמי לב"
+p_details.font.size = Pt(22)
+p_details.font.bold = True
+p_details.alignment = PP_ALIGN.CENTER
+set_rtl(p_details)
 
-    # --- שקף 3: ממשק ה-VGA (פרוטוקול) ---
-    slide_3 = prs.slides.add_slide(slide_layout_content)
-    slide_3.shapes.title.text = "ממשק ה-VGA: פרוטוקול ותזמונים"
-    tf_3 = slide_3.shapes.placeholders[1].text_frame
-    tf_3.text = "הפרוטוקול מבוסס על סריקה קווית (Raster Scan) ואותות סנכרון מדויקים (HSYNC, VSYNC)."
-    # (כאן בעתיד נוסיף את התמונה של טבלת התזמונים)
+# ==========================================
+# שקף 2: ארכיטקטורת המערכת
+# ==========================================
+slide2 = prs.slides.add_slide(prs.slide_layouts[5])
 
+title2 = slide2.shapes.title
+title2.text = "ארכיטקטורת המערכת"
+set_rtl(title2.text_frame.paragraphs[0])
 
-    # --- שקף 4: ממשק ה-VGA (חומרה ופיזיקה) ---
-    slide_4 = prs.slides.add_slide(slide_layout_content)
-    slide_4.shapes.title.text = "ממשק ה-VGA: שליטה חומרתית ופיזיקה"
-    tf_4 = slide_4.shapes.placeholders[1].text_frame
-    tf_4.text = "שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים (Cathode ray) על המסך."
-    tf_4.add_paragraph().text = "אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן."
-    tf_4.add_paragraph().text = "באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים (Electron guns)."
+txBox_text2 = slide2.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1))
+tf_text2 = txBox_text2.text_frame
 
+b1_s2 = tf_text2.add_paragraph()
+b1_s2.text = "נתוני התמונה הגולמיים נקלטים מהמצלמה ונאגרים בזיכרון ה-BRAM."
+b1_s2.font.size = Pt(18); b1_s2.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s2)
 
-    # --- שקף 5: ממשק ה-VGA (נתיב נתונים) ---
-    slide_5 = prs.slides.add_slide(slide_layout_content)
-    slide_5.shapes.title.text = "ממשק ה-VGA: מיקום בקר ה-VGA בנתיב הנתונים"
-    tf_5 = slide_5.shapes.placeholders[1].text_frame
-    tf_5.text = "הבקר מקבל שעון פיקסל (25MHz) מבלוק ניהול השעונים של המערכת."
-    tf_5.add_paragraph().text = "המימוש הלוגי מחשב ומשדר כתובת (addrb) כדי לשלוף נתונים (doutb) ישירות מזיכרון ה-BRAM."
-    # (כאן בעתיד נוסיף דיאגרמת RTL)
+b2_s2 = tf_text2.add_paragraph()
+b2_s2.text = "בקר ה-VGA שולף את הנתונים ומעביר לממיר D to A לקבלת אות אנלוגי פיזי למסך."
+b2_s2.font.size = Pt(18); b2_s2.alignment = PP_ALIGN.RIGHT; set_rtl(b2_s2)
 
+top_box = slide2.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(3.8), Inches(2.4), Inches(2.2), Inches(1.8))
+top_box.fill.solid(); top_box.fill.fore_color.rgb = RGBColor(0, 0, 0)
+top_text = top_box.text_frame.paragraphs[0]
+top_text.text = "מערכת התראת נפילה\n(Top Level)"
+top_text.font.color.rgb = RGBColor(255, 255, 255); top_text.alignment = PP_ALIGN.CENTER; set_rtl(top_text)
 
-    # --- שקף 6: מקרה בוחן 1 ---
-    slide_6 = prs.slides.add_slide(slide_layout_content)
-    slide_6.shapes.title.text = "מקרה בוחן 1: תזמון ירידת שורה (Horizontal Blanking)"
-    tf_6 = slide_6.shapes.placeholders[1].text_frame
-    tf_6.text = "ניהול המונים (Horizontal/Vertical) ושליטה במנגנון ההחשכה (Blanking) לחזרת הקרן."
-    # (כאן בעתיד נוסיף את שרטוט מונה הסנכרון האופקי)
+inputs_box = slide2.shapes.add_textbox(Inches(1.2), Inches(2.1), Inches(2.5), Inches(2))
+inputs_box.text_frame.paragraphs[0].text = "Inputs:\nclk, reset\nov7670_vsync, href, pclk\nov7670_data[7:0]\nbtn[1:0], sw[1:0]\nscl, sda"
+inputs_box.text_frame.paragraphs[0].font.size = Pt(13); inputs_box.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
+slide2.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(3.1), Inches(3.1), Inches(0.6), Inches(0.3))
 
+outputs_box = slide2.shapes.add_textbox(Inches(6.2), Inches(2.1), Inches(3.5), Inches(2))
+outputs_box.text_frame.paragraphs[0].text = "Outputs:\nVGA_HS_O, VGA_VS_O\nVGA_R[3:0], G[3:0], B[3:0]\nov7670_xclk, pwdn, reset\nled[3:0]"
+outputs_box.text_frame.paragraphs[0].font.size = Pt(13)
+slide2.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(6.1), Inches(3.1), Inches(0.6), Inches(0.3))
 
-    # --- שקף 7: מקרה בוחן 2 ---
-    slide_7 = prs.slides.add_slide(slide_layout_content)
-    slide_7.shapes.title.text = "מקרה בוחן 2: מ-RGB דיגיטלי ליציאה אנלוגית"
-    tf_7 = slide_7.shapes.placeholders[1].text_frame
-    tf_7.text = "המרת 12 ביטים של צבע (RGB) למתח פיזי רציף באמצעות רשת נגדים (DAC) ומחבר ה-VGA."
-    # (כאן בעתיד נוסיף את שרטוט המעגל האנלוגי)
+blocks = ["ov7670_capture", "frame_buffer", "vga_controller", "D to A Converter"]
+for i, b_text in enumerate(blocks):
+    b = slide2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6 + i*2.2), Inches(5.2), Inches(1.7), Inches(0.8))
+    b.fill.solid(); b.fill.fore_color.rgb = RGBColor(79, 129, 189)
+    bp = b.text_frame.paragraphs[0]
+    bp.text = b_text; bp.font.size = Pt(14); bp.alignment = PP_ALIGN.CENTER
+    if i < 3:
+        slide2.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(2.3 + i*2.2), Inches(5.5), Inches(0.5), Inches(0.2))
 
+# ==========================================
+# שקף 3: הסבר VGA (1/3) - פרוטוקול ותזמונים
+# ==========================================
+slide3 = prs.slides.add_slide(prs.slide_layouts[5])
 
-    # שמירת הקובץ
-    output_file = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\presentation\output\VGA_Presentation_Yossi.pptx"
-    prs.save(output_file)
-    print(f"המצגת נבנתה ונשמרה בהצלחה בנתיב:\n{output_file}")
+title3 = slide3.shapes.title
+title3.text = "ממשק ה-VGA: פרוטוקול ותזמונים"
+set_rtl(title3.text_frame.paragraphs[0])
 
-if __name__ == "__main__":
-    create_presentation()
+txBox_text3 = slide3.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
+tf_text3 = txBox_text3.text_frame
+b1_s3 = tf_text3.add_paragraph()
+b1_s3.text = "הפרוטוקול מבוסס על סריקה קווית (Raster Scan) ואותות סנכרון מדויקים (HSYNC, VSYNC)."
+b1_s3.font.size = Pt(16); b1_s3.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s3)
+
+image_path3_1 = os.path.join(base_path, "image_4486b2_2.png")
+image_path3_2 = os.path.join(base_path, "image_44207c.png")
+
+if os.path.exists(image_path3_1):
+    slide3.shapes.add_picture(image_path3_1, Inches(0.5), Inches(2.1), width=Inches(4.3))
+if os.path.exists(image_path3_2):
+    slide3.shapes.add_picture(image_path3_2, Inches(5.1), Inches(2.1), width=Inches(4.4))
+
+# ==========================================
+# שקף 4: הסבר VGA (2/3) - פיזיקה ושליטה
+# ==========================================
+slide4 = prs.slides.add_slide(prs.slide_layouts[5])
+
+title4 = slide4.shapes.title
+title4.text = "ממשק ה-VGA: שליטה חומרתית ופיזיקה"
+set_rtl(title4.text_frame.paragraphs[0])
+
+txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(1.2))
+tf_text4 = txBox_text4.text_frame
+
+b1_s4 = tf_text4.add_paragraph()
+b1_s4.text = "שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים (Cathode ray) על המסך."
+b1_s4.font.size = Pt(15); b1_s4.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s4)
+
+b2_s4 = tf_text4.add_paragraph()
+b2_s4.text = "אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן."
+b2_s4.font.size = Pt(15); b2_s4.alignment = PP_ALIGN.RIGHT; set_rtl(b2_s4)
+
+b3_s4 = tf_text4.add_paragraph()
+b3_s4.text = "באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים (Electron guns)."
+b3_s4.font.size = Pt(15); b3_s4.alignment = PP_ALIGN.RIGHT; set_rtl(b3_s4)
+
+image_path4 = os.path.join(base_path, "image_4486b2_3.png")
+if os.path.exists(image_path4):
+    slide4.shapes.add_picture(image_path4, Inches(2.2), Inches(2.8), width=Inches(5.5))
+
+# ==========================================
+# שקף 5: הסבר VGA (3/3) - נתיב הנתונים ב-RTL
+# ==========================================
+slide5 = prs.slides.add_slide(prs.slide_layouts[5])
+
+title5 = slide5.shapes.title
+title5.text = "ממשק ה-VGA: מיקום בקר ה-VGA בנתיב הנתונים"
+set_rtl(title5.text_frame.paragraphs[0])
+
+txBox_text5 = slide5.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(1.2))
+tf_text5 = txBox_text5.text_frame
+
+b1_s5 = tf_text5.add_paragraph()
+b1_s5.text = "הבקר מקבל שעון פיקסל (25MHz) מבלוק ניהול השעונים של המערכת."
+b1_s5.font.size = Pt(16); b1_s5.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s5)
+
+b2_s5 = tf_text5.add_paragraph()
+b2_s5.text = "המימוש הלוגי מחשב ומשדר כתובת (addrb) כדי לשלוף נתונים (doutb) ישירות מזיכרון ה-BRAM."
+b2_s5.font.size = Pt(16); b2_s5.alignment = PP_ALIGN.RIGHT; set_rtl(b2_s5)
+
+image_path5 = os.path.join(base_path, "rtl_direct_vga_path (3)_3.png")
+if os.path.exists(image_path5):
+    slide5.shapes.add_picture(image_path5, Inches(0.5), Inches(2.6), width=Inches(9))
+
+# ==========================================
+# שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
+# ==========================================
+slide6 = prs.slides.add_slide(prs.slide_layouts[5])
+
+title6 = slide6.shapes.title
+title6.text = "מקרה בוחן 1: תזמון ירידת שורה (Horizontal Blanking)"
+set_rtl(title6.text_frame.paragraphs[0])
+
+txBox_text6 = slide6.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
+tf_text6 = txBox_text6.text_frame
+b1_s6 = tf_text6.add_paragraph()
+b1_s6.text = "ניהול המונים (Horizontal/Vertical) ושליטה במנגנון ההחשכה (Blanking) לחזרת הקרן."
+b1_s6.font.size = Pt(16); b1_s6.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s6)
+
+# שתי התמונות זו לצד זו (הטבלה והמונים)
+image_path6_1 = os.path.join(base_path, "image_44207c.png") # טבלת תזמונים
+image_path6_2 = os.path.join(base_path, "image_441d97.png") # דיאגרמת מונים
+
+if os.path.exists(image_path6_1):
+    slide6.shapes.add_picture(image_path6_1, Inches(0.2), Inches(2.2), width=Inches(4.4))
+if os.path.exists(image_path6_2):
+    slide6.shapes.add_picture(image_path6_2, Inches(5.0), Inches(2.5), width=Inches(4.8))
+
+# ==========================================
+# שקף 7: מקרה בוחן 2 - המרה D to A
+# ==========================================
+slide7 = prs.slides.add_slide(prs.slide_layouts[5])
+
+title7 = slide7.shapes.title
+title7.text = "מקרה בוחן 2: מ-RGB דיגיטלי ליציאה אנלוגית"
+set_rtl(title7.text_frame.paragraphs[0])
+
+txBox_text7 = slide7.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
+tf_text7 = txBox_text7.text_frame
+b1_s7 = tf_text7.add_paragraph()
+b1_s7.text = "המרת 12 ביטים של צבע (RGB) למתח פיזי רציף באמצעות רשת נגדים (DAC) ומחבר ה-VGA."
+b1_s7.font.size = Pt(16); b1_s7.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s7)
+
+image_path7_1 = os.path.join(base_path, "image_441292.png")
+image_path7_2 = os.path.join(base_path, "image_441cda.png")
+
+if os.path.exists(image_path7_1):
+    slide7.shapes.add_picture(image_path7_1, Inches(0.8), Inches(2.1), height=Inches(4.5))
+if os.path.exists(image_path7_2):
+    slide7.shapes.add_picture(image_path7_2, Inches(5.3), Inches(2.6), width=Inches(3.8))
+
+# ==========================================
+# שמירת המצגת
+# ==========================================
+output_path = os.path.join(base_path, 'VGA_Presentation_Yossi.pptx')
+prs.save(output_path)
+print(f"All 7 Slides generated and saved successfully at: {output_path}")
