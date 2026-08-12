@@ -260,6 +260,30 @@ if os.path.exists(img_path8_2):
 
 
 
+
+
+# ==========================================
+# שקף 9: עומק הנדסי - הפיזיקה של מחלק המתח (MSB/LSB)
+# ==========================================
+slide9 = prs.slides.add_slide(prs.slide_layouts[5])
+title9 = slide9.shapes.title
+title9.text = "עומק הנדסי: מחלק המתח ומשקלי הביטים"
+set_rtl(title9.text_frame.paragraphs[0])
+title9.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text9 = slide9.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+tf_text9 = txBox_text9.text_frame
+
+add_bullet(tf_text9, "• משקל פיזי לכל ביט (MSB לעומת LSB): הביט המשמעותי ביותר (MSB) מחובר לנגד הקטן ביותר, ולכן מזזרים את הזרם הגדול ביותר למעגל ומשפיע משמעותית על עוצמת הצבע.")
+add_bullet(tf_text9, "• כוונון עדין: לעומתו, הביט הפחות משמעותי (LSB) מחובר לנגד הגדול ביותר בסולם. תרומתו לזרם הכולל היא מזערית ונועדה לכוונון עדין של הגוון.")
+add_bullet(tf_text9, "• סכימה אנלוגית על המסך: כל הזרמים מהביטים הפעילים ('1') מתחברים וזורמים יחד דרך נגד הסיומת של המסך (75Ω) אל האדמה. כך נוצר מחלק מתח דינמי המפיק 0V עד 0.7V.")
+
+# התמונה הממחישה את הסכימה החשמלית
+# ודא ששם הקובץ בתיקייה הוא vga_voltage_divider_dac.png
+img_path9 = "docs/presentation/assets/vga_voltage_divider_dac.png" 
+if os.path.exists(img_path9):
+    slide9.shapes.add_picture(img_path9, Inches(1.5), Inches(3.2), width=Inches(7.0))
+
     
 # ==========================================
 # שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
