@@ -425,6 +425,59 @@ img_path13 = "docs/presentation/assets/camera_capture_flow.png.jpeg"
 if os.path.exists(img_path13):
     slide13.shapes.add_picture(img_path13, Inches(2.5), Inches(3.5), width=Inches(5.0))
 
+
+# ==========================================
+# שקף 15: ממשק הזיכרון - לוגיקת שליפת הנתונים
+# ==========================================
+slide15 = prs.slides.add_slide(prs.slide_layouts[5])
+title15 = slide15.shapes.title
+title15.text = "ממשק הזיכרון (BRAM): ממדים וסנכרון נתונים"
+set_rtl(title15.text_frame.paragraphs[0])
+title15.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text15 = slide15.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(2.0))
+tf_text15 = txBox_text15.text_frame
+
+add_bullet(tf_text15, "• תרגום קואורדינטות: הכתובת לזיכרון (addrb באורך 19 ביט) מחושבת מתמטית לפי המיקום באזור הפעיל: Y * 640 + X.")
+add_bullet(tf_text15, "• מנגנון ה-Pipeline (עיכוב מכוון): לזיכרון ה-BRAM יש זמן תגובה. הקוד רושם את הנתון הנכנס (doutb) לתוך אוגר פנימי (pxl_data_reg) בעליית השעון הבאה.")
+add_bullet(tf_text15, "• סנכרון שומר הסף: כדי לפצות על השהיית הזיכרון, דגל אזור התצוגה (in_display_area) מושהה גם הוא במחזור שעון אחד (ל-in_display_area_delayed).")
+add_bullet(tf_text15, "• ניתוב דיגיטלי (Mux): רק כאשר הדגל המושהה דולק, 12 הביטים מפוצלים ומנותבים ליציאות VGA_R, VGA_G ו-VGA_B (4 ביטים לצבע).")
+
+# אפשר לשים כאן סניפט (צילום מסך של קטע הקוד של ה-PROCESS שמחשב את bram_address_next)
+img_path15 = "docs/presentation/assets/vga_address_logic_code.png" # הכן צילום מסך של הקוד
+if os.path.exists(img_path15):
+    slide15.shapes.add_picture(img_path15, Inches(2.5), Inches(4.0), width=Inches(5.0))
+
+
+# ==========================================
+# שקף 16: סימולציית מסלול הנתונים (Data Path)
+# ==========================================
+slide16 = prs.slides.add_slide(prs.slide_layouts[5])
+title16 = slide16.shapes.title
+title16.text = "אימות מסלול הנתונים: VGA Controller ↔ BRAM"
+set_rtl(title16.text_frame.paragraphs[0])
+title16.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text16 = slide16.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text16 = txBox_text16.text_frame
+
+add_bullet(tf_text16, "• מטרת הסימולציה: הוכחת לחיצת היד (Handshake) שבין בקשת הכתובת (addrb) לקבלת נתוני הפיקסל (doutb).")
+add_bullet(tf_text16, "• דגימה בזמן אמת: ניתן לראות בבירור כיצד הכתובת עולה, ולאחר מחזור שעון, המידע מופיע ב-pxl_data_reg.")
+add_bullet(tf_text16, "• מניעת זבל ויזואלי: הסימולציה מוכיחה שבמעבר ל-Blanking (סוף שורה), יציאות ה-RGB נחתכות ל-0 מיידית, למרות שהזיכרון עדיין פולט מידע ישן.")
+
+# כאן תיכנס התמונה של ה-Waveform מ-ModelSim שאותה נייצר כעת
+img_path16 = "docs/presentation/assets/modelsim_data_path_flow.png" 
+if os.path.exists(img_path16):
+    slide16.shapes.add_picture(img_path16, Inches(1.0), Inches(3.6), width=Inches(8.0))
+else:
+    err_box = slide16.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]
+    err_p.text = f"[שומר מקום: כאן תיכנס תמונת ה-Waveform של זרימת הנתונים]"
+    err_p.font.size = Pt(14)
+    err_p.font.color.rgb = RGBColor(0, 112, 192)
+    err_p.alignment = PP_ALIGN.CENTER
+
+
 # ==========================================
 # שמירת המצגת
 # ==========================================
