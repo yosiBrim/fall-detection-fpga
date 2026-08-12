@@ -290,6 +290,64 @@ img_path9 = "docs/presentation/assets/vga_voltage_divider_dac.png"
 if os.path.exists(img_path9):
     slide9.shapes.add_picture(img_path9, Inches(1.5), Inches(3.2), width=Inches(7.0))
 
+# ==========================================
+# שקף 10: מבט-על - זרימת נתונים ותחומי שעון (RTL)
+# ==========================================
+slide10 = prs.slides.add_slide(prs.slide_layouts[5])
+title10 = slide10.shapes.title
+title10.text = "מבט-על: זרימת נתונים ותחומי שעון (RTL)"
+set_rtl(title10.text_frame.paragraphs[0])
+title10.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text10 = slide10.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text10 = txBox_text10.text_frame
+
+add_bullet(tf_text10, "• מחולל שעונים (clk_generator): רכיב PLL המקבל שעון מערכת ומפיק שעון 25MHz נפרד ל-VGA ושעון ייעודי למצלמה.")
+add_bullet(tf_text10, "• גישור חציית שעונים (CDC): זיכרון ה-BRAM (בתצורת Dual-Port) פועל כחוצץ בטוח בין קצב הכתיבה לקצב הקריאה.")
+add_bullet(tf_text10, "• תחום אדום (Camera Domain): קליטת הפיקסלים מהמצלמה (ov7670_capture) ודחיפתם לפורט A של הזיכרון (clka).")
+add_bullet(tf_text10, "• תחום כחול (VGA Domain): המיקוד שלנו – שליפת הפיקסלים מפורט B (clkb) על ידי בקר ה-VGA וייצור אותות התצוגה.")
+
+# תמונת ה-RTL
+img_path10 = "docs/presentation/assets/rtl_direct_vga_path (4).png"
+if os.path.exists(img_path10):
+    # מיקום התמונה (ממורכזת)
+    slide10.shapes.add_picture(img_path10, Inches(0.5), Inches(3.0), width=Inches(9.0))
+    
+    # יצירת מסגרת אדומה (Camera Domain) - צד שמאל ועד אמצע הזיכרון
+    red_box = slide10.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(1.0), Inches(3.2), Inches(4.0), Inches(3.8))
+    red_box.fill.background() # הופך את תוכן הריבוע לשקוף
+    red_box.line.color.rgb = RGBColor(255, 0, 0) # צבע אדום
+    red_box.line.width = Pt(3)
+    
+    # יצירת מסגרת כחולה (VGA Domain - התחום שלך) - מאמצע הזיכרון ועד ימין
+    blue_box = slide10.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(5.1), Inches(3.2), Inches(4.0), Inches(3.8))
+    blue_box.fill.background() # הופך את תוכן הריבוע לשקוף
+    blue_box.line.color.rgb = RGBColor(0, 112, 192) # צבע כחול
+    blue_box.line.width = Pt(4) # קצת יותר עבה כדי להדגיש שזה התחום שלך
+
+
+# ==========================================
+# שקף 11: צלילה לתכן - ניהול שעונים (Clock Generator)
+# ==========================================
+slide11 = prs.slides.add_slide(prs.slide_layouts[5])
+title11 = slide11.shapes.title
+title11.text = "ניהול שעונים במערכת (Clock Generator)"
+set_rtl(title11.text_frame.paragraphs[0])
+title11.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text11 = slide11.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text11 = txBox_text11.text_frame
+
+# שימוש ממוקד במספרים ושמות האותות מתוך הלוגיקה
+add_bullet(tf_text11, "• מקור שעון (System Clock): כניסת clk מקבלת את שעון הלוח המקורי (100MHz) ומזינה את ה-PLL (clk_wiz_0).")
+add_bullet(tf_text11, "• שעון תצוגה (vga_pll): ה-PLL מפיק תדר של 25MHz המזין את בקר ה-VGA (pxl_clk) ואת פורט הקריאה (clkb) ב-BRAM.")
+add_bullet(tf_text11, "• שעון מצלמה (xclk_pll): הפקת שעון ייעודי של 24MHz (xclk_ov7670) המנותב החוצה לסנכרון רכיב המצלמה.")
+
+# הכנה לתמונה מתאימה (סניפט קוד או סכמת בלוק של clk_wiz_0)
+img_path11 = "docs/presentation/assets/clk_wiz_instantiation.png"
+if os.path.exists(img_path11):
+    slide11.shapes.add_picture(img_path11, Inches(2.5), Inches(3.2), width=Inches(5.0))
+    
 
 # ==========================================
 # שמירת המצגת
