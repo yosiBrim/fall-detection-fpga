@@ -105,170 +105,162 @@ for i, b_text in enumerate(blocks):
         slide2.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(2.3 + i*2.2), Inches(5.5), Inches(0.5), Inches(0.2))
 
 # ==========================================
-# שקף 3: הסבר VGA (1/3) - פרוטוקול ותזמונים
+# שקף 3: צעד 1 בסיפור - הפיזיקה של הסריקה הקווית (Raster Scan)
 # ==========================================
-
 slide3 = prs.slides.add_slide(prs.slide_layouts[5])
-
 title3 = slide3.shapes.title
-title3.text = "מהו פרוטוקול VGA?"
+title3.text = "מבוא ל-VGA: סריקה קווית (Raster Scan)"
 set_rtl(title3.text_frame.paragraphs[0])
 title3.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-# כותרת משנה עם הטקסט החדש וירידת שורה
 txBox_text3 = slide3.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
 tf_text3 = txBox_text3.text_frame
-p1_s3 = tf_text3.paragraphs[0]
-p1_s3.text = "הפרוטוקול מבוסס על סריקה קווית (raster scan) משמאל לימין ומלמעלה למטה.\nנתוני הצבע משודרים אך ורק באזור הפעיל (active video) ומלווים באותות סינכרון."
-p1_s3.font.size = Pt(16)
-p1_s3.alignment = PP_ALIGN.RIGHT
-set_rtl(p1_s3)
 
-# הוספת התמונה שמתארת את שלבי התצוגה וזמני השידור
-# וודא שהקובץ קיים בנתיב זה בתיקיית ה-assets שלך
-image_path3 = "docs/presentation/assets/vga_raster_scan_timing.png" 
-
-if os.path.exists(image_path3):
-    slide3.shapes.add_picture(image_path3, Inches(2.0), Inches(3.0), width=Inches(6.0))
-else:
-    # תיבת שגיאה למקרה שהתמונה חסרה
-    error_box = slide3.shapes.add_textbox(Inches(2.0), Inches(3.0), Inches(6.0), Inches(1.0))
-    error_p = error_box.text_frame.paragraphs[0]
-    error_p.text = "[שגיאה: תמונת שלבי התצוגה לא נמצאה ב-assets]"
-    error_p.font.color.rgb = RGBColor(255, 0, 0)
-    error_p.alignment = PP_ALIGN.CENTER
-
-# ==========================================
-# שקף 4: ממשק ה-VGA - לוגיקה אנלוגית לדיגיטלית
-# ==========================================
-slide4 = prs.slides.add_slide(prs.slide_layouts[5])
-
-# כותרת ראשית עם ירידת שורה
-title4 = slide4.shapes.title
-title4.text = "ממשק ה-VGA:\nמהלוגיקה האנלוגית לדיגיטלית"
-set_rtl(title4.text_frame.paragraphs[0])
-title4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
-
-# יצירת תיבת טקסט עם בולטים (נקודות)
-txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.5), Inches(9), Inches(1.5))
-tf_text4 = txBox_text4.text_frame
-
-# פונקציית עזר להוספת בולט
 def add_bullet(tf, text):
     p = tf.add_paragraph()
     p.text = text
-    p.font.size = Pt(18)
+    p.font.size = Pt(16)
     p.alignment = PP_ALIGN.RIGHT
     set_rtl(p)
     return p
 
-add_bullet(tf_text4, "• שעון הפיקסל מנהל את קצב הסריקה של קרן האלקטרונים על המסך.")
-add_bullet(tf_text4, "• אותות הסנכרון שולטים בסלילי ההטיה המכוונים את מיקום הקרן.")
-add_bullet(tf_text4, "• באזור תצוגה פעיל, הלוגיקה משחררת את נתוני ה-RGB לתותחי האלקטרונים.")
+add_bullet(tf_text3, "• הציור על המסך מבוסס על קרן שסורקת את הפיקסלים משמאל לימין (שורה) ומלמעלה למטה (פריים).")
+add_bullet(tf_text3, "• תנועת הקרן חייבת להיות רציפה, מה שיוצר מסלול בצורת 'זיגזג'.")
+add_bullet(tf_text3, "• בכל פעם שהקרן מגיעה לקצה (אופקי או אנכי), נדרש זמן כדי להחזיר אותה לנקודת ההתחלה (Retrace).")
 
-# הוספת התמונה
-# וודא שהקובץ נמצא ב: docs/presentation/assets/vga_analog_cathode_ray_concept.png
-image_path4 = "docs/presentation/assets/vga_analog_cathode_ray_concept.png"
+# תמונת הסריקה הקווית הממחישה את הזיגזג וה-Retrace
+image_path3 = "docs/presentation/assets/vga_raster_scan_retrace_concept.png" 
+if os.path.exists(image_path3):
+    slide3.shapes.add_picture(image_path3, Inches(2.5), Inches(3.0), width=Inches(4.5))
+
+
+# ==========================================
+# שקף 4: צעד 2 בסיפור - מרחב התצוגה ואזורי ההחשכה
+# ==========================================
+slide4 = prs.slides.add_slide(prs.slide_layouts[5])
+title4 = slide4.shapes.title
+title4.text = "מרחב התצוגה: אזור פעיל מול זמני החשכה"
+set_rtl(title4.text_frame.paragraphs[0])
+title4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+tf_text4 = txBox_text4.text_frame
+
+add_bullet(tf_text4, "• אזור פעיל (Active Region): החלק במרכז המסך שבו משודרים נתוני התמונה בפועל (כגון 640x480).")
+add_bullet(tf_text4, "• זמני השהייה (Front/Back Porch): 'שוליים' של זמן שנועדו לייצב את האות לפני ואחרי הסנכרון.")
+add_bullet(tf_text4, "• זמן סנכרון (Sync Pulse): פקודה פיזית למסך להחזיר את הקרן אחורה. בזמן זה הקרן חייבת להיות מוחשכת (Blanking).")
+
+# תמונת הגרף שמראה את האזורים הפעילים מול ה-Blanking
+image_path4 = "docs/presentation/assets/vga_active_vs_blanking_regions.png" 
 if os.path.exists(image_path4):
-    slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.2), width=Inches(4.5))
-else:
-    # הדפסת שגיאה על השקף אם התמונה לא נמצאה
-    err_box = slide4.shapes.add_textbox(Inches(2.5), Inches(3.5), Inches(4.5), Inches(1))
-    err_box.text = "Error: Image vga_analog_cathode_ray_concept.png not found"
-
-# ==========================================
-# שקף א': תזמונים ורזולוציה (Active מול Blanking)
-# ==========================================
-slide_t1 = prs.slides.add_slide(prs.slide_layouts[5])
-title_t1 = slide_t1.shapes.title
-title_t1.text = "ממשק ה-VGA: תזמונים ורזולוציה"
-set_rtl(title_t1.text_frame.paragraphs[0])
-title_t1.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
-
-tx_t1 = slide_t1.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
-tf_t1 = tx_t1.text_frame
-
-def add_clean_bullet(tf, text):
-    p = tf.add_paragraph()
-    p.text = text
-    p.font.size = Pt(16)
-    p.space_after = Pt(10)
-    p.alignment = PP_ALIGN.RIGHT
-    set_rtl(p)
-
-add_clean_bullet(tf_t1, "• עבודה ברזולוציה סטנדרטית של 640 על 480 פיקסלים בקצב של 60 הרץ.")
-add_clean_bullet(tf_t1, "• דורש שעון פיקסל (Pixel Clock) מדויק בתדר של 25.175 מגה-הרץ.")
-add_clean_bullet(tf_t1, "• חלוקת מרחב התצוגה לאזור פעיל (Active Region) ואזורי השהייה (Front/Back Porch ו-Sync).")
-
-# הוספת התמונה vga_active_vs_blanking_regions.png
-img_path_t1 = "docs/presentation/assets/vga_active_vs_blanking_regions.png"
-if os.path.exists(img_path_t1):
-    slide_t1.shapes.add_picture(img_path_t1, Inches(0.5), Inches(1.8), width=Inches(4.2))
+    slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.2), width=Inches(5.0))
 
 
 # ==========================================
-# שקף ב': מונים וסריקה קווית (Raster Scan & Retrace)
+# שקף 5: צעד 3 בסיפור - הלוגיקה והמימוש ב-FPGA
 # ==========================================
-slide_t2 = prs.slides.add_slide(prs.slide_layouts[5])
-title_t2 = slide_t2.shapes.title
-title_t2.text = "ממשק ה-VGA: מונים וסריקה קווית (Raster Scan)"
-set_rtl(title_t2.text_frame.paragraphs[0])
-title_t2.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+slide5 = prs.slides.add_slide(prs.slide_layouts[5])
+title5 = slide5.shapes.title
+title5.text = "תזמונים והחשכה (VGA controller)"
+set_rtl(title5.text_frame.paragraphs[0])
+title5.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_t2 = slide_t2.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
-tf_t2 = tx_t2.text_frame
+tx_c5 = slide5.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9.0), Inches(1.5))
+tf_c5 = tx_c5.text_frame
 
-add_clean_bullet(tf_t2, "• תנועת זיגזג: סריקה מהירה משמאל לימין (Horizontal Retrace) שורה אחר שורה.")
-add_clean_bullet(tf_t2, "• מונה אופקי סופר 800 מחזורים (640 פעילים + 160 להחשכה וסנכרון).")
-add_clean_bullet(tf_t2, "• מונה אנכית סופר 521 שורות (480 פעילות), ובסיומן מבצע Vertical Retrace חזרה לראש המסך.")
+p_sub5 = tf_c5.paragraphs[0]
+p_sub5.text = "מוני ה-horizontal וה-vertical מנוהלים על ידי שעון 25 MHz ומחשבים את מיקום הקרן. בזמני ה-porch וה-sync pulse, היציאות נדחפות ל-0000 כדי לאפשר את חזרת הקרן (blanking)."
+p_sub5.font.size = Pt(16)
+p_sub5.alignment = PP_ALIGN.RIGHT
+set_rtl(p_sub5)
 
-# הוספת התמונה vga_raster_scan_retrace_concept.png
-img_path_t2 = "docs/presentation/assets/vga_raster_scan_retrace_concept.png"
-if os.path.exists(img_path_t2):
-    slide_t2.shapes.add_picture(img_path_t2, Inches(0.5), Inches(1.8), width=Inches(4.2))
+# 1. דיאגרמת הבלוקים והמונים (RTL Schematic)
+img1_path5 = "docs/presentation/assets/vga_counters_rtl_schematic.png"
+if os.path.exists(img1_path5):
+    slide5.shapes.add_picture(img1_path5, Inches(0.5), Inches(2.8), width=Inches(4.5))
+
+# 2. גרף התזמונים והטבלה שממנה נגזרים הערכים
+img2_path5 = "docs/presentation/assets/vga_timing_waveform_and_table.png"
+if os.path.exists(img2_path5):
+    slide5.shapes.add_picture(img2_path5, Inches(5.2), Inches(2.6), width=Inches(4.0))
+ 
+#
+ 
+# ==========================================
+# שקף 6: מסלול הנתונים - חישוב כתובת ושליפה מה-BRAM
+# ==========================================
+slide6 = prs.slides.add_slide(prs.slide_layouts[5])
+title6 = slide6.shapes.title
+title6.text = "מסלול הנתונים: חישוב כתובת הפיקסל ושליפה"
+set_rtl(title6.text_frame.paragraphs[0])
+title6.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text6 = slide6.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+tf_text6 = txBox_text6.text_frame
+
+add_bullet(tf_text6, "• מיקום הקרן (X,Y): המונים hsync_reg ו-vsync_reg מפיקים את הקואורדינטות הדינמיות display_x ו-display_y בתוך האזור הפעיל.")
+add_bullet(tf_text6, "• תרגום לכתובת ליניארית: הקואורדינטה מתורגמת מתמטית לכתובת הזיכרון bram_address_next ונשלחת החוצה דרך האות addrb.")
+add_bullet(tf_text6, "• שליפה מה-BRAM: רכיב ה-frame_buffer מקבל את הכתובת ומשחרר את 12 הביטים של הפיקסל היישר אל האות doutb של בקר ה-VGA.")
+
+# תמונה מומלצת: תרשים זרימה שמראה את H/V -> Address -> BRAM -> doutb
+img_path6 = "docs/presentation/assets/vga_address_bram_flow.png" 
+if os.path.exists(img_path6):
+    slide6.shapes.add_picture(img_path6, Inches(2.5), Inches(3.2), width=Inches(5.0))
 
 
 # ==========================================
-# שקף ג': ארכיטקטורת בלוקים ב-FPGA והחיבור ל-BRAM
+# שקף 7: פענוח הצבע ובקרת הוידאו
 # ==========================================
-slide_t3 = prs.slides.add_slide(prs.slide_layouts[5])
-title_t3 = slide_t3.shapes.title
-title_t3.text = "ממשק ה-VGA: ארכיטקטורה וניהול BRAM"
-set_rtl(title_t3.text_frame.paragraphs[0])
-title_t3.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+slide7 = prs.slides.add_slide(prs.slide_layouts[5])
+title7 = slide7.shapes.title
+title7.text = "עיבוד הפיקסל: ניתוב ל-RGB ומנגנון ה-Blanking"
+set_rtl(title7.text_frame.paragraphs[0])
+title7.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_t3 = slide_t3.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
-tf_t3 = tx_t3.text_frame
+txBox_text7 = slide7.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+tf_text7 = txBox_text7.text_frame
 
-add_clean_bullet(tf_t3, "• הפרדת רשויות: רכיב ה-vga_sync מנהל את שעוני הסנכרון והכתובת (Pixel X/Y).")
-add_clean_bullet(tf_t3, "• מנגנון ההשתקה (Blanking): מחוץ לאזור הפעיל, ערכי ה-RGB מאולצים להתאפס (שחור מוחלט).")
-add_clean_bullet(tf_t3, "• שליפת נתונים מותנית: זיכרון ה-BRAM משחרר פיקסלים אך ורק כשהקרן נמצאת באזור המורשה.")
+add_bullet(tf_text7, "• רישום ופיצול: הנתונים מ-doutb ננעלים באוגר pxl_data_reg ומפוצלים לשגרירים: vga_r_int (ביטים 11:8), vga_g_int (7:4) ו-vga_b_int (3:0).")
+add_bullet(tf_text7, "• שומר הסף: האות in_display_area_delayed משמש כדגל המזהה האם הקרן מצוירת כעת על המסך או נמצאת מחוץ לתצוגה.")
+add_bullet(tf_text7, "• סינון דיגיטלי (Mux): כאשר הדגל ב-'1', ערכי ה-RGB מועברים ליציאות VGA_R/G/B. בזמני ה-Porch וה-Sync, היציאות נאלצות ל-\"0000\" (שחור מוחלט).")
 
-# הוספת התמונה vga_fpga_top_architecture.png
-img_path_t3 = "docs/presentation/assets/vga_fpga_top_architecture.png"
-if os.path.exists(img_path_t3):
-    slide_t3.shapes.add_picture(img_path_t3, Inches(0.5), Inches(1.8), width=Inches(4.2))
+# תמונה מומלצת: לוגיקת ה-MUX או שער AND של in_display_area_delayed
+img_path7 = "docs/presentation/assets/vga_rgb_video_on_logic.png" 
+if os.path.exists(img_path7):
+    slide7.shapes.add_picture(img_path7, Inches(2.5), Inches(3.2), width=Inches(5.0))
+
 
 
 # ==========================================
-# שקף ד': סימולציה ת 
+# שקף 8: המעבר לעולם האנלוגי ומחבר ה-VGA (DAC)
 # ==========================================
-slide_t4 = prs.slides.add_slide(prs.slide_layouts[5])
-title_t4 = slide_t4.shapes.title
-title_t4.text = "ממשק ה-VGA: סימולציה ומימוש מעשי"
-set_rtl(title_t4.text_frame.paragraphs[0])
-title_t4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+slide8 = prs.slides.add_slide(prs.slide_layouts[5])
+title8 = slide8.shapes.title
+title8.text = "המרת DAC אנלוגית ומחבר ה-VGA"
+set_rtl(title8.text_frame.paragraphs[0])
+title8.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_t4 = slide_t4.shapes.add_textbox(Inches(5.0), Inches(1.5), Inches(4.5), Inches(5.0))
-tf_t4 = tx_t4.text_frame
+# טקסט מקוצר, ממוקד ומרווח
+txBox_text8 = slide8.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(1.0))
+tf_text8 = txBox_text8.text_frame
 
-add_clean_bullet(tf_t4, "• מימוש מעגל המונים (Horiz & Vert) עם חיווט מלא של הפרמטרים התקניים.")
-add_clean_bullet(tf_t4, "• בקרת אותות ה-HSYNC, VSYNC וערוצי הצבע (R, G, B).")
-add_clean_bullet(tf_t4, "• הצגת תבנית בדיקה ויזואלית המוכיח סנכרון מושלם ותדר שעון יציב ברזולוציית היעד.")
-# הוספת התמונה vga_counters_logic_flow.png
-img_path_t4 = "docs/presentation/assets/vga_counters_logic_flow.png"
-if os.path.exists(img_path_t4):
-    slide_t4.shapes.add_picture(img_path_t4, Inches(0.5), Inches(1.8), width=Inches(4.2))
+add_bullet(tf_text8, "• סולם נגדים (Resistor Network): המרת 12 ביטי ה-RGB למתח אנלוגי רציף באמצעות משקולות נגדים (510Ω עד 4KΩ).")
+add_bullet(tf_text8, "• אותות סנכרון (B11 / B12): פיני היציאה מוגנים באמצעות נגדי 100Ω ומזינים ישירות את מחבר ה-DB15 של המסך.")
+
+# שתי התמונות החדשות והמדהימות זו לצד זו בשקף נקי ומרווח:
+# 1. סולם הנגדים והחיבור ל-HD-DB15 (התמונה החדשה הראשונה)
+img_path8_1 = "docs/presentation/assets/vga_dac_resistor_network.png" 
+if os.path.exists(img_path8_1):
+    slide8.shapes.add_picture(img_path8_1, Inches(0.5), Inches(2.3), width=Inches(4.4))
+
+# 2. מיפוי הפינים במחבר ה-DB15 (התמונה החדשה השנייה)
+img_path8_2 = "docs/presentation/assets/vga_db15_connector_pins.png" 
+if os.path.exists(img_path8_2):
+    slide8.shapes.add_picture(img_path8_2, Inches(5.1), Inches(2.5), width=Inches(4.4))
+
+
+
+    
 # ==========================================
 # שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
 # ==========================================
