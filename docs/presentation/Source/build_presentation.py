@@ -350,6 +350,50 @@ if os.path.exists(img_path11):
     
 
 # ==========================================
+# שקף 12: חוצץ התמונה - זיכרון ה-BRAM (Frame Buffer)
+# ==========================================
+slide12 = prs.slides.add_slide(prs.slide_layouts[5])
+title12 = slide12.shapes.title
+title12.text = "זיכרון ה-BRAM: חוצץ התמונה (Frame Buffer)"
+set_rtl(title12.text_frame.paragraphs[0])
+title12.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text12 = slide12.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text12 = txBox_text12.text_frame
+
+add_bullet(tf_text12, "• תצורת Dual-Port: הפרדה מוחלטת לחומרת כתיבה (A) וקריאה (B). זהו הפתרון שלנו ל-CDC (חציית תחומי שעון) המונע התנגשויות נתונים.")
+add_bullet(tf_text12, "• שעונים א-סינכרוניים: הכתיבה (clka) מתבצעת בתדר המערכת (100MHz), בעוד הקריאה למסך (clkb) מונעת בלעדית על ידי שעון ה-VGA שלנו (25MHz).")
+add_bullet(tf_text12, "• ממדי הזיכרון (307,200x12): הזיכרון מוקצה במדויק להכיל 307,200 פיקסלים (רזולוציה של 640x480).")
+add_bullet(tf_text12, "• תפוקת הנתונים: האות doutb משחרר 12 ביט של צבע (RGB) בכל מחזור שעון (25MHz) ישירות לבקר ה-VGA.")
+
+# הכנה לתמונת ה-IP Symbol של רכיב ה-BRAM (blk_mem_gen_0)
+img_path12 = "docs/presentation/assets/bram_ip_symbol.png"
+if os.path.exists(img_path12):
+    slide12.shapes.add_picture(img_path12, Inches(2.5), Inches(3.5), width=Inches(5.0))
+    
+
+# ==========================================
+# שקף 13: הצד האדום - לכידת התמונה (Camera to BRAM)
+# ==========================================
+slide13 = prs.slides.add_slide(prs.slide_layouts[5])
+title13 = slide13.shapes.title
+title13.text = "ממשק המצלמה: מהעולם הפיזי אל הזיכרון"
+set_rtl(title13.text_frame.paragraphs[0])
+title13.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text13 = slide13.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text13 = txBox_text13.text_frame
+
+add_bullet(tf_text13, "• הגשר הפיזי (XCLK מול PCLK): ה-FPGA מפיק 24MHz (XCLK) החוצה להפעלת המצלמה. בתגובה, המצלמה משדרת חזרה פיקסלים יחד עם שעון סנכרון עצמאי משלה (PCLK).")
+add_bullet(tf_text13, "• לכידת הנתונים: רכיב ה-ov7670_capture רץ בתדר המערכת (100MHz) המאפשר דגימה מהירה ובטוחה של ה-PCLK ואסיפת 12 ביט של צבע.")
+add_bullet(tf_text13, "• כתיבה לזיכרון: הבלוק מייצר את הכתובת (addra), המידע (dina), ודגל הכתיבה (wea) ודוחף אותם לפורט A של ה-BRAM.")
+
+# הכנה לתמונה הממחישה את הלכידה
+img_path13 = "docs/presentation/assets/camera_capture_flow.png"
+if os.path.exists(img_path13):
+    slide13.shapes.add_picture(img_path13, Inches(2.5), Inches(3.5), width=Inches(5.0))
+
+# ==========================================
 # שמירת המצגת
 # ==========================================
 output_path = os.path.join(base_path, 'VGA_Presentation_Yossi.pptx')
