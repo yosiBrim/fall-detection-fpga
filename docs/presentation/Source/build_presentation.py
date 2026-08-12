@@ -10,6 +10,15 @@ def set_rtl(paragraph):
     pPr = paragraph._p.get_or_add_pPr()
     pPr.set('rtl', '1')
 
+# פונקציית עזר להוספת תבליט מיושר לימין (הועברה לכאן כדי למנוע שגיאות)
+def add_bullet(text_frame, text):
+    p = text_frame.add_paragraph()
+    p.text = text
+    p.font.size = Pt(16)
+    p.alignment = PP_ALIGN.RIGHT
+    set_rtl(p)
+    return p
+
 prs = Presentation()
 
 base_path = r"docs\presentation\output" 
@@ -51,6 +60,7 @@ else:
     fallback_p.font.size = Pt(14)
     fallback_p.font.color.rgb = RGBColor(255, 0, 0)
     fallback_p.alignment = PP_ALIGN.CENTER
+    
 txBox_details = slide1.shapes.add_textbox(Inches(0.5), Inches(6.3), Inches(9), Inches(0.5))
 p_details = txBox_details.text_frame.paragraphs[0]
 p_details.text = "מגיש: יוסי ברים | הנדסת חשמל שנה ד| המרכז האקדמי לב"
@@ -104,11 +114,6 @@ for i, b_text in enumerate(blocks):
     if i < 3:
         slide2.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(2.3 + i*2.2), Inches(5.5), Inches(0.5), Inches(0.2))
 
-
-
-
-
-
 # ==========================================
 # שקף 3: צעד 1 בסיפור - הפיזיקה של הסריקה הקווית (Raster Scan)
 # ==========================================
@@ -121,14 +126,6 @@ title3.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 txBox_text3 = slide3.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
 tf_text3 = txBox_text3.text_frame
 
-def add_bullet(tf, text):
-    p = tf.add_paragraph()
-    p.text = text
-    p.font.size = Pt(16)
-    p.alignment = PP_ALIGN.RIGHT
-    set_rtl(p)
-    return p
-
 add_bullet(tf_text3, "• הציור על המסך מבוסס על קרן שסורקת את הפיקסלים משמאל לימין (שורה) ומלמעלה למטה (פריים).")
 add_bullet(tf_text3, "• תנועת הקרן חייבת להיות רציפה, מה שיוצר מסלול בצורת 'זיגזג'.")
 add_bullet(tf_text3, "• בכל פעם שהקרן מגיעה לקצה (אופקי או אנכי), נדרש זמן כדי להחזיר אותה לנקודת ההתחלה (Retrace).")
@@ -137,7 +134,6 @@ add_bullet(tf_text3, "• בכל פעם שהקרן מגיעה לקצה (אופק
 image_path3 = "docs/presentation/assets/vga_raster_scan_retrace_concept.png" 
 if os.path.exists(image_path3):
     slide3.shapes.add_picture(image_path3, Inches(2.5), Inches(3.0), width=Inches(4.5))
-
 
 # ==========================================
 # שקף 4: צעד 2 בסיפור - מרחב התצוגה ואזורי ההחשכה
@@ -159,7 +155,6 @@ add_bullet(tf_text4, "• זמן סנכרון (Sync Pulse): פקודה פיזי�
 image_path4 = "docs/presentation/assets/vga_active_vs_blanking_regions.png" 
 if os.path.exists(image_path4):
     slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.2), width=Inches(5.0))
-
 
 # ==========================================
 # שקף 5: צעד 3 בסיפור - הלוגיקה והמימוש ב-FPGA
@@ -188,9 +183,7 @@ if os.path.exists(img1_path5):
 img2_path5 = "docs/presentation/assets/vga_timing_waveform_and_table.png"
 if os.path.exists(img2_path5):
     slide5.shapes.add_picture(img2_path5, Inches(5.2), Inches(2.6), width=Inches(4.0))
- 
-#
- 
+
 # ==========================================
 # שקף 6: מסלול הנתונים - חישוב כתובת ושליפה מה-BRAM
 # ==========================================
@@ -207,11 +200,9 @@ add_bullet(tf_text6, "• מיקום הקרן (X,Y): המונים hsync_reg ו-v
 add_bullet(tf_text6, "• תרגום לכתובת ליניארית: הקואורדינטה מתורגמת מתמטית לכתובת הזיכרון bram_address_next ונשלחת החוצה דרך האות addrb.")
 add_bullet(tf_text6, "• שליפה מה-BRAM: רכיב ה-frame_buffer מקבל את הכתובת ומשחרר את 12 הביטים של הפיקסל היישר אל האות doutb של בקר ה-VGA.")
 
-# תמונה מומלצת: תרשים זרימה שמראה את H/V -> Address -> BRAM -> doutb
 img_path6 = "docs/presentation/assets/vga_address_bram_flow.png" 
 if os.path.exists(img_path6):
     slide6.shapes.add_picture(img_path6, Inches(2.5), Inches(3.2), width=Inches(5.0))
-
 
 # ==========================================
 # שקף 7: פענוח הצבע ובקרת הוידאו
@@ -229,12 +220,9 @@ add_bullet(tf_text7, "• רישום ופיצול: הנתונים מ-doutb ננ�
 add_bullet(tf_text7, "• שומר הסף: האות in_display_area_delayed משמש כדגל המזהה האם הקרן מצוירת כעת על המסך או נמצאת מחוץ לתצוגה.")
 add_bullet(tf_text7, "• סינון דיגיטלי (Mux): כאשר הדגל ב-'1', ערכי ה-RGB מועברים ליציאות VGA_R/G/B. בזמני ה-Porch וה-Sync, היציאות נאלצות ל-\"0000\" (שחור מוחלט).")
 
-# תמונה מומלצת: לוגיקת ה-MUX או שער AND של in_display_area_delayed
 img_path7 = "docs/presentation/assets/vga_rgb_video_on_logic.png" 
 if os.path.exists(img_path7):
     slide7.shapes.add_picture(img_path7, Inches(2.5), Inches(3.2), width=Inches(5.0))
-
-
 
 # ==========================================
 # שקף 8: המעבר לעולם האנלוגי ומחבר ה-VGA (DAC)
@@ -245,27 +233,19 @@ title8.text = "המרת DAC אנלוגית ומחבר ה-VGA"
 set_rtl(title8.text_frame.paragraphs[0])
 title8.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-# טקסט מקוצר, ממוקד ומרווח
 txBox_text8 = slide8.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(1.0))
 tf_text8 = txBox_text8.text_frame
 
 add_bullet(tf_text8, "• סולם נגדים (Resistor Network): המרת 12 ביטי ה-RGB למתח אנלוגי רציף באמצעות משקולות נגדים (510Ω עד 4KΩ).")
 add_bullet(tf_text8, "• אותות סנכרון (B11 / B12): פיני היציאה מוגנים באמצעות נגדי 100Ω ומזינים ישירות את מחבר ה-DB15 של המסך.")
 
-# שתי התמונות החדשות והמדהימות זו לצד זו בשקף נקי ומרווח:
-# 1. סולם הנגדים והחיבור ל-HD-DB15 (התמונה החדשה הראשונה)
 img_path8_1 = "docs/presentation/assets/vga_dac_resistor_network.png" 
 if os.path.exists(img_path8_1):
     slide8.shapes.add_picture(img_path8_1, Inches(0.5), Inches(2.3), width=Inches(4.4))
 
-# 2. מיפוי הפינים במחבר ה-DB15 (התמונה החדשה השנייה)
 img_path8_2 = "docs/presentation/assets/vga_db15_connector_pins.png" 
 if os.path.exists(img_path8_2):
     slide8.shapes.add_picture(img_path8_2, Inches(5.1), Inches(2.5), width=Inches(4.4))
-
-
-
-
 
 # ==========================================
 # שקף 9: עומק הנדסי - הפיזיקה של מחלק המתח (MSB/LSB)
@@ -283,59 +263,56 @@ add_bullet(tf_text9, "• משקל פיזי לכל ביט (MSB לעומת LSB): 
 add_bullet(tf_text9, "• כוונון עדין: לעומתו, הביט הפחות משמעותי (LSB) מחובר לנגד הגדול ביותר בסולם. תרומתו לזרם הכולל היא מזערית ונועדה לכוונון עדין של הגוון.")
 add_bullet(tf_text9, "• סכימה אנלוגית על המסך: כל הזרמים מהביטים הפעילים ('1') מתחברים וזורמים יחד דרך נגד הסיומת של המסך (75Ω) אל האדמה. כך נוצר מחלק מתח דינמי המפיק 0V עד 0.7V.")
 
-# התמונה הממחישה את הסכימה החשמלית
-# ודא ששם הקובץ בתיקייה הוא vga_voltage_divider_dac.png
 img_path9 = "docs/presentation/assets/vga_voltage_divider_dac.png" 
 if os.path.exists(img_path9):
     slide9.shapes.add_picture(img_path9, Inches(1.5), Inches(3.2), width=Inches(7.0))
 
-    
 # ==========================================
-# שקף 6: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
+# שקף 10: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
 # ==========================================
-slide6 = prs.slides.add_slide(prs.slide_layouts[5])
+slide10 = prs.slides.add_slide(prs.slide_layouts[5])
 
-title6 = slide6.shapes.title
-title6.text = "מקרה בוחן 1: תזמון ירידת שורה (Horizontal Blanking)"
-set_rtl(title6.text_frame.paragraphs[0])
+title10 = slide10.shapes.title
+title10.text = "מקרה בוחן 1: תזמון ירידת שורה (Horizontal Blanking)"
+set_rtl(title10.text_frame.paragraphs[0])
 
-txBox_text6 = slide6.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
-tf_text6 = txBox_text6.text_frame
-b1_s6 = tf_text6.add_paragraph()
-b1_s6.text = "ניהול המונים (Horizontal/Vertical) ושליטה במנגנון ההחשכה (Blanking) לחזרת הקרן."
-b1_s6.font.size = Pt(16); b1_s6.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s6)
+txBox_text10 = slide10.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
+tf_text10 = txBox_text10.text_frame
+b1_s10 = tf_text10.add_paragraph()
+b1_s10.text = "ניהול המונים (Horizontal/Vertical) ושליטה במנגנון ההחשכה (Blanking) לחזרת הקרן."
+b1_s10.font.size = Pt(16); b1_s10.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s10)
 
 # שתי התמונות זו לצד זו (הטבלה והמונים)
-image_path6_1 = os.path.join(base_path, "image_44207c.png") # טבלת תזמונים
-image_path6_2 = os.path.join(base_path, "image_441d97.png") # דיאגרמת מונים
+image_path10_1 = os.path.join(base_path, "image_44207c.png") # טבלת תזמונים
+image_path10_2 = os.path.join(base_path, "image_441d97.png") # דיאגרמת מונים
 
-if os.path.exists(image_path6_1):
-    slide6.shapes.add_picture(image_path6_1, Inches(0.2), Inches(2.2), width=Inches(4.4))
-if os.path.exists(image_path6_2):
-    slide6.shapes.add_picture(image_path6_2, Inches(5.0), Inches(2.5), width=Inches(4.8))
+if os.path.exists(image_path10_1):
+    slide10.shapes.add_picture(image_path10_1, Inches(0.2), Inches(2.2), width=Inches(4.4))
+if os.path.exists(image_path10_2):
+    slide10.shapes.add_picture(image_path10_2, Inches(5.0), Inches(2.5), width=Inches(4.8))
 
 # ==========================================
-# שקף 7: מקרה בוחן 2 - המרה D to A
+# שקף 11: מקרה בוחן 2 - המרה D to A
 # ==========================================
-slide7 = prs.slides.add_slide(prs.slide_layouts[5])
+slide11 = prs.slides.add_slide(prs.slide_layouts[5])
 
-title7 = slide7.shapes.title
-title7.text = "מקרה בוחן 2: מ-RGB דיגיטלי ליציאה אנלוגית"
-set_rtl(title7.text_frame.paragraphs[0])
+title11 = slide11.shapes.title
+title11.text = "מקרה בוחן 2: מ-RGB דיגיטלי ליציאה אנלוגית"
+set_rtl(title11.text_frame.paragraphs[0])
 
-txBox_text7 = slide7.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
-tf_text7 = txBox_text7.text_frame
-b1_s7 = tf_text7.add_paragraph()
-b1_s7.text = "המרת 12 ביטים של צבע (RGB) למתח פיזי רציף באמצעות רשת נגדים (DAC) ומחבר ה-VGA."
-b1_s7.font.size = Pt(16); b1_s7.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s7)
+txBox_text11 = slide11.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
+tf_text11 = txBox_text11.text_frame
+b1_s11 = tf_text11.add_paragraph()
+b1_s11.text = "המרת 12 ביטים של צבע (RGB) למתח פיזי רציף באמצעות רשת נגדים (DAC) ומחבר ה-VGA."
+b1_s11.font.size = Pt(16); b1_s11.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s11)
 
-image_path7_1 = os.path.join(base_path, "image_441292.png")
-image_path7_2 = os.path.join(base_path, "image_441cda.png")
+image_path11_1 = os.path.join(base_path, "image_441292.png")
+image_path11_2 = os.path.join(base_path, "image_441cda.png")
 
-if os.path.exists(image_path7_1):
-    slide7.shapes.add_picture(image_path7_1, Inches(0.8), Inches(2.1), height=Inches(4.5))
-if os.path.exists(image_path7_2):
-    slide7.shapes.add_picture(image_path7_2, Inches(5.3), Inches(2.6), width=Inches(3.8))
+if os.path.exists(image_path11_1):
+    slide11.shapes.add_picture(image_path11_1, Inches(0.8), Inches(2.1), height=Inches(4.5))
+if os.path.exists(image_path11_2):
+    slide11.shapes.add_picture(image_path11_2, Inches(5.3), Inches(2.6), width=Inches(3.8))
 
 # ==========================================
 # שמירת המצגת
