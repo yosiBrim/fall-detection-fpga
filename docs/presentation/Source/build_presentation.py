@@ -114,6 +114,28 @@ for i, b_text in enumerate(blocks):
     if i < 3:
         slide2.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(2.3 + i*2.2), Inches(5.5), Inches(0.5), Inches(0.2))
 
+
+# ==========================================
+# שקף תוספת: רקע היסטורי וקונספט תותח האלקטרונים (CRT)
+# ==========================================
+slide_history = prs.slides.add_slide(prs.slide_layouts[5])
+title_history = slide_history.shapes.title
+title_history.text = "מבוא ל-VGA: קונספט תותח האלקטרונים (CRT)"
+set_rtl(title_history.text_frame.paragraphs[0])
+title_history.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_history = slide_history.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+tf_history = txBox_history.text_frame
+
+add_bullet(tf_history, "• מקור הפרוטוקול: טכנולוגיית ה-VGA פותחה במקור עבור מסכי שפופרת קרן קתודית (CRT) המבוססים על פיזיקה אנלוגית.")
+add_bullet(tf_history, "• תותח אלקטרונים: המסך פועל באמצעות קרן פיזית הנורית על גבי מסך מצופה זרחן. עוצמת הזרם קובעת את עוצמת ההארה של כל פיקסל.")
+add_bullet(tf_history, "• המורשת האנלוגית: למרות שכיום המסכים מודרניים, הפרוטוקול מחייב שידור אותות השהייה שיאפשרו לקרן הפיזית זמן תנועה וחזרה.")
+
+# תמונת תותח האלקטרונים
+image_path_history = "docs/presentation/assets/vga_analog_cathode_ray_concept.png" 
+if os.path.exists(image_path_history):
+    slide_history.shapes.add_picture(image_path_history, Inches(2.5), Inches(3.2), width=Inches(5.0))
+
 # ==========================================
 # שקף 3: צעד 1 בסיפור - הפיזיקה של הסריקה הקווית (Raster Scan)
 # ==========================================
