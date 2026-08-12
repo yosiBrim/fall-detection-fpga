@@ -292,24 +292,24 @@ if os.path.exists(img_path9):
 
 
 # ==========================================
-# שקף תוספת : סיכום המבוא - מפיזיקה אנלוגית לארכיטקטורה דיגיטלית
+# שקף תוספת: סיכום המבוא - לקראת ארכיטקטורת החומרה
 # ==========================================
 slide10 = prs.slides.add_slide(prs.slide_layouts[5])
 title10 = slide10.shapes.title
-title10.text = "סיכום המבוא: מהעולם האנלוגי ללוגיקה הדיגיטלית"
+title10.text = "סיכום תיאורטי: לקראת ארכיטקטורת החומרה"
 set_rtl(title10.text_frame.paragraphs[0])
 title10.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
 txBox_text10 = slide10.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
 tf_text10 = txBox_text10.text_frame
 
-add_bullet(tf_text10, "• 1. המסע הפיזיקלי (Macroscopic): הבנת דרישות ה-VGA הקלאסי - סריקה, זמני החשכה (Blanking) והמרה אנלוגית (DAC).")
-add_bullet(tf_text10, "• 2. רמת המערכת (Board Level): מיפוי השחקנים על הלוח – סנכרון השעונים, קליטת המצלמה, וה-BRAM כגשר בין העולמות.")
-add_bullet(tf_text10, "• 3. מיקרו-ארכיטקטורה (RTL): פיצול בקר ה-VGA לשני תהליכים מקבילים – מחולל תזמונים (vga_sync) ומחולל פיקסלים (RGB).")
-add_bullet(tf_text10, "• 4. ולידציה והוכחת התכן (Verification): השלב הבא – אימות הלוגיקה הפנימית באמצעות סימולציות (ModelSim/Vivado).")
+add_bullet(tf_text10, "• האתגר הפיזיקלי: ראינו שהמסך החיצוני דורש תזמונים מדויקים ונוקשים (Sync, Blanking) והמרת צבע רציפה (DAC) כדי לפעול כראוי.")
+add_bullet(tf_text10, "• המעבר פנימה (FPGA): כדי לייצר את האותות הללו בזמן אמת ובאמינות מוחלטת, אנו נכנסים אל תוך הלוגיקה הדיגיטלית (RTL) על הכרטיס.")
+add_bullet(tf_text10, "• תפקיד ה-VGA Controller: זהו רכיב הגישור הסופי במערכת. הוא שואב נתונים מהזיכרון הפנימי ומתרגם אותם לאותות הפיזיים שהמסך דורש.")
+add_bullet(tf_text10, "• התחנה הבאה: נמפה את האקו-סיסטם על הכרטיס (שעונים, מצלמה, חוצץ זיכרון) ולאחר מכן נצלול פנימה אל הלוגיקה של בקר ה-VGA עצמו.")
 
-# תמונת סכמת הבלוקים שמראה את החלוקה ההגיונית של הבקר
-img_path10 = "docs\presentation\assets\vga_fpga_top_architecture.png"
+# הנתיב המעודכן לתמונת הארכיטקטורה
+img_path10 = "docs/presentation/assets/vga_fpga_top_architecture.png"
 
 if os.path.exists(img_path10):
     slide10.shapes.add_picture(img_path10, Inches(2.5), Inches(3.6), width=Inches(5.0))
