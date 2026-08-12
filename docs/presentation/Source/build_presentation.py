@@ -158,53 +158,54 @@ if os.path.exists(image_path3):
     slide3.shapes.add_picture(image_path3, Inches(2.5), Inches(3.0), width=Inches(4.5))
 
 # ==========================================
-# שקף 4: צעד 2 בסיפור - מרחב התצוגה ואזורי ההחשכה
+# שקף 4: מרחב התצוגה: צלילה לערכי ה-Horizontal
 # ==========================================
 slide4 = prs.slides.add_slide(prs.slide_layouts[5])
 title4 = slide4.shapes.title
-title4.text = "מרחב התצוגה: אזור פעיל מול זמני החשכה"
+title4.text = "מרחב התצוגה: צלילה לערכי ה-Horizontal"
 set_rtl(title4.text_frame.paragraphs[0])
 title4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-txBox_text4 = slide4.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+txBox_text4 = slide4.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
 tf_text4 = txBox_text4.text_frame
 
-add_bullet(tf_text4, "• אזור פעיל (Active Region): החלק במרכז המסך שבו משודרים נתוני התמונה בפועל (כגון 640x480).")
-add_bullet(tf_text4, "• זמני השהייה (Front/Back Porch): 'שוליים' של זמן שנועדו לייצב את האות לפני ואחרי הסנכרון.")
-add_bullet(tf_text4, "• זמן סנכרון (Sync Pulse): פקודה פיזית למסך להחזיר את הקרן אחורה. בזמן זה הקרן חייבת להיות מוחשכת (Blanking).")
+add_bullet(tf_text4, "• אזור פעיל (640 פיקסלים): המידע האקטיבי. תקן ה-VGA מקצה בדיוק 640 מחזורי שעון לציור השורה בפועל.")
+add_bullet(tf_text4, "• שוליים וסנכרון (Front 16, Sync 96, Back 48): זמנים אלו נועדו במקור כדי לאפשר לקרן האלקטרונים (CRT) לכבות ולחזור שמאלה.")
+add_bullet(tf_text4, "• למה זה נדרש כיום? במסכי LCD/LED מודרניים אין קרן פיזית, אך הבקרים עדיין דורשים את 'הזמנים המתים' הללו (Blanking).")
+add_bullet(tf_text4, "• תאימות תקן (VESA): שמירה על תזמונים אלו היא קריטית. ללא הדיליי המדויק הזה, המסך לא יסתנכרן ויציג שגיאת 'No Signal'.")
 
 # תמונת הגרף שמראה את האזורים הפעילים מול ה-Blanking
 image_path4 = "docs/presentation/assets/vga_active_vs_blanking_regions.png" 
 if os.path.exists(image_path4):
-    slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.2), width=Inches(5.0))
+    slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.5), width=Inches(5.0))
+
+#cture(img2_path5, Inches(5.2), Inches(2.6), width=Inches(4.0))
 
 # ==========================================
-# שקף 5: צעד 3 בסיפור - הלוגיקה והמימוש ב-FPGA
+# שקף 5: תזמונים והחשכה בחומרה (VGA Controller)
 # ==========================================
 slide5 = prs.slides.add_slide(prs.slide_layouts[5])
 title5 = slide5.shapes.title
-title5.text = "תזמונים והחשכה (VGA controller)"
+title5.text = "תזמונים והחשכה בחומרה (VGA Controller)"
 set_rtl(title5.text_frame.paragraphs[0])
 title5.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-tx_c5 = slide5.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9.0), Inches(1.5))
+tx_c5 = slide5.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
 tf_c5 = tx_c5.text_frame
 
-p_sub5 = tf_c5.paragraphs[0]
-p_sub5.text = "מוני ה-horizontal וה-vertical מנוהלים על ידי שעון 25 MHz ומחשבים את מיקום הקרן. בזמני ה-porch וה-sync pulse, היציאות נדחפות ל-0000 כדי לאפשר את חזרת הקרן (blanking)."
-p_sub5.font.size = Pt(16)
-p_sub5.alignment = PP_ALIGN.RIGHT
-set_rtl(p_sub5)
+add_bullet(tf_c5, "• מחזור שלם (800 פיקסלים): חיבור הערכים (640+16+96+48) דורש מהמונה האופקי (h_count) לספור מ-0 ועד 799.")
+add_bullet(tf_c5, "• שעון פיקסל 25MHz: כל 'פיקסל' שקול למחזור שעון אחד של 40ns. סנכרון זה מבטיח קצב ריענון תקני של 60Hz.")
+add_bullet(tf_c5, "• אכיפת שחור (Blanking): מחוץ לתחום ה-640, הלוגיקה שלנו מאלצת \"0000\" ב-RGB כדי למנוע 'מריחות' צבע בעת תנועת הקרן.")
 
 # 1. דיאגרמת הבלוקים והמונים (RTL Schematic)
 img1_path5 = "docs/presentation/assets/vga_counters_rtl_schematic.png"
 if os.path.exists(img1_path5):
-    slide5.shapes.add_picture(img1_path5, Inches(0.5), Inches(2.8), width=Inches(4.5))
+    slide5.shapes.add_picture(img1_path5, Inches(0.5), Inches(3.2), width=Inches(4.5))
 
 # 2. גרף התזמונים והטבלה שממנה נגזרים הערכים
 img2_path5 = "docs/presentation/assets/vga_timing_waveform_and_table.png"
 if os.path.exists(img2_path5):
-    slide5.shapes.add_picture(img2_path5, Inches(5.2), Inches(2.6), width=Inches(4.0))
+    slide5.shapes.add_picture(img2_path5, Inches(5.2), Inches(2.8), width=Inches(4.0))
 
 # ==========================================
 # שקף 6: מסלול הנתונים - חישוב כתובת ושליפה מה-BRAM
@@ -289,52 +290,6 @@ img_path9 = "docs/presentation/assets/vga_voltage_divider_dac.png"
 if os.path.exists(img_path9):
     slide9.shapes.add_picture(img_path9, Inches(1.5), Inches(3.2), width=Inches(7.0))
 
-# ==========================================
-# שקף 10: מקרה בוחן 1 - תזמונים ומונים (שילוב הטבלה והמונים)
-# ==========================================
-slide10 = prs.slides.add_slide(prs.slide_layouts[5])
-
-title10 = slide10.shapes.title
-title10.text = "מקרה בוחן 1: תזמון ירידת שורה (Horizontal Blanking)"
-set_rtl(title10.text_frame.paragraphs[0])
-
-txBox_text10 = slide10.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
-tf_text10 = txBox_text10.text_frame
-b1_s10 = tf_text10.add_paragraph()
-b1_s10.text = "ניהול המונים (Horizontal/Vertical) ושליטה במנגנון ההחשכה (Blanking) לחזרת הקרן."
-b1_s10.font.size = Pt(16); b1_s10.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s10)
-
-# שתי התמונות זו לצד זו (הטבלה והמונים)
-image_path10_1 = os.path.join(base_path, "image_44207c.png") # טבלת תזמונים
-image_path10_2 = os.path.join(base_path, "image_441d97.png") # דיאגרמת מונים
-
-if os.path.exists(image_path10_1):
-    slide10.shapes.add_picture(image_path10_1, Inches(0.2), Inches(2.2), width=Inches(4.4))
-if os.path.exists(image_path10_2):
-    slide10.shapes.add_picture(image_path10_2, Inches(5.0), Inches(2.5), width=Inches(4.8))
-
-# ==========================================
-# שקף 11: מקרה בוחן 2 - המרה D to A
-# ==========================================
-slide11 = prs.slides.add_slide(prs.slide_layouts[5])
-
-title11 = slide11.shapes.title
-title11.text = "מקרה בוחן 2: מ-RGB דיגיטלי ליציאה אנלוגית"
-set_rtl(title11.text_frame.paragraphs[0])
-
-txBox_text11 = slide11.shapes.add_textbox(Inches(0.5), Inches(1.1), Inches(9), Inches(0.8))
-tf_text11 = txBox_text11.text_frame
-b1_s11 = tf_text11.add_paragraph()
-b1_s11.text = "המרת 12 ביטים של צבע (RGB) למתח פיזי רציף באמצעות רשת נגדים (DAC) ומחבר ה-VGA."
-b1_s11.font.size = Pt(16); b1_s11.alignment = PP_ALIGN.RIGHT; set_rtl(b1_s11)
-
-image_path11_1 = os.path.join(base_path, "image_441292.png")
-image_path11_2 = os.path.join(base_path, "image_441cda.png")
-
-if os.path.exists(image_path11_1):
-    slide11.shapes.add_picture(image_path11_1, Inches(0.8), Inches(2.1), height=Inches(4.5))
-if os.path.exists(image_path11_2):
-    slide11.shapes.add_picture(image_path11_2, Inches(5.3), Inches(2.6), width=Inches(3.8))
 
 # ==========================================
 # שמירת המצגת
