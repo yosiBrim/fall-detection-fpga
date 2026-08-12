@@ -389,7 +389,8 @@ add_bullet(tf_text13, "• לכידת הנתונים: רכיב ה-ov7670_capture
 add_bullet(tf_text13, "• כתיבה לזיכרון: הבלוק מייצר את הכתובת (addra), המידע (dina), ודגל הכתיבה (wea) ודוחף אותם לפורט A של ה-BRAM.")
 
 # הכנה לתמונה הממחישה את הלכידה
-img_path13 = "docs/presentation/assets/camera_capture_flow.png"
+img_path13 = "docs/presentation/assets/camera_capture_flow.png.jpeg"
+ 
 if os.path.exists(img_path13):
     slide13.shapes.add_picture(img_path13, Inches(2.5), Inches(3.5), width=Inches(5.0))
 
