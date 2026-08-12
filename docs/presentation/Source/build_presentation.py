@@ -308,7 +308,7 @@ add_bullet(tf_text10, "• תחום אדום (Camera Domain): קליטת הפי�
 add_bullet(tf_text10, "• תחום כחול (VGA Domain): המיקוד שלנו – שליפת הפיקסלים מפורט B (clkb) על ידי בקר ה-VGA וייצור אותות התצוגה.")
 
 # תמונת ה-RTL
-img_path10 = "docs/presentation/assets/rtl_direct_vga_path (4).png"
+img_path10 = "docs/presentation/assets/rtl_direct_vga_path.png"
 if os.path.exists(img_path10):
     # מיקום התמונה (ממורכזת)
     slide10.shapes.add_picture(img_path10, Inches(0.5), Inches(3.0), width=Inches(9.0))
