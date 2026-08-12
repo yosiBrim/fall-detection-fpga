@@ -290,6 +290,37 @@ img_path9 = "docs/presentation/assets/vga_voltage_divider_dac.png"
 if os.path.exists(img_path9):
     slide9.shapes.add_picture(img_path9, Inches(1.5), Inches(3.2), width=Inches(7.0))
 
+
+# ==========================================
+# שקף תוספת : סיכום המבוא - מפיזיקה אנלוגית לארכיטקטורה דיגיטלית
+# ==========================================
+slide10 = prs.slides.add_slide(prs.slide_layouts[5])
+title10 = slide10.shapes.title
+title10.text = "סיכום המבוא: מהעולם האנלוגי ללוגיקה הדיגיטלית"
+set_rtl(title10.text_frame.paragraphs[0])
+title10.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text10 = slide10.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text10 = txBox_text10.text_frame
+
+add_bullet(tf_text10, "• 1. המסע הפיזיקלי (Macroscopic): הבנת דרישות ה-VGA הקלאסי - סריקה, זמני החשכה (Blanking) והמרה אנלוגית (DAC).")
+add_bullet(tf_text10, "• 2. רמת המערכת (Board Level): מיפוי השחקנים על הלוח – סנכרון השעונים, קליטת המצלמה, וה-BRAM כגשר בין העולמות.")
+add_bullet(tf_text10, "• 3. מיקרו-ארכיטקטורה (RTL): פיצול בקר ה-VGA לשני תהליכים מקבילים – מחולל תזמונים (vga_sync) ומחולל פיקסלים (RGB).")
+add_bullet(tf_text10, "• 4. ולידציה והוכחת התכן (Verification): השלב הבא – אימות הלוגיקה הפנימית באמצעות סימולציות (ModelSim/Vivado).")
+
+# תמונת סכמת הבלוקים שמראה את החלוקה ההגיונית של הבקר
+img_path10 = "docs\presentation\assets\vga_fpga_top_architecture.png"
+
+if os.path.exists(img_path10):
+    slide10.shapes.add_picture(img_path10, Inches(2.5), Inches(3.6), width=Inches(5.0))
+else:
+    err_box = slide10.shapes.add_textbox(Inches(2.5), Inches(4.0), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]
+    err_p.text = f"[שגיאה: התמונה לא נמצאה בנתיב: {img_path10}]"
+    err_p.font.size = Pt(14)
+    err_p.font.color.rgb = RGBColor(255, 0, 0)
+    err_p.alignment = PP_ALIGN.CENTER
+    
 # ==========================================
 # שקף 10: מבט-על - זרימת נתונים ותחומי שעון (RTL)
 # ==========================================
