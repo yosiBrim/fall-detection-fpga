@@ -489,7 +489,7 @@ txBox_text15 = slide15.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5),
 tf_text15 = txBox_text15.text_frame
 
 add_bullet(tf_text15, "• תרגום קואורדינטות: הכתובת לזיכרון (addrb באורך 19 ביט) מחושבת מתמטית לפי המיקום באזור הפעיל: Y * 640 + X.")
-add_bullet(tf_text15, "• מנגנון ה-Pipeline (עיכוב מכוון): לזיכרון ה-BRAM יש זמן תגובה. הקוד רושם את הנתון הנכנס (doutb) לתוך אוגר פנימי (pxl_data_reg) בעליית השעון הבאה.")
+add_bullet(tf_text15, "• מנגנון ה-Pipeline (עיכוב מכוון): הקריאה מהזיכרון א-סינכרונית. כדי להבטיח יציבות, הקוד נועל את הנתון הנכנס (doutb) לתוך אוגר פנימי (pxl_data_reg) בעליית השעון הבאה.")
 add_bullet(tf_text15, "• סנכרון שומר הסף: כדי לפצות על השהיית הזיכרון, דגל אזור התצוגה (in_display_area) מושהה גם הוא במחזור שעון אחד (ל-in_display_area_delayed).")
 add_bullet(tf_text15, "• ניתוב דיגיטלי (Mux): רק כאשר הדגל המושהה דולק, 12 הביטים מפוצלים ומנותבים ליציאות VGA_R, VGA_G ו-VGA_B (4 ביטים לצבע).")
 
@@ -500,7 +500,7 @@ if os.path.exists(img_path15):
 
 
 # ==========================================
-# שקף 16:  סימולצייתמסלול הנתונים (Data Path)
+# שקף 16: סימולציית מסלול הנתונים (Data Path)
 # ==========================================
 slide16 = prs.slides.add_slide(prs.slide_layouts[5])
 title16 = slide16.shapes.title
@@ -512,7 +512,7 @@ txBox_text16 = slide16.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5),
 tf_text16 = txBox_text16.text_frame
 
 add_bullet(tf_text16, "• מטרת הסימולציה: הוכחת לחיצת היד (Handshake) שבין בקשת הכתובת (addrb) לקבלת נתוני הפיקסל (doutb).")
-add_bullet(tf_text16, "• דגימה בזמן אמת: ניתן לראות בבירור כיצד הכתובת עולה, ולאחר מחזור שעון, המידע מופיע ב-pxl_data_reg.")
+add_bullet(tf_text16, "• דגימה בזמן אמת: ניתן לראות בבירור כיצד הכתובת עולה, המידע מופיע מיידית ב-doutb (קריאה א-סינכרונית), וננעל באוגר pxl_data_reg בעליית השעון הבאה.")
 add_bullet(tf_text16, "• מניעת זבל ויזואלי: הסימולציה מוכיחה שבמעבר ל-Blanking (סוף שורה), יציאות ה-RGB נחתכות ל-0 מיידית, למרות שהזיכרון עדיין פולט מידע ישן.")
 
 # כאן תיכנס התמונה של ה-Waveform מ-ModelSim שאותה נייצר כעת
@@ -526,7 +526,6 @@ else:
     err_p.font.size = Pt(14)
     err_p.font.color.rgb = RGBColor(0, 112, 192)
     err_p.alignment = PP_ALIGN.CENTER
-
 
 # ==========================================
 # שמירת המצגת
