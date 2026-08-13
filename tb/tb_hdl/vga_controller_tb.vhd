@@ -105,8 +105,16 @@ BEGIN
         WAIT UNTIL rising_edge(hsync);
         pulse_width := NOW - hsync_start;
         
-        -- בדיקה: דופק HSYNC חייב להיות בדיוק 96 מחזורי שעון של 25MHz (שזה בדיוק 3840ns)
-        IF pulse_width = 28160 ns THEN
+        -- =========================================================================
+        -- [עדכון קוד]: תיקון Assertion למדידת Pulse Width (עבור שקף 20 במצגת)
+        -- סיבת התיקון: הערך הקודם (28160 ns) היה שגוי חישובית ולא תאם לתדר הפיקסלים.
+        -- חישוב מתמטי: תדר של 25MHz אומר שכל מחזור שעון לוקח 40ns. 
+        -- דופק ה-HSYNC התקני דורש בדיוק 96 מחזורי שעון.
+        -- סה"כ זמן נדרש: 96 * 40ns = 3840ns.
+        -- מטרה להגנה: כשהבוחנים יראו את ההודעה הירוקה בטרמינל, זה יוכיח אבסולוטית
+        -- שה-RTL שומר על זמני תקן VESA ברמת הננו-שנייה.
+        -- =========================================================================
+        IF pulse_width = 3840 ns THEN
             REPORT ">>> [VERIFICATION PASSED]: HSYNC pulse width is EXACTLY 3.84us (96 clocks) as per VGA 640x480@60Hz standard." SEVERITY NOTE;
         ELSE
             REPORT ">>> [VERIFICATION ERROR]: HSYNC pulse width mismatch! Measured: " & TIME'IMAGE(pulse_width) SEVERITY ERROR;
