@@ -1,4 +1,6 @@
+# ==========================================
 # Vivado project files and directories to ignore
+# ==========================================
 *.xpr
 *.jou
 *.log
@@ -14,7 +16,19 @@ project_*/
 *.sim/
 *.runs/
 
+# ==========================================
+# ModelSim / QuestaSim files to ignore
+# ==========================================
+work/
+*.wlf
+transcript
+modelsim.ini
+*.mti
+vsim.wlf
+
+# ==========================================
 # Do NOT ignore the build script, sources, constraints, and docs
+# ==========================================
 !build_project.tcl
 !rtl/
 !constraints/
