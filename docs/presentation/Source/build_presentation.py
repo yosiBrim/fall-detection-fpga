@@ -207,29 +207,6 @@ for row_idx, row in enumerate(row_data):
             cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
         set_rtl(cell.text_frame.paragraphs[0])
 
-# ==========================================
-# שקף 4: מרחב התצוגה: צלילה לערכי ה-Horizontal
-# ==========================================
-slide4 = prs.slides.add_slide(prs.slide_layouts[5])
-title4 = slide4.shapes.title
-title4.text = "מרחב התצוגה: צלילה לערכי ה-Horizontal"
-set_rtl(title4.text_frame.paragraphs[0])
-title4.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
-
-txBox_text4 = slide4.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
-tf_text4 = txBox_text4.text_frame
-
-add_bullet(tf_text4, "• אזור פעיל (640 פיקסלים): המידע האקטיבי. תקן ה-VGA מקצה בדיוק 640 מחזורי שעון לציור השורה בפועל.")
-add_bullet(tf_text4, "• שוליים וסנכרון (Front 16, Sync 96, Back 48): זמנים אלו נועדו במקור כדי לאפשר לקרן האלקטרונים (CRT) לכבות ולחזור שמאלה.")
-add_bullet(tf_text4, "• למה זה נדרש כיום? במסכי LCD/LED מודרניים אין קרן פיזית, אך הבקרים עדיין דורשים את 'הזמנים המתים' הללו (Blanking).")
-add_bullet(tf_text4, "• תאימות תקן (VESA): שמירה על תזמונים אלו היא קריטית. ללא הדיליי המדויק הזה, המסך לא יסתנכרן ויציג שגיאת 'No Signal'.")
-
-# תמונת הגרף שמראה את האזורים הפעילים מול ה-Blanking
-image_path4 = "docs/presentation/assets/vga_active_vs_blanking_regions.png" 
-if os.path.exists(image_path4):
-    slide4.shapes.add_picture(image_path4, Inches(2.5), Inches(3.5), width=Inches(5.0))
-
-#cture(img2_path5, Inches(5.2), Inches(2.6), width=Inches(4.0))
 
 # ==========================================
 # שקף 5: תזמונים והחשכה בחומרה (VGA Controller)
@@ -325,7 +302,7 @@ if os.path.exists(img_path8_2):
 # ==========================================
 slide9 = prs.slides.add_slide(prs.slide_layouts[5])
 title9 = slide9.shapes.title
-title9.text = "עומק הנדסי: מחלק המתח ומשקלי הביטים"
+title9.text = "  מחלק המתח ומשקלי הביטים"
 set_rtl(title9.text_frame.paragraphs[0])
 title9.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
