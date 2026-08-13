@@ -504,6 +504,103 @@ else:
     err_p.font.color.rgb = RGBColor(0, 112, 192)
     err_p.alignment = PP_ALIGN.CENTER
 
+
+# ==========================================
+# שקף 17: מבוא לוריפיקציה ומחזור שורה שלם (Ts)
+# ==========================================
+slide17 = prs.slides.add_slide(prs.slide_layouts[5])
+title17 = slide17.shapes.title
+title17.text = "מבוא לאימות התקן: מחזור שורה שלם (Ts)"
+set_rtl(title17.text_frame.paragraphs[0])
+title17.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text17 = slide17.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text17 = txBox_text17.text_frame
+
+add_bullet(tf_text17, "• שלב ב' - מהדיגיטל לפיזיקה: לאחר שהוכחנו את אמינות שליפת הנתונים מהזיכרון, כעת נוכיח שהחומרה מייצרת את התזמונים הפיזיים הנדרשים בתקן ה-VGA.")
+add_bullet(tf_text17, "• מפת הדרכים (Macro to Micro): נתחיל ממבט-על של שורת מסך שלמה, ונצלול בהדרגה לניתוח האזורים הפעילים, זמני ההמתנה (Porches) ודופק הסנכרון.")
+add_bullet(tf_text17, "• הוכחת מחזור השורה: התקן דורש 800 מחזורי שעון. מונה ה-hsync_reg סופר 0-799 במדויק, ומדידת הסמנים מוכיחה דלתא של 32us.")
+
+img_path17 = "docs/presentation/assets/modelsim_full_line_ts.png" 
+if os.path.exists(img_path17):
+    slide17.shapes.add_picture(img_path17, Inches(1.0), Inches(3.6), width=Inches(8.0))
+else:
+    err_box = slide17.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_full_line_ts.png]"
+    err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+
+# ==========================================
+# שקף 18: האזור הפעיל – זמן תצוגה
+# ==========================================
+slide18 = prs.slides.add_slide(prs.slide_layouts[5])
+title18 = slide18.shapes.title
+title18.text = "ליבת התצוגה: אימות האזור הפעיל (Tdisp)"
+set_rtl(title18.text_frame.paragraphs[0])
+title18.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text18 = slide18.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text18 = txBox_text18.text_frame
+
+add_bullet(tf_text18, "• תזמון הנתונים: מתוך כלל מחזור השורה, מוקצים בדיוק 640 מחזורי שעון לציור הפיקסלים (25.6us).")
+add_bullet(tf_text18, "• דגל הבקרה: האות in_display_area עולה ל-'1' ומאפשר את שליפת הנתונים רק בטווח המורשה.")
+add_bullet(tf_text18, "• מונה הפיקסלים הפעיל: המונה display_x סופר במדויק מ-0 ועד 639. לאורך כל החלון הזה, יציאות ה-RGB פולטות נתונים אקטיביים למסך.")
+
+img_path18 = "docs/presentation/assets/modelsim_active_display_tdisp.png" 
+if os.path.exists(img_path18):
+    slide18.shapes.add_picture(img_path18, Inches(1.0), Inches(3.6), width=Inches(8.0))
+else:
+    err_box = slide18.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_active_display_tdisp.png]"
+    err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+
+# ==========================================
+# שקף 19: השוליים ודחיקת האותות (Blanking)
+# ==========================================
+slide19 = prs.slides.add_slide(prs.slide_layouts[5])
+title19 = slide19.shapes.title
+title19.text = "אכיפת Blanking: שוליים (Porches)"
+set_rtl(title19.text_frame.paragraphs[0])
+title19.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text19 = slide19.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text19 = txBox_text19.text_frame
+
+add_bullet(tf_text19, "• משמעות ה'זמנים המתים': ה-Front Porch (16 שעונים) וה-Back Porch (48 שעונים) נועדו לייצוב תנועת הקרן.")
+add_bullet(tf_text19, "• אכיפה לוגית: בסימולציה ניתן לראות כי ברגע שהקרן חורגת מהאזור הפעיל (display_x מסתיים), המערכת מאלצת את כל ערוצי ה-RGB ל-'0000'.")
+add_bullet(tf_text19, "• התוצאה: שחור מוחלט על המסך באזורי המעבר, מה שמונע 'מריחות' צבע ומאפשר למסך להסתנכרן בצורה חלקה.")
+
+img_path19 = "docs/presentation/assets/modelsim_porches_blanking.png" 
+if os.path.exists(img_path19):
+    slide19.shapes.add_picture(img_path19, Inches(1.0), Inches(3.6), width=Inches(8.0))
+else:
+    err_box = slide19.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_porches_blanking.png]"
+    err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+
+# ==========================================
+# שקף 20: דופק הסנכרון והוכחה אוטומטית (Tpw)
+# ==========================================
+slide20 = prs.slides.add_slide(prs.slide_layouts[5])
+title20 = slide20.shapes.title
+title20.text = "דופק הסנכרון (Tpw) ווריפיקציה אוטומטית"
+set_rtl(title20.text_frame.paragraphs[0])
+title20.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text20 = slide20.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text20 = txBox_text20.text_frame
+
+add_bullet(tf_text20, "• אות ה-HSYNC: זהו הטריגר הפיזי המורה למסך לבצע Retrace לתחילת השורה הבאה.")
+add_bullet(tf_text20, "• דיוק של מחזור בודד: הצבת סמנים על הדילוג של האות הפיזי מוכיחה רוחב דופק מדויק של 3.84us, השקול ל-96 מחזורי שעון.")
+add_bullet(tf_text20, "• Self-Checking Testbench: מעבר לבדיקה הוויזואלית, סביבת הבדיקה (TB) כוללת מנגנון אוטומטי (Assert) שבודק את רוחב הדופק בזמן ריצה ומתריע על כל חריגה מהתקן.")
+
+img_path20 = "docs/presentation/assets/modelsim_sync_pulse_assertion.png" 
+if os.path.exists(img_path20):
+    slide20.shapes.add_picture(img_path20, Inches(1.0), Inches(3.5), width=Inches(8.0))
+else:
+    err_box = slide20.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_sync_pulse_assertion.png]"
+    err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+    
 # ==========================================
 # שמירת המצגת
 # ==========================================
