@@ -157,6 +157,56 @@ image_path3 = "docs/presentation/assets/vga_raster_scan_retrace_concept.png"
 if os.path.exists(image_path3):
     slide3.shapes.add_picture(image_path3, Inches(2.5), Inches(3.0), width=Inches(4.5))
 
+
+# ==========================================
+# שקף תוספת (שקף 5 החדש): תזמוני VGA - הפיזיקה מאחורי המספרים
+# ==========================================
+slide_table = prs.slides.add_slide(prs.slide_layouts[5])
+title_table = slide_table.shapes.title
+title_table.text = "תזמוני VGA: הפיזיקה מאחורי המספרים"
+set_rtl(title_table.text_frame.paragraphs[0])
+title_table.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+# יצירת טבלה 5 שורות, 4 עמודות
+x, y, cx, cy = Inches(0.5), Inches(1.5), Inches(9.0), Inches(3.0)
+table_shape = slide_table.shapes.add_table(5, 4, x, y, cx, cy)
+table = table_shape.table
+
+# הגדרת רוחב העמודות
+table.columns[0].width = Inches(1.5) # פרמטר
+table.columns[1].width = Inches(1.5) # שעונים
+table.columns[2].width = Inches(3.0) # משמעות היסטורית
+table.columns[3].width = Inches(3.0) # משמעות מעשית (FPGA)
+
+# כותרות הטבלה
+headers = ["פרמטר", "מחזורי שעון", "הצורך הפיזיקלי המקורי (CRT)", "המימוש שלנו (RTL)"]
+for col_idx, header in enumerate(headers):
+    cell = table.cell(0, col_idx)
+    cell.text = header
+    cell.text_frame.paragraphs[0].font.bold = True
+    cell.text_frame.paragraphs[0].font.size = Pt(16)
+    cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+    set_rtl(cell.text_frame.paragraphs[0])
+
+# תוכן השורות
+row_data = [
+    ["Active Display", "640", "הקרן מציירת את הפיקסלים הפיזיים על המסך משמאל לימין.", "שליפת נתונים מה-BRAM ושידור צבע (RGB) פעיל."],
+    ["Front Porch", "16", "מרווח זמן לקרן 'להירגע' בסוף השורה לפני שחוזרת אחורה.", "כיבוי מיידי של ה-RGB ל-'0000' למניעת מריחות."],
+    ["Sync Pulse", "96", "מכת מתח (טריגר) שמאלצת את הקרן לקפוץ חזרה שמאלה.", "הורדת האות הפיזי HSYNC ל-'0' למשך 96 שעונים."],
+    ["Back Porch", "48", "המתנה לייצוב הקרן בתחילת השורה החדשה בצד שמאל.", "המשך השהיית ה-RGB על '0000' עד הגעה לפיקסל הראשון."]
+]
+
+for row_idx, row in enumerate(row_data):
+    for col_idx, text in enumerate(row):
+        cell = table.cell(row_idx + 1, col_idx)
+        cell.text = text
+        cell.text_frame.paragraphs[0].font.size = Pt(14)
+        if col_idx < 2:
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+        else:
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
+        set_rtl(cell.text_frame.paragraphs[0])
+
 # ==========================================
 # שקף 4: מרחב התצוגה: צלילה לערכי ה-Horizontal
 # ==========================================
@@ -450,7 +500,7 @@ if os.path.exists(img_path15):
 
 
 # ==========================================
-# שקף 16: סימולציית מסלול הנתונים (Data Path)
+# שקף 16:  סימולצייתמסלול הנתונים (Data Path)
 # ==========================================
 slide16 = prs.slides.add_slide(prs.slide_layouts[5])
 title16 = slide16.shapes.title

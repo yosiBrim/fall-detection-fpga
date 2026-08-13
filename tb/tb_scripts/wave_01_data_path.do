@@ -31,4 +31,8 @@ configure wave -signalnamewidth 0
 run 1005 us
 
 # אנחנו מתמקדים בדיוק ברגע שבו הפיקסל הראשון (כתובת 0) מתחיל להיות משודר למסך
+<<<<<<< HEAD
 WaveRestoreZoom {997 us} {999 us}
+=======
+WaveRestoreZoom {997 us} {999 us}
+>>>>>>> c51c6fa101c829ffa18a5bc6d79d892c04615d03
