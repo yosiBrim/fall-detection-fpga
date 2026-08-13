@@ -1,6 +1,9 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 
+# פקודת הקסם שמנקה את החלון מהריצות הקודמות!
+delete wave *
+
 add wave -noupdate -divider -height 24 {1. Master Clock (25MHz = 40ns)}
 add wave -noupdate -color Yellow /vga_controller_tb/DUT/pxl_clk
 
@@ -23,13 +26,15 @@ add wave -noupdate -color Magenta -radix hexadecimal /vga_controller_tb/DUT/VGA_
 add wave -noupdate -color Magenta -radix hexadecimal /vga_controller_tb/DUT/VGA_B
 
 TreeUpdate [SetDefaultTree]
-# הרחבת עמודת השמות כדי שהטקסט הארוך של הכותרות ייכנס בשלמותו
 configure wave -namecolwidth 380
 configure wave -valuecolwidth 80
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 
-# הרצה לעומק הפריים (כדי שיהיו לנו נתונים אמיתיים להציג)
+# מרסטים את הסימולציה מתוך הסקריפט כדי להיות בטוחים
+restart -f
+
+# הרצה לעומק הפריים (כדי שיהיו לנו נתונים אמיתיים להציג, מעבר ל-Vertical Blanking)
 run 1050 us
 
 # זום מדויק שמציג מחזור שורה שלם אחד במרכז המסך (כ-36 מיקרו-שניות סה"כ)
