@@ -712,6 +712,74 @@ for row_idx, row in enumerate(row_data2):
         else:
             cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
         set_rtl(cell.text_frame.paragraphs[0])
+ 
+ # ==========================================
+# שקף 23: עלות הדיבוג - ניתוח משאבי חומרה (Utilization)
+# ==========================================
+slide23 = prs.slides.add_slide(prs.slide_layouts[5])
+title23 = slide23.shapes.title
+title23.text = "עלות הדיבוג: ניתוח משאבי חומרה (Trade-offs)"
+set_rtl(title23.text_frame.paragraphs[0])
+title23.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text23 = slide23.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text23 = txBox_text23.text_frame
+
+add_bullet(tf_text23, "• ה-ILA איננו תוכנה: זוהי חומרה פיזית (IP) המסונתזת ונצרבת על הסיליקון לצד לוגיקת התצוגה.")
+add_bullet(tf_text23, "• פרדוקס הגודל: בקר ה-VGA שלנו יעיל מאוד וצורך משאבים אפסיים, בעוד שמערכת הדיבוג (ILA + Debug Hub) דורשת אלפי רכיבים לוגיים.")
+add_bullet(tf_text23, "• מסקנה הנדסית: ה-ILA הוא כלי קריטי לשלבי הפיתוח (R&D), אך יוסר בגרסת הייצור הסופית (Release) כדי לחסוך בשטח סיליקון ובהספק.")
+
+# טבלת צריכת משאבים אמיתית מה-Vivado
+x3, y3, cx3, cy3 = Inches(5.0), Inches(3.6), Inches(4.5), Inches(2.5)
+table_shape3 = slide23.shapes.add_table(4, 4, x3, y3, cx3, cy3)
+table3 = table_shape3.table
+
+# הגדרת רוחב עמודות לטבלה הקטנה
+table3.columns[0].width = Inches(1.5)
+table3.columns[1].width = Inches(1.0)
+table3.columns[2].width = Inches(1.0)
+table3.columns[3].width = Inches(1.0)
+
+headers3 = ["מודול (Module)", "LUTs", "Registers", "BRAM"]
+for col_idx, header in enumerate(headers3):
+    cell = table3.cell(0, col_idx)
+    cell.text = header
+    cell.text_frame.paragraphs[0].font.bold = True
+    cell.text_frame.paragraphs[0].font.size = Pt(13)
+    cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+    set_rtl(cell.text_frame.paragraphs[0])
+
+# הנתונים האמיתיים מהתמונה
+row_data3 = [
+    ["VGA Controller", "47", "52", "0"],
+    ["ILA + Debug Hub", "1,732", "2,642", "1.5"],
+    ["Total Design", "2,756", "2,890", "105"]
+]
+
+for row_idx, row in enumerate(row_data3):
+    for col_idx, text in enumerate(row):
+        cell = table3.cell(row_idx + 1, col_idx)
+        cell.text = text
+        cell.text_frame.paragraphs[0].font.size = Pt(12)
+        if col_idx == 0:
+            cell.text_frame.paragraphs[0].font.bold = True
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+        else:
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+        set_rtl(cell.text_frame.paragraphs[0])
+
+# תמונת ה-Device View עם ה"כתם" של ה-ILA
+img_path23 = "docs/presentation/assets/device_view_with_ila.png" 
+if os.path.exists(img_path23):
+    slide23.shapes.add_picture(img_path23, Inches(0.5), Inches(3.2), width=Inches(4.2))
+else:
+    err_box = slide23.shapes.add_textbox(Inches(0.5), Inches(3.5), Inches(4.2), Inches(2.0))
+    err_p = err_box.text_frame.paragraphs[0]
+    err_p.text = "[שומר מקום: device_view_with_ila.png - צילום הצ'יפ עם ה-ILA]"
+    err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+ 
+ 
+ 
     
 # ==========================================
 # שמירת המצגת
