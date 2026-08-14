@@ -64,31 +64,35 @@ ARCHITECTURE rtl OF vga_controller IS
     -- אותות פנימיים לדיבוג שרשרת הנתונים וההשתקה
     SIGNAL vga_r_int, vga_g_int, vga_b_int : STD_LOGIC_VECTOR(3 DOWNTO 0);
     
+
+-- ==========================================================
+    -- **** VHDL ILA Probes (White Box Testing) ****
     -- ==========================================================
-    -- **** הוספנו כאן את וקטור הדיבוג למונה ה-HSYNC ****
+    
+    
+    -- ==========================================================
+    -- **** האות שאנחנו מייצרים במיוחד עבור ה-ILA ****
     SIGNAL hsync_debug : STD_LOGIC_VECTOR(9 DOWNTO 0);
     -- ==========================================================
     
-    -- ==========================================================
-    -- **** אותות לדיבוג ILA (White Box Testing) ****
-    -- ==========================================================
+    
+    
     ATTRIBUTE mark_debug : STRING;
     
-    -- 1. ציר הזמן והבקרה (Timing & Control)
+    -- 1. ציר הזמן והבקרה
     ATTRIBUTE mark_debug OF hsync_debug : SIGNAL IS "true";
     ATTRIBUTE mark_debug OF in_display_area_delayed : SIGNAL IS "true";
     
-    -- 2. מסלול הנתונים - כאן נוכיח את ה-Latency! (Data Path)
-    ATTRIBUTE mark_debug OF bram_address_reg : SIGNAL IS "true"; -- הכתובת שנשלחת לזיכרון
-    ATTRIBUTE mark_debug OF doutb : SIGNAL IS "true";            -- המידע החוזר מהזיכרון
-    ATTRIBUTE mark_debug OF pxl_data_reg : SIGNAL IS "true";     -- נעילת המידע באוגר הפנימי
+    -- 2. מסלול הנתונים וההשהיה (Latency & Data Flow)
+    ATTRIBUTE mark_debug OF bram_address_reg : SIGNAL IS "true"; 
+    ATTRIBUTE mark_debug OF doutb : SIGNAL IS "true";            
+    ATTRIBUTE mark_debug OF pxl_data_reg : SIGNAL IS "true";     
     
-    -- 3. יציאות הצבע לפני המסך (RGB)
+    -- 3. יציאות הצבע הדיגיטליות 
     ATTRIBUTE mark_debug OF vga_r_int : SIGNAL IS "true";
     ATTRIBUTE mark_debug OF vga_g_int : SIGNAL IS "true";
     ATTRIBUTE mark_debug OF vga_b_int : SIGNAL IS "true";
     -- ==========================================================
-    
     
     
 BEGIN
