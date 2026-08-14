@@ -577,6 +577,32 @@ else:
     err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_porches_blanking.png]"
     err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
 
+
+# ==========================================
+# שקף 19.5 (תוספת): המרפסת האחורית (Back Porch) וחזרת הצבע
+# ==========================================
+slide_bp = prs.slides.add_slide(prs.slide_layouts[5])
+title_bp = slide_bp.shapes.title
+title_bp.text = "אכיפת Blanking: המרפסת האחורית (Back Porch)"
+set_rtl(title_bp.text_frame.paragraphs[0])
+title_bp.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text_bp = slide_bp.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text_bp = txBox_text_bp.text_frame
+
+add_bullet(tf_text_bp, "• זמן המתנה (Back Porch): לאחר סיום דופק הסנכרון, המערכת ממתינה 48 מחזורי שעון (1.92us) לייצוב הקרן בתחילת השורה.")
+add_bullet(tf_text_bp, "• המשך החשכה: בדומה למרפסת הקדמית, ה-RGB מוחזק במכוון על '0000' כדי למנוע זליגות צבע.")
+add_bullet(tf_text_bp, "• חזרת הצבעים: ברגע שהאות in_display_area עולה ל-'1', רואים בבירור את נתוני ה-RGB האמיתיים מהזיכרון פורצים החוצה ומציירים את הפיקסל הראשון.")
+
+img_path_bp = "docs/presentation/assets/modelsim_back_porch.png" 
+if os.path.exists(img_path_bp):
+    slide_bp.shapes.add_picture(img_path_bp, Inches(1.0), Inches(3.6), width=Inches(8.0))
+else:
+    err_box = slide_bp.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
+    err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_back_porch.png]"
+    err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+    
+    
 # ==========================================
 # שקף 20: דופק הסנכרון והוכחה אוטומטית (Tpw)
 # ==========================================
