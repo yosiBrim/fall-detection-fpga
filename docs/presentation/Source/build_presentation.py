@@ -626,6 +626,92 @@ else:
     err_box = slide20.shapes.add_textbox(Inches(2.5), Inches(4.5), Inches(5), Inches(1))
     err_p = err_box.text_frame.paragraphs[0]; err_p.text = "[שומר מקום: modelsim_sync_pulse_assertion.png]"
     err_p.font.size = Pt(14); err_p.font.color.rgb = RGBColor(0, 112, 192); err_p.alignment = PP_ALIGN.CENTER
+ 
+ 
+# ==========================================
+# שקף 21: המעבר לחומרה - מגבלות הסימולציה והקופסה השחורה
+# ==========================================
+slide21 = prs.slides.add_slide(prs.slide_layouts[5])
+title21 = slide21.shapes.title
+title21.text = "המעבר לחומרה: מסימולציה ל'קופסה שחורה'"
+set_rtl(title21.text_frame.paragraphs[0])
+title21.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text21 = slide21.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
+tf_text21 = txBox_text21.text_frame
+
+add_bullet(tf_text21, "• העולם האידיאלי (ModelSim): עד כה בדקנו את הלוגיקה בסביבה וירטואלית. ראינו כל אות ומונה, אך ללא עיכובים פיזיים (Zero Latency).")
+add_bullet(tf_text21, "• המציאות הפיזית (FPGA): לאחר סינתזה וצריבה, הלוגיקה הופכת ל'קופסה שחורה' אטומה. ישנם זמני התפשטות (Propagation delays) של האותות בתוך הסיליקון.")
+add_bullet(tf_text21, "• מגבלת הדיבוג החיצוני: מבחוץ (למשל עם אוסצילוסקופ), ניתן למדוד רק את הפינים הפיזיים (VGA_R/G/B, Sync). אין לנו שום דרך לראות מתי המונה מתאפס או איזו כתובת נשלחת לזיכרון.")
+
+# ציור קופסה שחורה שממחישה את המגבלה
+black_box = slide21.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(3.0), Inches(4.0), Inches(4.0), Inches(1.5))
+black_box.fill.solid()
+black_box.fill.fore_color.rgb = RGBColor(40, 40, 40)
+tb_black = black_box.text_frame
+tb_black.text = "Artix-7 FPGA (קופסה שחורה)\nאין גישה לאותות פנימיים"
+tb_black.paragraphs[0].font.bold = True
+tb_black.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
+tb_black.paragraphs[0].alignment = PP_ALIGN.CENTER
+set_rtl(tb_black.paragraphs[0])
+
+# פינים יוצאים (חיצים)
+slide21.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(7.0), Inches(4.3), Inches(0.8), Inches(0.3))
+slide21.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(7.0), Inches(4.9), Inches(0.8), Inches(0.3))
+out_txt = slide21.shapes.add_textbox(Inches(7.8), Inches(4.2), Inches(1.5), Inches(1.0))
+out_txt.text_frame.text = "פינים בלבד\n(RGB, Sync)"
+
+# ==========================================
+# שקף 22: הפתרון - Vivado ILA (קופסה לבנה)
+# ==========================================
+slide22 = prs.slides.add_slide(prs.slide_layouts[5])
+title22 = slide22.shapes.title
+title22.text = "דיבוג בתוך הסיליקון: Vivado ILA (קופסה לבנה)"
+set_rtl(title22.text_frame.paragraphs[0])
+title22.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text22 = slide22.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text22 = txBox_text22.text_frame
+
+add_bullet(tf_text22, "• הפתרון ההנדסי: הוספת Integrated Logic Analyzer (ILA) – רכיב חומרה פנימי שדוגם את האותות ומשדר אותם למחשב (בדיקת קופסה לבנה).")
+add_bullet(tf_text22, "• היתרון (מציאות מול תיאוריה): מאפשר לראות את זמני ההשהיה האמיתיים (Latency) שבין שליחת בקשה לזיכרון (addrb) לקבלת הנתון (doutb).")
+add_bullet(tf_text22, "• החיסרון (Trade-off): ה-ILA אינו חינמי. הוא 'גוזל' משאבי חומרה יקרים מהכרטיס (LUTs ו-BRAM) לצורך לוגיקת הדגימה ואגירת הנתונים.")
+
+# טבלת תוכנית הניסוי - מה אנחנו בודקים
+x2, y2, cx2, cy2 = Inches(0.5), Inches(3.8), Inches(9.0), Inches(2.5)
+table_shape2 = slide22.shapes.add_table(4, 3, x2, y2, cx2, cy2)
+table2 = table_shape2.table
+
+table2.columns[0].width = Inches(2.0)
+table2.columns[1].width = Inches(3.5)
+table2.columns[2].width = Inches(3.5)
+
+headers2 = ["יעד הבדיקה", "מגבלת ה'קופסה השחורה'", "האות שנדגום ב-ILA"]
+for col_idx, header in enumerate(headers2):
+    cell = table2.cell(0, col_idx)
+    cell.text = header
+    cell.text_frame.paragraphs[0].font.bold = True
+    cell.text_frame.paragraphs[0].font.size = Pt(15)
+    cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+    set_rtl(cell.text_frame.paragraphs[0])
+
+row_data2 = [
+    ["זרימת נתונים ו-Latency", "רואים רק את הפיקסל הסופי מתחלף ביציאה.", "addrb, doutb, pxl_data_reg (בדיקת צנרת)"],
+    ["מיקום אופקי", "לא ניתן לדעת איזה פיקסל משורטט כרגע.", "display_x (מונה הפיקסלים)"],
+    ["אכיפת שחור (Blanking)", "רואים מסך חשוך, ללא הקשר תזמוני.", "in_display_area_delayed"]
+]
+
+for row_idx, row in enumerate(row_data2):
+    for col_idx, text in enumerate(row):
+        cell = table2.cell(row_idx + 1, col_idx)
+        cell.text = text
+        cell.text_frame.paragraphs[0].font.size = Pt(14)
+        if col_idx == 0:
+            cell.text_frame.paragraphs[0].font.bold = True
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+        else:
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
+        set_rtl(cell.text_frame.paragraphs[0])
     
 # ==========================================
 # שמירת המצגת
