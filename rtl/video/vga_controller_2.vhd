@@ -58,22 +58,45 @@ ARCHITECTURE rtl OF vga_controller IS
     SIGNAL in_display_area : STD_LOGIC;
 
     SIGNAL in_display_area_delayed : STD_LOGIC := '0';
-	
-	SIGNAL pxl_data_reg : STD_LOGIC_VECTOR(11 DOWNTO 0) := (OTHERS => '0');
-	
-	-- אותות פנימיים לדיבוג שרשרת הנתונים וההשתקה
+    
+    SIGNAL pxl_data_reg : STD_LOGIC_VECTOR(11 DOWNTO 0) := (OTHERS => '0');
+    
+    -- אותות פנימיים לדיבוג שרשרת הנתונים וההשתקה
     SIGNAL vga_r_int, vga_g_int, vga_b_int : STD_LOGIC_VECTOR(3 DOWNTO 0);
     
-    -- קיבוע האותות ל-ILA (כפיית חומרה)
+    -- ==========================================================
+    -- **** הוספנו כאן את וקטור הדיבוג למונה ה-HSYNC ****
+    SIGNAL hsync_debug : STD_LOGIC_VECTOR(9 DOWNTO 0);
+    -- ==========================================================
+    
+    -- ==========================================================
+    -- **** אותות לדיבוג ILA (White Box Testing) ****
+    -- ==========================================================
     ATTRIBUTE mark_debug : STRING;
+    
+    -- 1. ציר הזמן והבקרה (Timing & Control)
+    ATTRIBUTE mark_debug OF hsync_debug : SIGNAL IS "true";
+    ATTRIBUTE mark_debug OF in_display_area_delayed : SIGNAL IS "true";
+    
+    -- 2. מסלול הנתונים - כאן נוכיח את ה-Latency! (Data Path)
+    ATTRIBUTE mark_debug OF bram_address_reg : SIGNAL IS "true"; -- הכתובת שנשלחת לזיכרון
+    ATTRIBUTE mark_debug OF doutb : SIGNAL IS "true";            -- המידע החוזר מהזיכרון
+    ATTRIBUTE mark_debug OF pxl_data_reg : SIGNAL IS "true";     -- נעילת המידע באוגר הפנימי
+    
+    -- 3. יציאות הצבע לפני המסך (RGB)
     ATTRIBUTE mark_debug OF vga_r_int : SIGNAL IS "true";
     ATTRIBUTE mark_debug OF vga_g_int : SIGNAL IS "true";
     ATTRIBUTE mark_debug OF vga_b_int : SIGNAL IS "true";
-    ATTRIBUTE mark_debug OF in_display_area_delayed : SIGNAL IS "true";
-	
+    -- ==========================================================
+    
+    
+    
 BEGIN
 
-
+    -- ==========================================================
+    -- **** המרת המונה (INTEGER) לוקטור (STD_LOGIC_VECTOR) עבור ה-ILA ****
+    hsync_debug <= std_logic_vector(to_unsigned(hsync_reg, 10));
+    -- ==========================================================
     
     -- חישוב מיקום הפיקסל בתוך אזור התצוגה
     display_x <= hsync_reg - H_DISPLAY_START WHEN hsync_reg >= H_DISPLAY_START AND hsync_reg < (H_DISPLAY_START + FRAME_WIDTH) ELSE 0;
@@ -103,73 +126,31 @@ BEGIN
                   vsync_reg + 1 WHEN line_finished = '1' ELSE
                   vsync_reg;
 
-    -- חישוב כתובת BRAM - עם סנכרון טוב יותר
--- שנה את החישוב של bram_address_next:
---	--PROCESS(hsync_reg, vsync_reg, frame_finished, start)
---		VARIABLE next_hsync : INTEGER RANGE 0 TO H_TOTAL_LINE - 1;
---		VARIABLE next_x, next_y : INTEGER;
---	BEGIN
---		IF frame_finished = '1' THEN
---			bram_address_next <= (OTHERS => '0');
---		ELSIF start = '1' THEN
---			-- חשב את המיקום של הפיקסל הבא
---			IF hsync_reg = H_TOTAL_LINE - 1 THEN
---				next_hsync := 0;
---			ELSE
---				next_hsync := hsync_reg + 1;
---			END IF;
---			
---			-- בדוק אם הפיקסל הבא יהיה באזור התצוגה
---			IF next_hsync >= H_DISPLAY_START AND next_hsync < (H_DISPLAY_START + FRAME_WIDTH) AND
---			   vsync_reg >= V_DISPLAY_START and vsync_reg < (V_DISPLAY_START + FRAME_HEIGHT) THEN
---				
---				next_x := next_hsync - H_DISPLAY_START;
---				next_y := vsync_reg - V_DISPLAY_START;
---				bram_address_next <= to_unsigned((next_y * FRAME_WIDTH) + next_x, 19);
---			ELSE
---				bram_address_next <= bram_address_reg;
---			END IF;
---		ELSE
---			bram_address_next <= bram_address_reg;
---		END IF;
---	END PROCESS;
-
-PROCESS(hsync_reg, vsync_reg, frame_finished, start)
-BEGIN
-    IF frame_finished = '1' THEN
-        bram_address_next <= (OTHERS => '0');
-    ELSIF start = '1' THEN
-        IF hsync_reg >= H_DISPLAY_START AND hsync_reg < (H_DISPLAY_START + FRAME_WIDTH) AND
-           vsync_reg >= V_DISPLAY_START AND vsync_reg < (V_DISPLAY_START + FRAME_HEIGHT) THEN
-            bram_address_next <= to_unsigned(((vsync_reg - V_DISPLAY_START) * FRAME_WIDTH) + (hsync_reg - H_DISPLAY_START), 19);
+    -- חישוב כתובת BRAM
+    PROCESS(hsync_reg, vsync_reg, frame_finished, start)
+    BEGIN
+        IF frame_finished = '1' THEN
+            bram_address_next <= (OTHERS => '0');
+        ELSIF start = '1' THEN
+            IF hsync_reg >= H_DISPLAY_START AND hsync_reg < (H_DISPLAY_START + FRAME_WIDTH) AND
+               vsync_reg >= V_DISPLAY_START AND vsync_reg < (V_DISPLAY_START + FRAME_HEIGHT) THEN
+                bram_address_next <= to_unsigned(((vsync_reg - V_DISPLAY_START) * FRAME_WIDTH) + (hsync_reg - H_DISPLAY_START), 19);
+            ELSE
+                bram_address_next <= bram_address_reg;
+            END IF;
         ELSE
             bram_address_next <= bram_address_reg;
         END IF;
-    ELSE
-        bram_address_next <= bram_address_reg;
-    END IF;
-END PROCESS;
+    END PROCESS;
 
-
-
-
-	PROCESS (pxl_clk)
-	BEGIN
-		IF rising_edge(pxl_clk) THEN
-			IF start = '1' THEN
-				pxl_data_reg <= doutb; -- רישום נתוני ה-BRAM
-			END IF;
-		END IF;
-	END PROCESS;
-
-	--VGA_R <= pxl_data_reg(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
-	--VGA_G <= pxl_data_reg(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
-	--VGA_B <= pxl_data_reg(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
-
-    -- שנה את יציאות RGB:
-    --VGA_R <= doutb(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
-    --VGA_G <= doutb(7 DOWNTO 4) WHEN in_display_area_delayed = '1' ELSE "0000";
-    --VGA_B <= doutb(3 DOWNTO 0) WHEN in_display_area_delayed = '1' ELSE "0000";
+    PROCESS (pxl_clk)
+    BEGIN
+        IF rising_edge(pxl_clk) THEN
+            IF start = '1' THEN
+                pxl_data_reg <= doutb; -- רישום נתוני ה-BRAM
+            END IF;
+        END IF;
+    END PROCESS;
     
     -- שומר הסף מחליט איזה מידע להעביר לשגרירים (האותות הפנימיים שיידגמו ב-ILA)
     vga_r_int <= pxl_data_reg(11 DOWNTO 8) WHEN in_display_area_delayed = '1' ELSE "0000";
@@ -181,23 +162,21 @@ END PROCESS;
     VGA_G <= vga_g_int;
     VGA_B <= vga_b_int;
     
-PROCESS (pxl_clk, rst)
-BEGIN
-    IF rst = '1' THEN
-        hsync_reg <= 0;
-        vsync_reg <= 0;
-        bram_address_reg <= (OTHERS => '0');
-        in_display_area_delayed <= '0';
-    ELSIF rising_edge(pxl_clk) THEN
-        IF start = '1' THEN
-            hsync_reg <= hsync_next;
-            vsync_reg <= vsync_next;
-            bram_address_reg <= bram_address_next;
-            in_display_area_delayed <= in_display_area;
+    PROCESS (pxl_clk, rst)
+    BEGIN
+        IF rst = '1' THEN
+            hsync_reg <= 0;
+            vsync_reg <= 0;
+            bram_address_reg <= (OTHERS => '0');
+            in_display_area_delayed <= '0';
+        ELSIF rising_edge(pxl_clk) THEN
+            IF start = '1' THEN
+                hsync_reg <= hsync_next;
+                vsync_reg <= vsync_next;
+                bram_address_reg <= bram_address_next;
+                in_display_area_delayed <= in_display_area;
+            END IF;
         END IF;
-    END IF;
-END PROCESS;
+    END PROCESS;
 
-
-    
 END ARCHITECTURE;
