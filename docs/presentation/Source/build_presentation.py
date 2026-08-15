@@ -670,13 +670,13 @@ title22.text = "דיבוג בתוך הסיליקון: Vivado ILA (קופסה ל�
 set_rtl(title22.text_frame.paragraphs[0])
 title22.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-txBox_text22 = slide22.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+txBox_text22 = slide22.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(2.2)) # הגדלתי מעט את הגובה ל-2.2
 tf_text22 = txBox_text22.text_frame
 
 add_bullet(tf_text22, "• הפתרון ההנדסי: הוספת Integrated Logic Analyzer (ILA) – רכיב חומרה פנימי שדוגם את האותות ומשדר אותם למחשב (בדיקת קופסה לבנה).")
 add_bullet(tf_text22, "• היתרון (מציאות מול תיאוריה): מאפשר לראות את זמני ההשהיה האמיתיים (Latency) שבין שליחת בקשה לזיכרון (addrb) לקבלת הנתון (doutb).")
 add_bullet(tf_text22, "• החיסרון (Trade-off): ה-ILA אינו חינמי. הוא 'גוזל' משאבי חומרה יקרים מהכרטיס (LUTs ו-BRAM) לצורך לוגיקת הדגימה ואגירת הנתונים.")
-
+add_bullet(tf_text22, "• הערת תכן (ModelSim לעומת ILA): בסימולציה התמקדנו ב-display_x (מונה הפיקסלים הפעיל). בחומרה אנו דוגמים את המונה הראשי (hsync_debug המייצג את hsync_reg) הכולל אותו בתוכו, כדי לצפות גם ב-Porches ובדופק הסנכרון בזמן אמת.")
 # טבלת תוכנית הניסוי - מה אנחנו בודקים
 x2, y2, cx2, cy2 = Inches(0.5), Inches(3.8), Inches(9.0), Inches(2.5)
 table_shape2 = slide22.shapes.add_table(4, 3, x2, y2, cx2, cy2)
