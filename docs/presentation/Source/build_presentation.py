@@ -782,6 +782,99 @@ else:
  
  
  
+ 
+ # ==========================================
+# שקף 24 (חדש): חשיפת הסיליקון - השוואת גלים בזמן אמת
+# ==========================================
+slide24 = prs.slides.add_slide(prs.slide_layouts[5])
+title24 = slide24.shapes.title
+title24.text = "חשיפת הסיליקון: ModelSim הווירטואלי מול Vivado ILA הפיזי"
+set_rtl(title24.text_frame.paragraphs[0])
+title24.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text24 = slide24.shapes.add_textbox(Inches(0.2), Inches(1.2), Inches(9.5), Inches(1.5))
+tf_text24 = txBox_text24.text_frame
+
+add_bullet(tf_text24, "• רגע האמת (The Trigger): תפסנו בחומרה את הרגע המדויק שבו in_display_area_delayed עולה ל-'1' והמסך מתחיל לשדר צבע.")
+add_bullet(tf_text24, "• ההקבלה: משמאל - התיאוריה המדויקת שפיתחנו. מימין - ההתנהגות הפיזית האמיתית שנמדדה מתוך ה-Artix-7.")
+add_bullet(tf_text24, "• התוצאה: זרימת הנתונים והאכיפה הלוגית (Gatekeeper) פועלות בחומרה בדיוק כפי שחזינו, גם תחת השהיות הסיליקון (Latency).")
+
+# תמונה שמאלית: ModelSim
+img_box_ms = slide24.shapes.add_textbox(Inches(0.5), Inches(3.2), Inches(4.2), Inches(3.5))
+p_ms = img_box_ms.text_frame.paragraphs[0]
+p_ms.text = "[שומר מקום: צילום מסך מודלסים]\nהעולם האידיאלי (Zero Delay)\n(כאן נשים את הגלים מה-DO file)"
+p_ms.font.size = Pt(16)
+p_ms.font.color.rgb = RGBColor(128, 128, 128)
+p_ms.alignment = PP_ALIGN.CENTER
+
+# תמונה ימנית: ILA
+img_box_ila = slide24.shapes.add_textbox(Inches(5.3), Inches(3.2), Inches(4.2), Inches(3.5))
+p_ila = img_box_ila.text_frame.paragraphs[0]
+p_ila.text = "[שומר מקום: צילום מסך ILA]\nהעולם הפיזי (Post-Silicon)\n(כאן נשים את הגלים מהחומרה החיה)"
+p_ila.font.size = Pt(16)
+p_ila.font.color.rgb = RGBColor(0, 112, 192)
+p_ila.alignment = PP_ALIGN.CENTER
+
+
+# ==========================================
+# שקף 25 (חדש): טבלת הניתוח - אידיאלי מול פיזי
+# ==========================================
+slide25 = prs.slides.add_slide(prs.slide_layouts[5])
+title25 = slide25.shapes.title
+title25.text = "Post-Silicon Validation: מה הסיליקון חושף?"
+set_rtl(title25.text_frame.paragraphs[0])
+title25.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text25 = slide25.shapes.add_textbox(Inches(0.2), Inches(1.1), Inches(9.5), Inches(1.0))
+tf_text25 = txBox_text25.text_frame
+
+add_bullet(tf_text25, "• המעבר מקופסה שחורה ללבנה: הוספנו mark_debug ל-VHDL כדי לאלץ את הסינתזה לשמר חוטים פנימיים למדידה[cite: 6].")
+add_bullet(tf_text25, "• הוכחת הפיזיקה: הטבלה מתארת כיצד כל אות וירטואלי מהסימולציה נמדד עתה כתופעה חשמלית/פיזית בתוך רשת השערים (Netlist).")
+
+# טבלת ההשוואה המפורטת
+x_25, y_25, cx_25, cy_25 = Inches(0.2), Inches(2.3), Inches(9.6), Inches(4.5)
+table_shape25 = slide25.shapes.add_table(6, 3, x_25, y_25, cx_25, cy_25)
+table25 = table_shape25.table
+
+# הגדרת רוחב העמודות (עמודת האות קטנה יותר, עמודות ההסבר רחבות)
+table25.columns[0].width = Inches(2.2)
+table25.columns[1].width = Inches(3.7)
+table25.columns[2].width = Inches(3.7)
+
+headers25 = ["האות (Signal)", "ModelSim (העולם הווירטואלי)", "Vivado ILA (הסיליקון הפיזי)"]
+for col_idx, header in enumerate(headers25):
+    cell = table25.cell(0, col_idx)
+    cell.text = header
+    cell.text_frame.paragraphs[0].font.bold = True
+    cell.text_frame.paragraphs[0].font.size = Pt(14)
+    cell.fill.solid()
+    # צבעים שונים לכותרות כדי להדגיש את ההבדל (אפור לווירטואלי, כחול לפיזי)
+    cell.fill.fore_color.rgb = RGBColor(79, 129, 189) if col_idx > 0 else RGBColor(40, 40, 40)
+    cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+    cell.text_frame.paragraphs[0].font.color.rgb = RGBColor(255, 255, 255)
+    set_rtl(cell.text_frame.paragraphs[0])
+
+# תוכן הטבלה (כל שורה מייצגת אות ב-Data Path)
+content25 = [
+    ["bram_address_reg", "עדכון מתמטי באפס זמן (0ns).", "ניתוב פיזי: 19 חוטים שמפעילים את פורט הקריאה בזיכרון."],
+    ["doutb (תגובת BRAM)", "המידע מופיע מיידית ובקסם.", "השהיית חומרה (Latency): זמן התגובה האמיתי של ה-IP."],
+    ["pxl_data_reg", "השמת משתנה פשוטה.", "הוכחת יציבות: הפליפ-פלופים דוגמים את doutb כראוי בעליית השעון."],
+    ["in_display_area_dly", "דגל בוליאני (True/False).", "פיקוד פיזי (Select Line) שכופה ניתוב על המרבבים (MUX) בחומרה."],
+    ["vga_r/g/b_int", "מחרוזות תווים (למשל '0000').", "אכיפה חשמלית: חיווט הפינים לאדמה (GND) למניעת זליגות צבע."]
+]
+
+for row_idx, row in enumerate(content25):
+    for col_idx, text in enumerate(row):
+        cell = table25.cell(row_idx + 1, col_idx)
+        cell.text = text
+        cell.text_frame.paragraphs[0].font.size = Pt(13)
+        if col_idx == 0:
+            cell.text_frame.paragraphs[0].font.bold = True
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.LEFT
+        else:
+            cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
+            set_rtl(cell.text_frame.paragraphs[0])
+ 
     
 # ==========================================
 # שמירת המצגת
