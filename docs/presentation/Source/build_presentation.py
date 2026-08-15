@@ -661,6 +661,7 @@ slide21.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(7.0), Inches(4.9), Inches
 out_txt = slide21.shapes.add_textbox(Inches(7.8), Inches(4.2), Inches(1.5), Inches(1.0))
 out_txt.text_frame.text = "פינים בלבד\n(RGB, Sync)"
 
+
 # ==========================================
 # שקף 22: הפתרון - Vivado ILA (קופסה לבנה)
 # ==========================================
@@ -677,6 +678,7 @@ add_bullet(tf_text22, "• הפתרון ההנדסי: הוספת Integrated Logi
 add_bullet(tf_text22, "• היתרון (מציאות מול תיאוריה): מאפשר לראות את זמני ההשהיה האמיתיים (Latency) שבין שליחת בקשה לזיכרון (addrb) לקבלת הנתון (doutb).")
 add_bullet(tf_text22, "• החיסרון (Trade-off): ה-ILA אינו חינמי. הוא 'גוזל' משאבי חומרה יקרים מהכרטיס (LUTs ו-BRAM) לצורך לוגיקת הדגימה ואגירת הנתונים.")
 add_bullet(tf_text22, "• הערת תכן (ModelSim לעומת ILA): בסימולציה התמקדנו ב-display_x (מונה הפיקסלים הפעיל). בחומרה אנו דוגמים את המונה הראשי (hsync_debug המייצג את hsync_reg) הכולל אותו בתוכו, כדי לצפות גם ב-Porches ובדופק הסנכרון בזמן אמת.")
+
 # טבלת תוכנית הניסוי - מה אנחנו בודקים
 x2, y2, cx2, cy2 = Inches(0.5), Inches(3.8), Inches(9.0), Inches(2.5)
 table_shape2 = slide22.shapes.add_table(4, 3, x2, y2, cx2, cy2)
@@ -697,7 +699,7 @@ for col_idx, header in enumerate(headers2):
 
 row_data2 = [
     ["זרימת נתונים ו-Latency", "רואים רק את הפיקסל הסופי מתחלף ביציאה.", "addrb, doutb, pxl_data_reg (בדיקת צנרת)"],
-    ["מיקום אופקי", "לא ניתן לדעת איזה פיקסל משורטט כרגע.", "display_x (מונה הפיקסלים)"],
+    ["מיקום אופקי", "לא ניתן לדעת איזה פיקסל משורטט כרגע.", "hsync_debug (מייצג את hsync_reg)"],
     ["אכיפת שחור (Blanking)", "רואים מסך חשוך, ללא הקשר תזמוני.", "in_display_area_delayed"]
 ]
 
@@ -712,7 +714,7 @@ for row_idx, row in enumerate(row_data2):
         else:
             cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
         set_rtl(cell.text_frame.paragraphs[0])
- 
+        
  # ==========================================
 # שקף 23: עלות הדיבוג - ניתוח משאבי חומרה (Utilization)
 # ==========================================
