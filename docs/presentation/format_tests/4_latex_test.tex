@@ -1,0 +1,41 @@
+\documentclass{beamer}
+\usepackage{fontspec}
+\usepackage{bidi}
+\usepackage{polyglossia}
+
+\setdefaultlanguage{hebrew}
+\setotherlanguage{english}
+\newfontfamily\hebrewfont{Arial}
+
+\usetheme{Madrid}
+
+\begin{document}
+
+\begin{frame}
+  \begin{center}
+    {\Large \textbf{פיתוח מערכת מבוססת \LRE{FPGA} להתראת נפילה לחולי דמנציה}} \\ \vspace{0.5cm}
+    קליטת תמונה בזמן אמת ממצלמת \LRE{OV7670} והצגתה דרך כרטיס \LRE{Artix-7}. \\
+    על מנת לאפשר עיבוד תמונה לזיהויי עמידה ממושכת לחולי דמנציה. \\ \vspace{0.5cm}
+    \textit{מגיש: יוסי ברים | הנדסת חשמל שנה ד | המרכז האקדמי לב}
+  \end{center}
+\end{frame}
+
+\begin{frame}{ארכיטקטורת המערכת}
+  \begin{itemize}
+    \item נתוני התמונה הגולמיים נקלטים מהמצלמה ונאגרים בזיכרון ה-\LRE{BRAM}.
+    \item בקר ה-\LRE{VGA} שולף את הנתונים ומעביר לממיר \LRE{D to A} לקבלת אות אנלוגי פיזי למסך.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{תזמוני VGA: הפיזיקה מאחורי המספרים}
+  \begin{table}[]
+    \begin{tabular}{|l|c|r|r|}
+    \hline
+    \textbf{פרמטר} & \textbf{שעונים} & \textbf{משמעות פיזיקלית} & \textbf{מימוש (RTL)} \\ \hline
+    \LRE{Active Display} & 640 & הקרן מציירת פיקסלים. & שידור \LRE{RGB} פעיל. \\ \hline
+    \LRE{Front Porch} & 16 & מרווח לקרן להירגע. & כיבוי ל-\LRE{0000}. \\ \hline
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\end{document}
