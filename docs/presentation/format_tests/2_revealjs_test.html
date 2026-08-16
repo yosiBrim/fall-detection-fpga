@@ -1,56 +1,539 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="he">
+<html lang="he" dir="rtl">
 <head>
-    <meta charset="utf-8">
-    <title>מצגת VGA - יוסי ברים</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/simple.min.css">
-    <style>
-        .reveal { font-family: 'Segoe UI', Arial, sans-serif; text-align: right; }
-        .reveal h1, .reveal h2 { text-transform: none; text-align: center; color: #2c3e50; }
-        .reveal ul { display: block; padding-right: 40px; }
-        .reveal table { width: 100%; font-size: 0.8em; margin-top: 20px; }
-        .reveal th { background-color: #2980b9; color: white; text-align: center; }
-        .reveal td { border-bottom: 1px solid #ddd; }
-        .ltr-text { direction: ltr; display: inline-block; }
-    </style>
+  <meta charset="utf-8">
+  <title>פיתוח מערכת מבוססת FPGA להתראת נפילה</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- טעינת הספריות של Reveal.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+  
+  <style>
+    /* עיצוב גלובלי והתאמה לעברית */
+    .reveal { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .reveal h1 { font-size: 1.6em; margin-bottom: 20px; text-align: center; color: #222; font-weight: bold; }
+    
+    /* מניעת שבירת משפטים בשילוב אנגלית */
+    .ltr-text { direction: ltr; display: inline-block; font-weight: bold; color: #4F81BD; font-family: monospace; }
+    
+    /* הכלל המנחה: טקסט כפיצוחים, תמונות כגיבורות */
+    .slide-text { font-size: 22px; text-align: right; line-height: 1.3; opacity: 0.85; max-width: 900px; margin: 0 auto 15px auto; }
+    .slide-text ul { padding-right: 20px; }
+    .slide-text li { margin-bottom: 5px; }
+    
+    .hero-img { max-height: 60vh; width: auto; max-width: 100%; display: block; margin: 0 auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .hero-img-small { max-height: 40vh; width: auto; border-radius: 8px; }
+    
+    /* עיצוב טבלאות */
+    .custom-table { width: 100%; border-collapse: collapse; font-size: 18px; margin-top: 15px; }
+    .custom-table th { background-color: #4F81BD; color: white; padding: 10px; border: 1px solid #ccc; text-align: center; }
+    .custom-table td { padding: 10px; border: 1px solid #ccc; text-align: right; }
+    .custom-table .ltr-td { text-align: left; direction: ltr; font-weight: bold; }
+
+    /* בלוקים גמישים (Flex) לתרשימים */
+    .flex-center { display: flex; justify-content: center; align-items: center; gap: 20px; }
+  </style>
 </head>
 <body>
-    <div class="reveal">
-        <div class="slides">
-            
-            <!-- שקף 1 -->
-            <section>
-                <h2>פיתוח מערכת מבוססת FPGA להתראת נפילה</h2>
-                <p style="font-size: 0.7em;">קליטת תמונה בזמן אמת ממצלמת <span class="ltr-text">OV7670</span> והצגתה דרך כרטיס <span class="ltr-text">Artix-7</span>.<br>על מנת לאפשר עיבוד תמונה לזיהויי עמידה ממושכת לחולי דמנציה.</p>
-                <img src="docs/presentation/assets/artix_board.png" alt="Board" style="height: 300px;">
-                <p style="font-weight: bold; font-size: 0.8em;">מגיש: יוסי ברים | הנדסת חשמל שנה ד | המרכז האקדמי לב</p>
-            </section>
+  <div class="reveal">
+    <div class="slides">
 
-            <!-- שקף 2 -->
-            <section>
-                <h2>ארכיטקטורת המערכת</h2>
-                <ul>
-                    <li>נתוני התמונה הגולמיים נקלטים מהמצלמה ונאגרים בזיכרון ה-<span class="ltr-text">BRAM</span>.</li>
-                    <li>בקר ה-<span class="ltr-text">VGA</span> שולף את הנתונים ומעביר לממיר <span class="ltr-text">D to A</span> לקבלת אות אנלוגי פיזי.</li>
-                </ul>
-            </section>
-
-            <!-- שקף 3 -->
-            <section>
-                <h2>תזמוני VGA: הפיזיקה מאחורי המספרים</h2>
-                <table>
-                    <tr><th>פרמטר</th><th>שעונים</th><th>משמעות פיזיקלית</th><th>מימוש (RTL)</th></tr>
-                    <tr><td>Active Display</td><td>640</td><td>הקרן מציירת פיקסלים.</td><td>שידור RGB פעיל.</td></tr>
-                    <tr><td>Front Porch</td><td>16</td><td>זמן 'להירגע' לקרן.</td><td>כיבוי מיידי של RGB.</td></tr>
-                </table>
-            </section>
-
+      <!-- ================== שקף 1 ================== -->
+      <section>
+        <h1>פיתוח מערכת מבוססת <span class="ltr-text">FPGA</span> להתראת נפילה לחולי דמנציה</h1>
+        <div class="slide-text" style="text-align: center; font-size: 24px;">
+          קליטת תמונה בזמן אמת ממצלמת <span class="ltr-text">OV7670</span> והצגתה דרך כרטיס <span class="ltr-text">Artix-7</span>.<br>
+          על מנת לאפשר עיבוד תמונה לזיהוי עמידה ממושכת לחולי דמנציה.
         </div>
+        <img src="../assets/artix_board.png" class="hero-img" alt="Artix-7 Board">
+        <div style="font-size: 24px; font-weight: bold; text-align: center; margin-top: 20px; color: #333;">
+          מגיש: יוסי ברים | הנדסת חשמל שנה ד' | המרכז האקדמי לב
+        </div>
+      </section>
+
+      <!-- ================== שקף 2 ================== -->
+      <section>
+        <h1>ארכיטקטורת המערכת</h1>
+        <div class="slide-text" style="text-align: center;">
+          נתוני התמונה הגולמיים נקלטים מהמצלמה ונאגרים בזיכרון ה-<span class="ltr-text">BRAM</span>.<br>
+          בקר ה-<span class="ltr-text">VGA</span> שולף את הנתונים ומעביר לממיר <span class="ltr-text">D to A</span> לקבלת אות אנלוגי פיזי למסך.
+        </div>
+        <div class="flex-center" style="margin-top: 30px; font-size: 16px;">
+          <div style="border: 2px solid #555; padding: 10px; border-radius: 8px; direction: ltr; text-align: left;">
+            <b>Inputs:</b><br>clk, reset<br>ov7670_vsync, href, pclk<br>ov7670_data[7:0]
+          </div>
+          <div>&#8594;</div>
+          <div style="background-color: #000; color: #fff; padding: 20px; border-radius: 8px; font-size: 22px;">
+            מערכת התראת נפילה<br>מבוססת <span class="ltr-text" style="color:white;">FPGA</span>
+          </div>
+          <div>&#8594;</div>
+          <div style="border: 2px solid #555; padding: 10px; border-radius: 8px; direction: ltr; text-align: left;">
+            <b>Outputs:</b><br>VGA_HS_O, VGA_VS_O<br>VGA_R, G, B<br>ov7670_xclk, pwdn
+          </div>
+        </div>
+        <div class="flex-center" style="margin-top: 40px; font-size: 18px;">
+          <div style="background: #4F81BD; color: white; padding: 10px 15px; border-radius: 20px;"><span class="ltr-text" style="color:white;">ov7670_capture</span></div> <span>&#8594;</span>
+          <div style="background: #4F81BD; color: white; padding: 10px 15px; border-radius: 20px;"><span class="ltr-text" style="color:white;">frame_buffer</span></div> <span>&#8594;</span>
+          <div style="background: #4F81BD; color: white; padding: 10px 15px; border-radius: 20px;"><span class="ltr-text" style="color:white;">vga_controller</span></div> <span>&#8594;</span>
+          <div style="background: #4F81BD; color: white; padding: 10px 15px; border-radius: 20px;"><span class="ltr-text" style="color:white;">D to A Converter</span></div>
+        </div>
+      </section>
+
+      <!-- ================== שקף 3 ================== -->
+      <section>
+        <h1>מבוא ל-<span class="ltr-text">VGA</span>: קונספט תותח האלקטרונים (<span class="ltr-text">CRT</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מקור הפרוטוקול:</b> פותח במקור עבור מסכי שפופרת קרן קתודית (<span class="ltr-text">CRT</span>) מבוססי פיזיקה אנלוגית.</li>
+            <li><b>תותח אלקטרונים:</b> המסך פועל ע"י קרן פיזית. עוצמת הזרם קובעת את ההארה.</li>
+            <li><b>המורשת האנלוגית:</b> מחייב שידור אותות השהייה שיאפשרו לקרן זמן תנועה וחזרה.</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_analog_cathode_ray_concept.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 4 ================== -->
+      <section>
+        <h1>מבוא ל-<span class="ltr-text">VGA</span>: סריקה קווית (<span class="ltr-text">Raster Scan</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li>הציור מבוסס על קרן שסורקת משמאל לימין (שורה) ומלמעלה למטה (פריים).</li>
+            <li>תנועת הקרן רציפה ויוצרת מסלול 'זיגזג'.</li>
+            <li>נדרש זמן כדי להחזיר אותה לנקודת ההתחלה (<span class="ltr-text">Retrace</span>).</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_raster_scan_retrace_concept.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 5 ================== -->
+      <section>
+        <h1>תזמוני <span class="ltr-text">VGA</span>: הפיזיקה מאחורי המספרים</h1>
+        <table class="custom-table">
+          <tr>
+            <th>פרמטר</th>
+            <th>מחזורי שעון</th>
+            <th>הצורך הפיזיקלי המקורי (<span class="ltr-text">CRT</span>)</th>
+            <th>המימוש שלנו (<span class="ltr-text">RTL</span>)</th>
+          </tr>
+          <tr>
+            <td class="ltr-td">Active Display</td>
+            <td class="ltr-td">640</td>
+            <td>הקרן מציירת את הפיקסלים הפיזיים על המסך משמאל לימין.</td>
+            <td>שליפת נתונים מה-<span class="ltr-text">BRAM</span> ושידור צבע (<span class="ltr-text">RGB</span>) פעיל.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">Front Porch</td>
+            <td class="ltr-td">16</td>
+            <td>מרווח זמן לקרן 'להירגע' בסוף השורה לפני שחוזרת אחורה.</td>
+            <td>כיבוי מיידי של ה-<span class="ltr-text">RGB</span> ל-'0000' למניעת מריחות.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">Sync Pulse</td>
+            <td class="ltr-td">96</td>
+            <td>מכת מתח (טריגר) שמאלצת את הקרן לקפוץ חזרה שמאלה.</td>
+            <td>הורדת האות הפיזי <span class="ltr-text">HSYNC</span> ל-'0' למשך 96 שעונים.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">Back Porch</td>
+            <td class="ltr-td">48</td>
+            <td>המתנה לייצוב הקרן בתחילת השורה החדשה בצד שמאל.</td>
+            <td>המשך השהיית ה-<span class="ltr-text">RGB</span> על '0000' עד הגעה לפיקסל הראשון.</td>
+          </tr>
+        </table>
+      </section>
+
+      <!-- ================== שקף 6 ================== -->
+      <section>
+        <h1>תזמונים והחשכה בחומרה (<span class="ltr-text">VGA Controller</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מחזור שלם:</b> חיבור הערכים דורש מהמונה האופקי (<span class="ltr-text">h_count</span>) לספור מ-0 ועד 799.</li>
+            <li><b>שעון פיקסל <span class="ltr-text">25MHz</span>:</b> כל 'פיקסל' שקול למחזור שעון של 40ns לסנכרון <span class="ltr-text">60Hz</span>.</li>
+            <li><b>אכיפת שחור (<span class="ltr-text">Blanking</span>):</b> מחוץ לתחום ה-640, הלוגיקה שלנו מאלצת "0000" ב-<span class="ltr-text">RGB</span>.</li>
+          </ul>
+        </div>
+        <div class="flex-center">
+          <img src="../assets/vga_counters_rtl_schematic.png" class="hero-img-small">
+          <img src="../assets/vga_timing_waveform_and_table.png" class="hero-img-small">
+        </div>
+      </section>
+
+      <!-- ================== שקף 7 ================== -->
+      <section>
+        <h1>מסלול הנתונים: חישוב כתובת הפיקסל ושליפה</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מיקום הקרן:</b> המונים מפיקים קואורדינטות דינמיות <span class="ltr-text">display_x, display_y</span>.</li>
+            <li><b>תרגום לכתובת:</b> מתורגמת לכתובת <span class="ltr-text">bram_address_next</span> ונשלחת דרך <span class="ltr-text">addrb</span>.</li>
+            <li><b>שליפה מה-<span class="ltr-text">BRAM</span>:</b> הבלוק מקבל כתובת ומשחרר 12 ביט ל-<span class="ltr-text">doutb</span>.</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_address_bram_flow.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 8 ================== -->
+      <section>
+        <h1>עיבוד הפיקסל: ניתוב ל-<span class="ltr-text">RGB</span> ומנגנון ה-<span class="ltr-text">Blanking</span></h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>רישום ופיצול:</b> הנתונים ננעלים באוגר ומפוצלים ל-<span class="ltr-text">R, G, B</span> פנימיים.</li>
+            <li><b>שומר הסף:</b> הדגל <span class="ltr-text">in_display_area_delayed</span> מזהה האם הקרן על המסך.</li>
+            <li><b>סינון דיגיטלי:</b> בזמני ה-<span class="ltr-text">Porch</span> וה-<span class="ltr-text">Sync</span>, היציאות נאלצות ל-"0000".</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_rgb_video_on_logic.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 9 ================== -->
+      <section>
+        <h1>המרת <span class="ltr-text">DAC</span> אנלוגית ומחבר ה-<span class="ltr-text">VGA</span></h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>סולם נגדים:</b> המרת 12 ביטי ה-<span class="ltr-text">RGB</span> למתח אנלוגי ע"י משקולות נגדים.</li>
+            <li><b>אותות סנכרון:</b> פיני היציאה מוגנים בנגדי 100Ω ומזינים את מחבר ה-<span class="ltr-text">DB15</span>.</li>
+          </ul>
+        </div>
+        <div class="flex-center">
+          <img src="../assets/vga_dac_resistor_network.png" class="hero-img-small">
+          <img src="../assets/vga_db15_connector_pins.png" class="hero-img-small">
+        </div>
+      </section>
+
+      <!-- ================== שקף 10 ================== -->
+      <section>
+        <h1>מחלק המתח ומשקלי הביטים</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>משקל פיזי:</b> ה-<span class="ltr-text">MSB</span> מחובר לנגד הקטן ביותר, מזרים זרם גדול ומשפיע משמעותית.</li>
+            <li><b>כוונון עדין:</b> ה-<span class="ltr-text">LSB</span> מחובר לנגד הגדול ביותר לתרומה מזערית.</li>
+            <li><b>סכימה אנלוגית:</b> הזרמים זורמים דרך נגד הסיומת (75Ω) למחלק מתח המפיק <span class="ltr-text">0V-0.7V</span>.</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_voltage_divider_dac.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 11 ================== -->
+      <section>
+        <h1>סיכום תיאורטי: לקראת ארכיטקטורת החומרה</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>האתגר הפיזיקלי:</b> תזמונים מדויקים והמרת צבע רציפה.</li>
+            <li><b>המעבר פנימה:</b> נכנסים לתוך הלוגיקה הדיגיטלית (<span class="ltr-text">RTL</span>) על הכרטיס.</li>
+            <li><b>תפקיד הבקר:</b> גישור סופי בין הזיכרון לאותות הפיזיים.</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_fpga_top_architecture.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 12 ================== -->
+      <section>
+        <h1>מבט-על: זרימת נתונים ותחומי שעון (<span class="ltr-text">RTL</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מחולל שעונים:</b> <span class="ltr-text">PLL</span> מפיק שעונים נפרדים ל-<span class="ltr-text">VGA</span> ולמצלמה.</li>
+            <li><b>גישור (<span class="ltr-text">CDC</span>):</b> זיכרון ה-<span class="ltr-text">BRAM</span> כחוצץ בטוח בין כתיבה לקריאה.</li>
+            <li><b>תחומים:</b> תחום אדום לקליטה, תחום כחול לשליפת פיקסלים לתצוגה.</li>
+          </ul>
+        </div>
+        <img src="../assets/rtl_direct_vga_path.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 13 ================== -->
+      <section>
+        <h1>ניהול שעונים במערכת (<span class="ltr-text">Clock Generator</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מקור שעון:</b> כניסת <span class="ltr-text">clk</span> מקבלת את שעון הלוח המקורי ומזינה את ה-<span class="ltr-text">PLL</span>.</li>
+            <li><b>שעון תצוגה:</b> הפקת <span class="ltr-text">25MHz</span> המזין את בקר ה-<span class="ltr-text">VGA</span> ואת פורט הקריאה.</li>
+            <li><b>שעון מצלמה:</b> הפקת <span class="ltr-text">24MHz</span> לסנכרון רכיב המצלמה.</li>
+          </ul>
+        </div>
+        <img src="../assets/clk_wiz_instantiation.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 14 ================== -->
+      <section>
+        <h1>זיכרון ה-<span class="ltr-text">BRAM</span>: חוצץ התמונה</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>תצורת <span class="ltr-text">Dual-Port</span>:</b> הפרדה לכתיבה וקריאה, פותר בעיות <span class="ltr-text">CDC</span>.</li>
+            <li><b>שעונים:</b> כתיבה ב-<span class="ltr-text">100MHz</span>, קריאה ב-<span class="ltr-text">25MHz</span>.</li>
+            <li><b>ממדים:</b> 307,200 פיקסלים ברוחב 12 ביט.</li>
+          </ul>
+        </div>
+        <img src="../assets/bram_ip_symbol.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 15 ================== -->
+      <section>
+        <h1>ממשק המצלמה: מהעולם הפיזי אל הזיכרון</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>הגשר הפיזי:</b> הפקת <span class="ltr-text">XCLK</span> החוצה, וקבלת פיקסלים עם <span class="ltr-text">PCLK</span> חזרה.</li>
+            <li><b>לכידה:</b> רץ ב-<span class="ltr-text">100MHz</span> לדגימה בטוחה של ה-<span class="ltr-text">PCLK</span>.</li>
+            <li><b>כתיבה:</b> ייצור כתובת, מידע ודגל כתיבה לדחיפה ל-<span class="ltr-text">BRAM</span>.</li>
+          </ul>
+        </div>
+        <img src="../assets/camera_capture_flow.png.jpeg" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 16 ================== -->
+      <section>
+        <h1>ממשק הזיכרון: ממדים וסנכרון נתונים</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>תרגום קואורדינטות:</b> כתובת `Y * 640 + X`.</li>
+            <li><b>מנגנון ה-<span class="ltr-text">Pipeline</span>:</b> נעילת הנתון הנכנס לאוגר פנימי כדי לפצות על השהיית הזיכרון.</li>
+            <li><b>ניתוב:</b> פיצול הביטים ליציאות <span class="ltr-text">VGA_R, G, B</span> רק כשהדגל דולק.</li>
+          </ul>
+        </div>
+        <img src="../assets/vga_address_logic_code.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 17 ================== -->
+      <section>
+        <h1>אימות מסלול הנתונים: בקר ↔ <span class="ltr-text">BRAM</span></h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>הוכחת לחיצת יד:</b> בין בקשת הכתובת לקבלת נתוני הפיקסל.</li>
+            <li><b>דגימה בזמן אמת:</b> הכתובת עולה, המידע מופיע וננעל באוגר.</li>
+            <li><b>מניעת זבל ויזואלי:</b> חיתוך יציאות ל-0 מיידית במעבר ל-<span class="ltr-text">Blanking</span>.</li>
+          </ul>
+        </div>
+        <img src="../assets/modelsim_data_path_flow.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 18 ================== -->
+      <section>
+        <h1>מבוא לאימות התקן: מחזור שורה שלם (<span class="ltr-text">Ts</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מהדיגיטל לפיזיקה:</b> הוכחה שהחומרה מייצרת את התזמונים הפיזיים הנדרשים.</li>
+            <li><b>הוכחת מחזור שורה:</b> התקן דורש 800 מחזורי שעון, והסמנים מוכיחים דלתא של 32us.</li>
+          </ul>
+        </div>
+        <img src="../assets/modelsim_full_line_ts.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 19 ================== -->
+      <section>
+        <h1>ליבת התצוגה: אימות האזור הפעיל (<span class="ltr-text">Tdisp</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>תזמון הנתונים:</b> 640 מחזורי שעון מוקצים לציור הפיקסלים.</li>
+            <li><b>דגל הבקרה:</b> עולה ל-'1' ומאפשר שליפת נתונים.</li>
+            <li><b>מונה פיקסלים:</b> סופר 0 עד 639 להפקת נתונים אקטיביים.</li>
+          </ul>
+        </div>
+        <img src="../assets/modelsim_active_display_tdisp.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 20 ================== -->
+      <section>
+        <h1>אכיפת <span class="ltr-text">Blanking</span>: שוליים (<span class="ltr-text">Porches</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>זמנים מתים:</b> נועדו לייצוב תנועת הקרן.</li>
+            <li><b>אכיפה לוגית:</b> כשחורגים מהאזור הפעיל, כל הערוצים מאולצים ל-'0000'.</li>
+            <li><b>התוצאה:</b> שחור מוחלט באזורי המעבר למניעת מריחות.</li>
+          </ul>
+        </div>
+        <img src="../assets/modelsim_porches_blanking.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 21 ================== -->
+      <section>
+        <h1>אכיפת <span class="ltr-text">Blanking</span>: המרפסת האחורית (<span class="ltr-text">Back Porch</span>)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>זמן המתנה:</b> ממתינים 48 מחזורי שעון לייצוב הקרן בתחילת השורה.</li>
+            <li><b>המשך החשכה:</b> ה-<span class="ltr-text">RGB</span> מוחזק על '0000'.</li>
+            <li><b>חזרת הצבעים:</b> כשהדגל עולה ל-'1', נתוני ה-<span class="ltr-text">RGB</span> פורצים החוצה.</li>
+          </ul>
+        </div>
+        <img src="../assets/modelsim_back_porch.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 22 ================== -->
+      <section>
+        <h1>דופק הסנכרון (<span class="ltr-text">Tpw</span>) ווריפיקציה אוטומטית</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>אות ה-<span class="ltr-text">HSYNC</span>:</b> הטריגר המורה למסך לבצע <span class="ltr-text">Retrace</span>.</li>
+            <li><b>דיוק של מחזור:</b> רוחב דופק מדויק של 3.84us (96 שעונים).</li>
+            <li><b><span class="ltr-text">Self-Checking TB</span>:</b> בדיקה אוטומטית (<span class="ltr-text">Assert</span>) מתריעה על חריגות.</li>
+          </ul>
+        </div>
+        <img src="../assets/modelsim_sync_pulse_assertion.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 23 ================== -->
+      <section>
+        <h1>המעבר לחומרה: מסימולציה ל'קופסה שחורה'</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>העולם האידיאלי:</b> בסימולציה ראינו כל אות ומונה ללא עיכובים פיזיים.</li>
+            <li><b>המציאות הפיזית:</b> ב-<span class="ltr-text">FPGA</span> הלוגיקה הופכת לקופסה שחורה עם זמני התפשטות.</li>
+            <li><b>מגבלת הדיבוג:</b> מבחוץ ניתן למדוד רק פינים פיזיים, אין גישה לאותות פנימיים.</li>
+          </ul>
+        </div>
+        <div class="flex-center" style="margin-top: 40px;">
+          <div style="background-color: #282828; color: white; padding: 40px; border-radius: 12px; font-size: 24px; font-weight: bold; text-align: center;">
+            <span class="ltr-text" style="color:white; font-size:28px;">Artix-7 FPGA</span> (קופסה שחורה)<br>
+            <span style="font-size: 18px; font-weight: normal; color: #ffcccc;">אין גישה לאותות פנימיים</span>
+          </div>
+          <div style="font-size: 40px; margin: 0 20px; color: #555;">&#8594;</div>
+          <div style="font-size: 22px; font-weight: bold; color: #333;">
+            פינים בלבד<br>(<span class="ltr-text">RGB, Sync</span>)
+          </div>
+        </div>
+      </section>
+
+      <!-- ================== שקף 24 ================== -->
+      <section>
+        <h1>דיבוג בתוך הסיליקון: <span class="ltr-text">Vivado ILA</span> (קופסה לבנה)</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>הפתרון ההנדסי:</b> הוספת <span class="ltr-text">ILA</span> – רכיב חומרה שדוגם אותות פנימיים.</li>
+            <li><b>היתרון:</b> צפייה בזמני ההשהיה האמיתיים (<span class="ltr-text">Latency</span>).</li>
+            <li><b>החיסרון:</b> גוזל משאבי חומרה יקרים.</li>
+          </ul>
+        </div>
+        <table class="custom-table">
+          <tr>
+            <th>יעד הבדיקה</th>
+            <th>מגבלת ה'קופסה השחורה'</th>
+            <th>האות שנדגום ב-<span class="ltr-text">ILA</span></th>
+          </tr>
+          <tr>
+            <td>זרימת נתונים ו-<span class="ltr-text">Latency</span></td>
+            <td>רואים רק את הפיקסל הסופי מתחלף.</td>
+            <td class="ltr-td">addrb, doutb, pxl_data_reg</td>
+          </tr>
+          <tr>
+            <td>מיקום אופקי</td>
+            <td>לא ניתן לדעת איזה פיקסל משורטט.</td>
+            <td class="ltr-td">hsync_debug</td>
+          </tr>
+          <tr>
+            <td>אכיפת שחור (<span class="ltr-text">Blanking</span>)</td>
+            <td>רואים מסך חשוך, ללא הקשר תזמוני.</td>
+            <td class="ltr-td">in_display_area_delayed</td>
+          </tr>
+        </table>
+      </section>
+
+      <!-- ================== שקף 25 ================== -->
+      <section>
+        <h1>עלות הדיבוג: ניתוח משאבי חומרה</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>פרדוקס הגודל:</b> בקר ה-<span class="ltr-text">VGA</span> יעיל, בעוד הדיבוג דורש אלפי רכיבים.</li>
+            <li><b>מסקנה:</b> ה-<span class="ltr-text">ILA</span> יוסר בגרסת הייצור לחיסכון בשטח סיליקון.</li>
+          </ul>
+        </div>
+        <div class="flex-center">
+          <img src="../assets/device_view_with_ila.png" class="hero-img-small">
+          <table class="custom-table" style="width: 50%; font-size: 16px;">
+            <tr>
+              <th>Module</th>
+              <th><span class="ltr-text">LUTs</span></th>
+              <th><span class="ltr-text">Registers</span></th>
+              <th><span class="ltr-text">BRAM</span></th>
+            </tr>
+            <tr>
+              <td class="ltr-td">VGA Controller</td>
+              <td>47</td>
+              <td>52</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td class="ltr-td">ILA + Debug Hub</td>
+              <td>1,732</td>
+              <td>2,642</td>
+              <td>1.5</td>
+            </tr>
+            <tr style="background-color: #f2f2f2; font-weight: bold;">
+              <td class="ltr-td">Total Design</td>
+              <td>2,756</td>
+              <td>2,890</td>
+              <td>105</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================== שקף 26 ================== -->
+      <section>
+        <h1><span class="ltr-text">Post-Silicon Validation</span>: מסלול נתונים בסיליקון</h1>
+        <div class="slide-text">
+          <ul>
+            <li>דוגמים את החומרה הפיזית בזמן אמת ע"י ה-<span class="ltr-text">ILA</span>.</li>
+            <li><b>השהיית זיכרון:</b> הכתובת נשלחת אך הנתון מופיע מאוחר יותר.</li>
+            <li><b>אכיפת שומר הסף:</b> רק כשהדגל עולה ל-'1', הנתונים נפרצים החוצה.</li>
+          </ul>
+        </div>
+        <img src="../assets/ila_hardware_data_path_transition.png" class="hero-img">
+      </section>
+
+      <!-- ================== שקף 27 ================== -->
+      <section>
+        <h1>סיכום וריפיקציה: סימולציה מול סיליקון</h1>
+        <div class="slide-text">
+          <ul>
+            <li><b>מציאות מול תיאוריה:</b> הטבלה מתארת כיצד התיאוריה תורגמה לתופעות חשמליות בתוך רשת השערים של ה-<span class="ltr-text">FPGA</span>.</li>
+          </ul>
+        </div>
+        <table class="custom-table" style="font-size: 16px;">
+          <tr>
+            <th style="background-color: #282828;">האות ב-<span class="ltr-text">Data Path</span></th>
+            <th><span class="ltr-text">ModelSim</span> (וירטואלי)</th>
+            <th><span class="ltr-text">Vivado ILA</span> (הסיליקון)</th>
+          </tr>
+          <tr>
+            <td class="ltr-td">bram_address_reg</td>
+            <td>עדכון מתמטי באפס זמן.</td>
+            <td>ניתוב פיזי ל-19 חוטים המפעילים את הזיכרון.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">doutb</td>
+            <td>המידע מופיע מיידית ובקסם.</td>
+            <td>חשיפת זמן התגובה האמיתי של החומרה.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">pxl_data_reg</td>
+            <td>השמת משתנה פשוטה.</td>
+            <td>הפליפ-פלופים דוגמים כראוי למרות ההשהיה.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">in_display_area_dly</td>
+            <td>דגל בוליאני.</td>
+            <td>פיקוד פיזי שכופה ניתוב על המרבבים.</td>
+          </tr>
+          <tr>
+            <td class="ltr-td">vga_r/g/b_int</td>
+            <td>מחרוזות תווים.</td>
+            <td>חיווט פינים לאדמה למניעת זליגות צבע.</td>
+          </tr>
+        </table>
+      </section>
+
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
-    <script>Reveal.initialize({ rtl: true, controls: true, progress: true, hash: true });</script>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({
+      rtl: true, // הגדרה קריטית לישור העברית
+      slideNumber: 'c/t', // מציג מספר שקף
+      controls: true,
+      progress: true,
+      center: true, // מרכוז כללי
+      hash: true, // שומר את מספר השקף בשורת הכתובת
+      transition: 'slide' // אנימציית מעבר
+    });
+  </script>
 </body>
 </html>
