@@ -865,6 +865,63 @@ for row_idx, row in enumerate(content25):
         else:
             cell.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
             set_rtl(cell.text_frame.paragraphs[0])
+ 
+ 
+# ==========================================
+# שקף 26: פיתוח עתידי ו-Edge AI - הוכחת היתכנות (PoC)
+# ==========================================
+slide26 = prs.slides.add_slide(prs.slide_layouts[5])
+title26 = slide26.shapes.title
+title26.text = "פיתוח עתידי: מעבר מזיהוי תנועה גולמי ל-Edge AI"
+set_rtl(title26.text_frame.paragraphs[0])
+title26.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text26 = slide26.shapes.add_textbox(Inches(0.2), Inches(1.1), Inches(9.5), Inches(1.5))
+tf_text26 = txBox_text26.text_frame
+
+add_bullet(tf_text26, "• האתגר במערכת הנוכחית: אלגוריתמי השוואת פריימים מזהים שינוי פיקסליירי, אך אינם יודעים להבדיל בין נפילת אדם לנפילת חפץ דומם.")
+add_bullet(tf_text26, "• פתרון PoC ברסברי פאי: הרצת מודל AI קליל (Lightweight Deep Learning) לזיהוי מדויק של בני אדם מקומית (Edge) בזמן אמת.")
+add_bullet(tf_text26, "• המטרה: לשלב בעתיד מודлли זיהוי דומים ישירות בתוך ארכיטקטורת החומרה של ה-FPGA.")
+
+# תמונת ה-PoC (כאן תכניס את הנתיב לתמונה שבה המודל מזהה אותך)
+img_path_poc = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\presentation\assets\raspberry_pi_ai_poc.png" 
+if os.path.exists(img_path_poc):
+    slide26.shapes.add_picture(img_path_poc, Inches(1.0), Inches(2.8), width=Inches(4.2))
+else:
+    img_box_poc = slide26.shapes.add_textbox(Inches(1.0), Inches(2.8), Inches(4.2), Inches(4.0))
+    p_poc = img_box_poc.text_frame.paragraphs[0]
+    p_poc.text = "[שומר מקום: תמונת זיהוי AI - רסברי פאי]"
+    p_poc.font.size = Pt(14); p_poc.font.color.rgb = RGBColor(0, 112, 192); p_poc.alignment = PP_ALIGN.CENTER
+
+# תמונה שנייה (אופציונלית - השוואת זיהוי / בלוק דיאגרמה)
+img_path_second = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\presentation\assets\second_ai_image.png" 
+if os.path.exists(img_path_second):
+    slide26.shapes.add_picture(img_path_second, Inches(5.5), Inches(2.8), width=Inches(4.2))
+else:
+    img_box_sec = slide26.shapes.add_textbox(Inches(5.5), Inches(2.8), Inches(4.2), Inches(4.0))
+    p_sec = img_box_sec.text_frame.paragraphs[0]
+    p_sec.text = "[שומר מקום: תמונה שנייה - זיהוי אובייקטים]"
+    p_sec.font.size = Pt(14); p_sec.font.color.rgb = RGBColor(0, 112, 192); p_sec.alignment = PP_ALIGN.CENTER
+
+
+# ==========================================
+# שקף 27: ארכיטקטורה עתידית - שילוב MicroBlaze ב-FPGA
+# ==========================================
+slide27 = prs.slides.add_slide(prs.slide_layouts[5])
+title27 = slide27.shapes.title
+title27.text = "ארכיטקטורה עתידית: חלוקת עבודה Hardware/Software"
+set_rtl(title27.text_frame.paragraphs[0])
+title27.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+txBox_text27 = slide27.shapes.add_textbox(Inches(0.5), Inches(1.3), Inches(9.0), Inches(5.0))
+tf_text27 = txBox_text27.text_frame
+
+add_bullet(tf_text27, "• שילוב מעבד רך (Soft-Core Processor): הטמעת מעבד **MicroBlaze** בתוך ה-Artix-7 FPGA.")
+add_bullet(tf_text27, "• חלוקת תפקידים חכמה:")
+add_bullet(tf_text27, "   - **חומרה (Fabric):** ניהול קליטת המצלמה (OV7670), זיכרון ה-BRAM, ובקר ה-VGA בזמן אמת ובמקביליות מלאה.")
+add_bullet(tf_text27, "   - **תוכנה (MicroBlaze):** הרצת מודל הסקת ה-AI על הפריימים שנדגמו וקבלת ההחלטה הקריטית.")
+add_bullet(tf_text27, "• יתרון מרכזי: שמירה על ביצועי חומרה קשיחים (Real-Time) לצד גמישות אלגוריתמית גבוהה.") 
+ 
     
 # ==========================================
 # שמירת המצגת
