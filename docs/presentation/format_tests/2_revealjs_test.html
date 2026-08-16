@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="utf-8">
+    <title>מצגת VGA - יוסי ברים</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/simple.min.css">
+    <style>
+        .reveal { font-family: 'Segoe UI', Arial, sans-serif; text-align: right; }
+        .reveal h1, .reveal h2 { text-transform: none; text-align: center; color: #2c3e50; }
+        .reveal ul { display: block; padding-right: 40px; }
+        .reveal table { width: 100%; font-size: 0.8em; margin-top: 20px; }
+        .reveal th { background-color: #2980b9; color: white; text-align: center; }
+        .reveal td { border-bottom: 1px solid #ddd; }
+        .ltr-text { direction: ltr; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- שקף 1 -->
+            <section>
+                <h2>פיתוח מערכת מבוססת FPGA להתראת נפילה</h2>
+                <p style="font-size: 0.7em;">קליטת תמונה בזמן אמת ממצלמת <span class="ltr-text">OV7670</span> והצגתה דרך כרטיס <span class="ltr-text">Artix-7</span>.<br>על מנת לאפשר עיבוד תמונה לזיהויי עמידה ממושכת לחולי דמנציה.</p>
+                <img src="docs/presentation/assets/artix_board.png" alt="Board" style="height: 300px;">
+                <p style="font-weight: bold; font-size: 0.8em;">מגיש: יוסי ברים | הנדסת חשמל שנה ד | המרכז האקדמי לב</p>
+            </section>
+
+            <!-- שקף 2 -->
+            <section>
+                <h2>ארכיטקטורת המערכת</h2>
+                <ul>
+                    <li>נתוני התמונה הגולמיים נקלטים מהמצלמה ונאגרים בזיכרון ה-<span class="ltr-text">BRAM</span>.</li>
+                    <li>בקר ה-<span class="ltr-text">VGA</span> שולף את הנתונים ומעביר לממיר <span class="ltr-text">D to A</span> לקבלת אות אנלוגי פיזי.</li>
+                </ul>
+            </section>
+
+            <!-- שקף 3 -->
+            <section>
+                <h2>תזמוני VGA: הפיזיקה מאחורי המספרים</h2>
+                <table>
+                    <tr><th>פרמטר</th><th>שעונים</th><th>משמעות פיזיקלית</th><th>מימוש (RTL)</th></tr>
+                    <tr><td>Active Display</td><td>640</td><td>הקרן מציירת פיקסלים.</td><td>שידור RGB פעיל.</td></tr>
+                    <tr><td>Front Porch</td><td>16</td><td>זמן 'להירגע' לקרן.</td><td>כיבוי מיידי של RGB.</td></tr>
+                </table>
+            </section>
+
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>Reveal.initialize({ rtl: true, controls: true, progress: true, hash: true });</script>
+</body>
+</html>
