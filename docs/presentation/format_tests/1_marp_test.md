@@ -285,3 +285,50 @@ section { padding-top: 13px; }
 </div>
 
 ---
+
+<!-- ========================================== -->
+<!-- שקף 10: מבט-על - זרימת נתונים ותחומי שעון (RTL) -->
+<!-- ========================================== -->
+
+<style scoped>
+section { padding-top: 13px; }
+</style>
+
+# מבט-על: זרימת נתונים ותחומי שעון (RTL)
+
+<div style="font-size: 11px; line-height: 1.1; max-width: 1000px; margin: 0 auto 5px auto; text-align: right; opacity: 0.85;">
+
+* **מחולל שעונים (clk_generator):** PLL המפיק שעון 25MHz ל-VGA ושעון למצלמה.
+* **גישור חציית שעונים (CDC):** BRAM (Dual-Port) כחוצץ בטוח בין כתיבה לקריאה.
+* **תחום אדום (Camera Domain):** קליטת פיקסלים (ov7670_capture) ודחיפה לפורט A (`clka`).
+* **תחום כחול (VGA Domain):** שליפה מפורט B (`clkb`) על ידי בקר ה-VGA.
+
+</div>
+
+<div style="text-align: center; margin-top: 5px;">
+  
+  <!-- התמונה החדשה עם המסגרות, בגודל ענק ובולט -->
+  ![width:850px](../assets/rtl_direct_vga_path_bounded.png)
+
+</div>
+
+---
+<!-- ========================================== -->
+<!-- שקף 11: צלילה לתכן - ניהול שעונים (Clock Generator) -->
+<!-- ========================================== -->
+
+# ניהול שעונים במערכת (Clock Generator)
+
+<div style="font-size: 11px; line-height: 1.1; max-width: 1000px; margin: 0 auto 5px auto; text-align: right; opacity: 0.85;">
+
+* **מקור שעון (System Clock):** כניסת `clk` מקבלת את שעון הלוח המקורי (100MHz) ומזינה את ה-PLL (`clk_wiz_0`).
+* **שעון תצוגה (vga_pll):** הפקת 25MHz המזין את בקר ה-VGA (`pxl_clk`) ואת פורט הקריאה (`clkb`) ב-BRAM.
+* **שעון מצלמה (xclk_pll):** הפקת שעון ייעודי של 24MHz (`xclk_ov7670`) המנותב החוצה לסנכרון המצלמה.
+
+</div>
+
+<center>
+  ![width:900px](../assets/clk_wiz_instantiation.png)
+</center>
+
+---
