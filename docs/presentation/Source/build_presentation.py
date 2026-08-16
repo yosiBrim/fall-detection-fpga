@@ -881,28 +881,19 @@ tf_text26 = txBox_text26.text_frame
 
 add_bullet(tf_text26, "• האתגר במערכת הנוכחית: אלגוריתמי השוואת פריימים מזהים שינוי פיקסליירי, אך אינם יודעים להבדיל בין נפילת אדם לנפילת חפץ דומם.")
 add_bullet(tf_text26, "• פתרון PoC ברסברי פאי: הרצת מודל AI קליל (Lightweight Deep Learning) לזיהוי מדויק של בני אדם מקומית (Edge) בזמן אמת.")
-add_bullet(tf_text26, "• המטרה: לשלב בעתיד מודлли זיהוי דומים ישירות בתוך ארכיטקטורת החומרה של ה-FPGA.")
+add_bullet(tf_text26, "• המטרה: לשלב בעתיד מודלי זיהוי דומים ישירות בתוך ארכיטקטורת החומרה של ה-FPGA.")
 
-# תמונת ה-PoC (כאן תכניס את הנתיב לתמונה שבה המודל מזהה אותך)
-img_path_poc = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\presentation\assets\raspberry_pi_ai_poc.png" 
+# תמונת ה-PoC המעודכנת עם הנתיב המדויק
+img_path_poc = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\images\verification\rp_fall.png" 
 if os.path.exists(img_path_poc):
-    slide26.shapes.add_picture(img_path_poc, Inches(1.0), Inches(2.8), width=Inches(4.2))
+    slide26.shapes.add_picture(img_path_poc, Inches(3.2), Inches(2.8), width=Inches(3.8))
 else:
-    img_box_poc = slide26.shapes.add_textbox(Inches(1.0), Inches(2.8), Inches(4.2), Inches(4.0))
+    img_box_poc = slide26.shapes.add_textbox(Inches(2.5), Inches(3.0), Inches(5.0), Inches(1.0))
     p_poc = img_box_poc.text_frame.paragraphs[0]
-    p_poc.text = "[שומר מקום: תמונת זיהוי AI - רסברי פאי]"
-    p_poc.font.size = Pt(14); p_poc.font.color.rgb = RGBColor(0, 112, 192); p_poc.alignment = PP_ALIGN.CENTER
-
-# תמונה שנייה (אופציונלית - השוואת זיהוי / בלוק דיאגרמה)
-img_path_second = r"C:\Users\USER\Desktop\לימודים\שנה ד\סמסטר א\פרוייקט ערן\clone\fall-detection-fpga\docs\presentation\assets\second_ai_image.png" 
-if os.path.exists(img_path_second):
-    slide26.shapes.add_picture(img_path_second, Inches(5.5), Inches(2.8), width=Inches(4.2))
-else:
-    img_box_sec = slide26.shapes.add_textbox(Inches(5.5), Inches(2.8), Inches(4.2), Inches(4.0))
-    p_sec = img_box_sec.text_frame.paragraphs[0]
-    p_sec.text = "[שומר מקום: תמונה שנייה - זיהוי אובייקטים]"
-    p_sec.font.size = Pt(14); p_sec.font.color.rgb = RGBColor(0, 112, 192); p_sec.alignment = PP_ALIGN.CENTER
-
+    p_poc.text = f"[שגיאה: התמונה לא נמצאה בנתיב המבוקש]"
+    p_poc.font.size = Pt(14)
+    p_poc.font.color.rgb = RGBColor(255, 0, 0)
+    p_poc.alignment = PP_ALIGN.CENTER
 
 # ==========================================
 # שקף 27: ארכיטקטורה עתידית - שילוב MicroBlaze ב-FPGA
