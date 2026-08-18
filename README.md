@@ -90,25 +90,3 @@ This project uses a Tcl-based generation system to prevent merge conflicts, brok
 * **Camera Control:** `ov7670_xclk`, `ov7670_pwdn`, `ov7670_reset`
 * **Status & Detection:** `posture_change_detected`, `current_posture`, System LEDs
 
-graph LR
-    subgraph Controller_Logic [בקר VGA - לוגיקה]
-        H_Counter[Horizontal Counter<br/>hsync_reg] --> Comparator1[Comparators<br/>Sync / Blanking / Display]
-        Comparator1 -->|Display Flag| Addr_Gen[Address Generator]
-    end
-
-    subgraph Memory_Pipe [צנרת זיכרון]
-        Addr_Gen -->|addrb| BRAM[(BRAM Memory)]
-        BRAM -->|doutb| Pxl_Reg[pxl_data_reg<br/>דגימת זיכרון - קלוק אחד]
-    end
-
-    subgraph Sync_Gate [סנכרון פיזי]
-        Comparator1 -->|in_display_area| Delayed_Flag[in_display_area_delayed<br/>רגיסטר השהיה]
-        Pxl_Reg -->|Data| MUX{MUX/Gate}
-        Delayed_Flag -->|Enable| MUX
-        MUX -->|RGB_Out| VGA_Pins[פיני VGA - צבע]
-    end
-
-    style BRAM fill:#f9f,stroke:#333,stroke-width:2px
-    style Pxl_Reg fill:#bbf,stroke:#333,stroke-width:2px
-    style Delayed_Flag fill:#bbf,stroke:#333,stroke-width:2px
-
