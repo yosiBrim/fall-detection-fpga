@@ -8,7 +8,7 @@
 \newfontfamily\hebrewfont[Script=Hebrew]{David CLM} 
 \newfontfamily\englishfont{Times New Roman}
 
-% --- Packages for Graphics, Math, and Formatting ---
+% --- Packages for Graphics, Tables, Math, and Formatting ---
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{geometry}
@@ -16,6 +16,7 @@
 \usepackage{fancyhdr}
 \usepackage{hyperref}
 \usepackage{setspace}
+\usepackage{array}
 \onehalfspacing
 
 \usepackage{tikz}
@@ -23,7 +24,7 @@
 
 \begin{document}
 
-% --- Cover Page (No Page Number) ---
+% --- Cover Page ---
 \begin{titlepage}
     \centering
     \vspace*{2cm}
@@ -37,9 +38,7 @@
     \vspace{1.5cm}
     {\huge \textbf{מערכת משובצת לזיהוי נפילות בזמן אמת:}} \\
     \vspace{0.5cm}
-    {\LARGE \textbf{קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס Artix-7.
-על מנת לאפשר עיבוד תמונה לזיהויי עמידה ממושכת לחולי דמנציה.
-}} \\
+    {\LARGE \textbf{קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס Artix-7, על מנת לאפשר עיבוד תמונה לזיהוי עמידה ממושכת לחולי דמנציה}} \\
     
     \vspace{4cm}
     \begin{flushright}
@@ -51,16 +50,17 @@
     ירושלים, אלול תשפ"ו
 \end{titlepage}
 
-% --- Acknowledgements and Abstract ---
+% --- Front Matter ---
 \pagenumbering{arabic}
 \setcounter{page}{2}
 
 \section*{תודות}
+[תוכן התודות...]
 
 \newpage
 
 \section*{תקציר (Abstract)}
-[תקציר הפרויקט בעברית המחולק ל-4 פסקאות: רקע, שיטות, תוצאות ומשמעות...]
+[תקציר הפרויקט בעברית...]
 
 \vspace{1cm}
 \begin{english}
@@ -68,7 +68,7 @@
 \end{english}
 \newpage
 
-% --- Table of Contents ---
+% --- Tables of Contents ---
 \tableofcontents
 \newpage
 \listoffigures
@@ -82,21 +82,21 @@
 \section{מבוא}
 
 \subsection{רקע ומוטיבציה}
-נפילות בקרב קשישים וחולי דמנציה מהוות גורם סיכון משמעותי, הדורש מענה טכנולוגי מהיר ואמין. מערכות ניטור וידאו מסורתיות סובלות לעיתים מעכבות (Latency) גבוהות או מתבססות על שירותי ענן הפוגעים בפרטיות המטופל. פרויקט זה מתבסס על מערכת משובצת (Embedded System) המיושמת על גבי רכיב FPGA, במטרה לאפשר עיבוד וידאו מקומי ובזמן אמת, תוך הצגת הנתונים על גבי מסך לשם בקרה.
+נפילות בקרב קשישים וחולי דמנציה מהוות גורם סיכון משמעותי, הדורש מענה טכנולוגי מהיר ואמין. מערכות ניטור וידאו מסורתיות סובלות לעיתים מעכבות (Latency) גבוהות או מתבססות על שירותי ענן הפוגעים בפרטיות המטופל. פרויקט זה מתבסס על מערכת משובצת (Embedded System) המיושמת על גבי רכיב FPGA, במטרה לאפשר עיבוד וידאו מקומי ובזמן אמת, תוך הצגת הנתונים על גבי מסך לשם בקרה וניטור.
 
 \subsection{חלוקת העבודה והגדרת תכולת הפרויקט (Scope)}
-מערכת הבסיס איתה עבדנו נועדה לקלוט תמונה ולעבד אותה לשם התראה. העבודה בפרויקט חולקה לשני צירים מרכזיים המשלימים זה את זה:
+מערכת הבסיס עליה עבדנו נועדה לקלוט תמונה, לנהל את הזיכרון ולהציגה על גבי מסך חיצוני. העבודה בפרויקט חולקה לשני צירים מרכזיים המשלימים זה את זה:
 
 \begin{itemize}
-    \item \textbf{עיבוד תמונה גולמי וגילוי תנועה (אלעד אסבג):} מימוש לוגיקה לזיהוי שינויים במרחב הפיקסלים לאורך זמן. גישה זו מתריעה על תנועה במרחב, אך חסרונה המרכזי הוא רגישות יתר והתראות שווא (False Positives) הנובעות מכל שינוי ויזואלי בסביבה, ואינה מבחינה בין אדם לעצם דומם.
+    \item \textbf{עיבוד תמונה גולמי וגילוי תנועה (אלעד אסבג):} מימוש לוגיקה לזיהוי שינויים במרחב הפיקסלים לאורך זמן. גישה זו מתריעה על תנועה במרחב, אך חסרונה המרכזי הוא רגישות יתר והתראות שווא (False Positives) הנובעות מכל שינוי ויזואלי בסביבה, ללא הבחנה סמנטית בין אדם לעצם דומם.
     
     \item \textbf{אימות ממשקי חומרה וארכיטקטורת Edge AI (יוסי ברים - מוקד דוח זה):} 
-    החלק הראשון של עבודה זו מתמקד בתהליכי אימות מחמירים (Verification \& Validation) של מסלול הנתונים מהכרטיס למסך. חלק זה כולל למידה, הוכחה וניתוח של פרוטוקול ה-VGA, תוך שימוש בכלי סימולציה ובדיקות חומרה פיזיות. 
-    החלק השני מציע שדרוג ארכיטקטוני למערכת: מעבר מזיהוי שינויים גולמי לשילוב אלגוריתמי בינה מלאכותית (Edge AI) המאמנים רשתות נוירונים לזיהוי אדם ספציפי (Human Detection). שדרוג זה נועד להפוך את המערכת מסנסור תנועה גנרי למערכת חכמה ואמינה עבור חולי דמנציה.
+    החלק הראשון של עבודה זו מתמקד בתהליכי אימות מחמירים (Verification \& Validation) של מסלול הנתונים מהכרטיס למסך. חלק זה כולל למידה, הוכחה וניתוח מעמיק של פרוטוקול ה-VGA, תוך שימוש בכלי סימולציה (ModelSim) ובדיקות חומרה פיזיות על הסיליקון (ILA). 
+    החלק השני מציע שדרוג ארכיטקטוני למערכת: מעבר מזיהוי שינויים גולמי לשילוב אלגוריתמי בינה מלאכותית (Edge AI) באמצעות מעבד משובץ (MicroBlaze), לשם זיהוי אדם ספציפי (Human Detection) ומניעת התראות שווא.
 \end{itemize}
 
 \subsection{מבנה הדוח}
-דוח זה יתמקד באחריות שתוארה לעיל. תחילה נסקור את הפיזיקה והתיאוריה מאחורי פרוטוקול ה-VGA. לאחר מכן נציג את תהליכי הפיתוח והאימות (ModelSim ו-ILA), ולבסוף נדון במגבלות המערכת הנוכחית ונציג את הארכיטקטורה העתידית המבוססת AI.
+דוח זה מתמקד באחריות שהוגדרה לעיל. תחילה נסקור את הפיזיקה והתיאוריה מאחורי פרוטוקול ה-VGA ומעגלי התצוגה. לאחר מכן נציג את ארכיטקטורת המערכת, תהליכי הפיתוח, ואימות החומרה המלא (הן בסימולציה והן בפוסט-סיליקון). לבסוף, נציג את הצעת השדרוג הארכיטקטונית המבוססת על שילוב מודל AI ומעבד פנימי.
 
 \newpage
 % ==========================================
@@ -119,17 +119,21 @@
 \subsection{סריקה קווית (Raster Scan) ומנגנון ה-Retrace}
 הצגת התמונה על גבי המסך מתבצעת בשיטת סריקה קווית (Raster Scan). בשיטה זו, ציור התמונה מבוסס על קרן הסורקת את מערך הפיקסלים באופן שיטתי ומחזורי: משמאל לימין עבור כל שורה בנפרד, ומלמעלה למטה עבור הפריים כולו. 
 
-מאחר שתנועת הקרן חייבת להיות רציפה, נוצר מסלול סריקה דמוי "זיגזג" לאורך המסך. עובדה זו מכתיבה אילוץ הנדסי ופיזיקלי מרכזי בפרוטוקול: בכל פעם שהקרן מגיעה לקצה אזור התצוגה, נדרש פסק זמן מוגדר כדי להחזיר אותה לנקודת ההתחלה. פסק זמן זה מכונה החזרה (Retrace). בזמנים אלו לא משודר מידע ויזואלי (Blanking), והם מנוהלים באמצעות אותות הסנכרון.
+מאחר שתנועת הקרן חייבת להיות רציפה, נוצר מסלול סריקה דמוי "זיגזג" לאורך המסך. עובדה זו מכתיבה אילוץ הנדסי ופיזיקלי מרכזי בפרוטוקול: בכל פעם שהקרן מגיעה לקצה אזור התצוגה – בין אם בסוף שורה (קצה אופקי) ובין אם בתחתית המסך בסיום הפריים (קצה אנכי) – נדרש פסק זמן מוגדר כדי להחזיר אותה לנקודת ההתחלה. 
+
+פסק זמן זה מכונה החזרה (Retrace) אופקית או אנכית, בהתאמה. בזמנים אלו לא משודר מידע ויזואלי (Blanking), והם מנוהלים במערכת באמצעות אותות הסנכרון כדי למנוע "מריחה" של התמונה.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\textwidth]{image_280846.png}
-    \caption{המחשת מסלול הסריקה הקווית (Raster Scan) ותהליכי ההחזרה (Retrace)}
+    \caption{המחשת מסלול הסריקה הקווית (Raster Scan) ותהליכי ההחזרה (Retrace) האופקית והאנכית}
     \label{fig:raster_scan}
 \end{figure}
 
 \subsection{תזמוני המסך: מהפיזיקה למימוש הלוגי (RTL)}
-הטבלה הבאה מתארת את הפרמטרים האופקיים (עבור רזולוציה של 640x480), את הצורך הפיזיקלי המקורי, וכיצד אילוץ זה מתורגם הלכה למעשה למימוש הדיגיטלי (RTL):
+כדי ליישם את סריקת המסך וההחזרות (Retrace) שנידונו לעיל, הפרוטוקול מגדיר ארבעה מצבי תזמון עיקריים עבור כל שורה (אופקי) ועבור כל פריים (אנכי). 
+
+הטבלה הבאה מתארת את הפרמטרים האופקיים (עבור רזולוציה של 640x480), את הצורך הפיזיקלי המקורי במסכי ה-CRT, וכיצד אילוץ זה מתורגם הלכה למעשה למימוש הדיגיטלי (RTL) במערכת ה-FPGA שפותחה:
 
 \begin{table}[h]
     \centering
@@ -158,13 +162,13 @@
 % ==========================================
 \section{פיתוח ושיטות}
 
-\subsection{ארכיטקטורת המערכת}
-זרימת הנתונים במערכת מתחלקת לארבעה שלבים עיקריים המשורשרים בזה אחר זה (Pipeline):
+\subsection{ארכיטקטורת המערכת וזרימת הנתונים}
+זרימת הנתונים במערכת בנויה כשרשרת עיבוד רציפה (Pipeline) המורכבת מארבעה מודולים עיקריים:
 \begin{enumerate}
-    \item \textbf{קליטת נתונים (OV7670\_capture):} דגימת נתוני התמונה הגולמיים מהמצלמה.
-    \item \textbf{אוגר תמונה (Frame Buffer):} אגירת הנתונים בזיכרון פנימי מסוג BRAM.
-    \item \textbf{בקר תצוגה (VGA Controller):} שליפת הנתונים מזיכרון ה-BRAM בסנכרון מלא לתזמוני המסך.
-    \item \textbf{ממיר אותות (D to A Converter):} העברת הנתונים לממיר דיגיטלי-לאנלוגי.
+    \item \textbf{קליטת נתונים (OV7670\_capture):} דגימת נתוני התמונה הגולמיים מחומרת המצלמה.
+    \item \textbf{אוגר תמונה (Frame Buffer):} אגירת הנתונים בזיכרון פנימי מובנה מסוג BRAM.
+    \item \textbf{בקר תצוגה (VGA Controller):} שליפת הנתונים מהזיכרון וייצור אותות הבקרה למסך.
+    \item \textbf{ממיר אותות (D to A Converter):} המרת האותות הדיגיטליים לרמות מתח אנלוגיות.
 \end{enumerate}
 
 \begin{figure}[h]
@@ -175,9 +179,9 @@
 \end{figure}
 
 \subsection{מימוש בקר התצוגה (VGA Controller)}
-מחזור שורה שלם מורכב מ-800 פיקסלים. לפיכך, המונה האופקי (\texttt{hsync\_reg}) מתוכנן לספור החל מ-0 ועד 799, ולהתאפס עם סיום השורה. המערכת פועלת בתדר שעון פיקסל של 25MHz. 
+בקר ה-VGA מיושם בחומרה באמצעות שני מונים סינכרוניים: מונה אופקי ומונה אנכי. מחזור שורה שלם מורכב מ-800 פיקסלים (חיבור של 640 פיקסלים פעילים, 16 מחזורי Front Porch, 96 מחזורי Sync Pulse, ו-48 מחזורי Back Porch). לפיכך, המונה האופקי (\texttt{hsync\_reg}) סופר החל מ-0 ועד 799 ומתאפס.
 
-כאשר המונה האופקי או האנכי נמצאים מחוץ לתחום התצוגה הפעילה הלוגיקה מאלצת את אותות הצבע (\texttt{RGB}) לערך \texttt{'0000'} למניעת מריחות.
+המערכת פועלת בתדר שעון פיקסל של 25MHz (זמן מחזור של 40ns), המבטיח קצב רענון תקני של 60Hz. כאשר המונה נמצא מחוץ לתחום התצוגה הפעילה, הלוגיקה מאלצת את אותות הצבע (\texttt{RGB}) לערך \texttt{'0000'} למניעת מריחות צבע בעת החזרת הקרן.
 
 \begin{figure}[h]
     \centering
@@ -187,92 +191,227 @@
 \end{figure}
 
 \subsubsection{מילון אותות מרכזיים וממשקים}
+להלן פירוט האותות המרכזיים המנהלים את פעולת בקר ה-VGA:
+
+\textbf{שעון ומוני בסיס:}
+\begin{itemize}
+    \item \texttt{pxl\_clk}: שעון הפיקסלים של הבקר בתדר $25\text{MHz}$, המניע את הלוגיקה הסינכרונית.
+    \item \texttt{hsync\_reg / vsync\_reg}: מונים המייצגים את מיקום הפיקסל הנוכחי בצירים X ו-Y.
+\end{itemize}
+
 \textbf{ממשק זיכרון (BRAM):}
 \begin{itemize}
-    \item \texttt{addrb}: אפיק כתובת מחושב בגודל 19 ביט, הנשלח אל זיכרון ה-BRAM.
-    \item \texttt{doutb}: אפיק נתונים בגודל 12 ביט, החוזר מהזיכרון ונושא את ערך הפיקסל.
+    \item \texttt{addrb}: אפיק כתובת מחושב בגודל 19 ביט, הנשלח אל ה-BRAM לשליפת הפיקסל.
+    \item \texttt{doutb}: אפיק נתונים בגודל 12 ביט, החוזר מהזיכרון ונושא את ערך הצבע.
 \end{itemize}
+
 \textbf{בקרה וניתוב נתונים (Pipeline):}
 \begin{itemize}
-    \item \texttt{in\_display\_area}: דגל לוגי המציין תצוגה פעילה.
-    \item \texttt{pxl\_data\_reg}: אוגר דגימה (Register) למניעת גליצ'ים.
-    \item \texttt{in\_display\_area\_delayed}: דגל אזור התצוגה הפעיל, מושהה במחזור שעון אחד לסנכרון.
+    \item \texttt{in\_display\_area}: דגל לוגי המציין הימצאות באזור התצוגה הפעיל.
+    \item \texttt{pxl\_data\_reg}: אוגר דגימה (Register) לייצוב הנתונים הנשלפים מהזיכרון ומניעת גליצ'ים.
+    \item \texttt{in\_display\_area\_delayed}: דגל אזור התצוגה מושהה במחזור שעון אחד, לפיצוי על עכבת הדגימה.
+\end{itemize}
+
+\textbf{יציאות פיזיות למסך:}
+\begin{itemize}
+    \item \texttt{VGA\_R, VGA\_G, VGA\_B}: אותות ערוצי הצבע המנותבים ישירות לפינים הפיזיים.
+    \item \texttt{VGA\_HS\_O, VGA\_VS\_O}: פולסי סנכרון אופקי ואנכי הנשלחים החוצה לניהול המסך.
 \end{itemize}
 
 \subsubsection{עיבוד הפיקסל וניתוב לערוצי צבע (RGB)}
-הנתונים מפוצלים לערוץ אדום \texttt{vga\_r\_int(11:8)}, ירוק \texttt{vga\_g\_int(7:4)}, וכחול \texttt{vga\_b\_int(3:0)}. כאשר הדגל \texttt{in\_display\_area} פעיל, ערכי ה-RGB מנותבים ליציאות, ואחרת מאולצים ל-0.
+לאחר שליפת הנתונים מזיכרון ה-BRAM, נדרש עיבוד של הפיקסל וניתובו:
+\begin{itemize}
+    \item \textbf{רישום ופיצול:} המילה הנשלפת בגודל 12 ביט ננעלת באוגר \texttt{pxl\_data\_reg} ומפוצלת לשלושה ערוצים: אדום \texttt{vga\_r\_int(11:8)}, ירוק \texttt{vga\_g\_int(7:4)}, וכחול \texttt{vga\_b\_int(3:0)}.
+    \item \textbf{סנכרון דגלי תצוגה:} האות \texttt{in\_display\_area\_delayed} מזהה האם הקרן באזור הפעיל.
+    \item \textbf{סינון דיגיטלי (Multiplexing):} כאשר הדגל פעיל ('1'), ערכי ה-RGB מנותבים ליציאות. בזמני ה-Porch וה-Sync, היציאות מאולצות לערך \texttt{"0000"} (שחור מוחלט).
+\end{itemize}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{image_2812f4.png}
-    \caption{תרשים זרימה של עיבוד הפיקסל: מזיכרון ה-BRAM לערוצי ה-RGB}
+    \includegraphics[width=0.85\textwidth]{image_2812f4.png}
+    \caption{תרשים זרימה של עיבוד הפיקסל: מזיכרון ה-BRAM, דרך מנגנון הרישום והסנכרון, ועד לניתוב למרבב ולערוצי ה-RGB}
     \label{fig:pixel_processing_rgb}
 \end{figure}
 
-\subsubsection{המרת אותות דיגיטליים לאנלוגיים (DAC)}
-12 הביטים מומרים למתח אנלוגי רציף באמצעות מערך נגדים (החל מ-$510\Omega$ ל-MSB ועד $4K\Omega$ ל-LSB). הזרמים זורמים לאדמה דרך נגד הסיומת במסך ($75\Omega$) ליצירת מחלק מתח דינמי המפיק מתח אנלוגי תקני.
+\subsubsection{המרת אותות דיגיטליים לאנלוגיים (DAC) וממשק מחבר ה-VGA}
+מאחר שמסך ה-VGA דורש אותות אנלוגיים רציפים, הוטמעה המרה באמצעות רשת נגדים (Resistor Network) פסיבית:
+\begin{itemize}
+    \item \textbf{משקל פיזי לכל ביט (MSB לעומת LSB):} הביט המשמעותי ביותר (MSB) מחובר לנגד בעל הערך הנמוך ביותר ($510\Omega$) ומזרים את מירב הזרם. הביט הפחות משמעותי (LSB) מחובר לנגד הגדול ביותר ($4\text{k}\Omega$) ותורם לכוונון עדין של הגוון.
+    \item \textbf{מחלק מתח דינמי:} הזרמים מהביטים הפעילים זורמים לאדמה דרך נגד הסיומת ($75\Omega$) המובנה בתוך המסך. שילוב הנגדים יוצר מחלק מתח דינמי הממיר את רמות המתח הספרתיות ($0\text{V}-3.3\text{V}$) למתח אנלוגי תקני.
+    \item \textbf{אותות הסנכרון:} האותות \texttt{HSYNC} ו-\texttt{VSYNC} מוגנים באמצעות נגדי טור של $100\Omega$ ומזינים ישירות את מחבר ה-HD-DB15.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image_281b09.jpg}
+    \caption{סכמה חשמלית של רשת הנגדים (DAC) ומחבר ה-HD-DB15}
+    \label{fig:vga_dac_resistors}
+\end{figure}
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{image_281e14.png}
-    \caption{סכמה חשמלית של סולם הנגדים היוצרים יחד מחלק מתח}
+    \caption{תרשים חשמלי המציג את סולם הנגדים בכרטיס (משמאל) ואת נגד הסיומת במסך (מימין)}
     \label{fig:dac_voltage_divider}
 \end{figure}
 
-\subsection{ניהול תחומי שעון (Clock Domains) וסנכרון זרימת הנתונים}
-בבסיס הארכיטקטורה מיושם מודול מבוסס PLL המפיק שעונים יציבים: שעון ייעודי למצלמה (\texttt{xclk\_pll} בתדר $24\text{MHz}$), ושעון תצוגה (\texttt{vga\_pll} בתדר $25\text{MHz}$).
-
-\subsubsection{זיכרון התמונה וממשק הסינכרון}
-רכיב ה-Dual-Port BRAM מספק הפרדה חומרתית מוחלטת: תחום הקליטה מכניס נתונים בתדר $100\text{MHz}$, בעוד תחום התצוגה (VGA Domain) שולף אותם בתדר $25\text{MHz}$.
-
-לשם סנכרון תצוגה מדויק, הכתובת מחושבת על פי הנוסחה $Address = X + 640 \times Y$. במקביל, הנתון הנשלף ננעל בתוך \texttt{pxl\_data\_reg} כדי להתגבר על זמן ה-Read Latency.
+\subsection{ניהול תחומי שעון (Clock Domains) וארכיטקטורת הזיכרון}
+\subsubsection{מחולל השעונים (Clock Generator)}
+באמצעות רכיב ה-Clocking Wizard ב-Vivado, שעון המערכת הראשי של הכרטיס ($100\text{MHz}$) מומר לשני שעונים נפרדים ויציבים:
+\begin{itemize}
+    \item \textbf{שעון תצוגה (\texttt{vga\_pll}):} שעון בתדר $25\text{MHz}$ המניע את בקר ה-VGA ואת פורט הקריאה של הזיכרון.
+    \item \textbf{שעון מצלמה (\texttt{xclk\_pll}):} שעון בתדר $24\text{MHz}$ המנותב החוצה לפין פיזי לסנכרון רכיב המצלמה.
+\end{itemize}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{image_288006.png}
-    \caption{קטע מקוד ה-VHDL המציג את תרגום הקואורדינטות ומנגנון ה-Pipeline Register}
+    \includegraphics[width=0.9\textwidth]{image_287c0b.png}
+    \caption{ממשק הקינפוג של ה-Clocking Wizard ב-Vivado}
+    \label{fig:vivado_clocking_wizard}
+\end{figure}
+
+\subsubsection{זיכרון התמונה (BRAM Frame Buffer)}
+רכיב הזיכרון מומש כ-Simple Dual-Port BRAM בגודל $307,200 \times 12$ ביט (המכיל פריים מלא ברזולוציית $640\times 480$). תצורה זו מספקת הפרדה מוחלטת בין תחומי השעון (CDC): פורט A קולט נתונים מהמצלמה בקצב של $100\text{MHz}$, בעוד פורט B משחרר נתונים לבקר ה-VGA בקצב של $25\text{MHz}$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.65\textwidth]{image_287cc4.png}
+    \caption{תרשים בלוקים של זיכרון ה-BRAM בתצורת Dual-Port}
+    \label{fig:bram_dual_port}
+\end{figure}
+
+\subsubsection{ממשק הזיכרון וסנכרון נתונים למסך}
+הכתובת החד-ממדית לזיכרון מחושבת בזמן אמת לפי המיקום במרחב הדו-ממדי: $Address = X + 640 \times Y$. כדי להתגבר על זמן השהיית הקריאה (Read Latency), הנתון הנשלף (\texttt{doutb}) ננעל בתוך אוגר \texttt{pxl\_data\_reg}, ודגל התצוגה מושהה במחזור אחד (\texttt{in\_display\_area\_delayed}) לצורך שמירה על סנכרון מושלם.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image_288006.png}
+    \caption{קטע מקוד ה-VHDL המציג את תרגום הקואורדינטות ואת מנגנון ה-Pipeline Register}
     \label{fig:vga_bram_interface_code}
 \end{figure}
 
-
 \newpage
 % ==========================================
-% CHAPTER 4: RESULTS
+% CHAPTER 4: RESULTS & VALIDATION
 % ==========================================
-\section{תוצאות: סימולציות ואימות חומרה (Verification)}
+\section{תוצאות: סימולציות ואימות חומרה (Verification \& Validation)}
 
-\subsection{אימות לוגי בסביבת ModelSim}
-\subsubsection{אימות מסלול הנתונים והסנכרון: VGA Controller $\leftrightarrow$ BRAM}
-מנגנון ה-Pipeline מבטיח השהיית נתונים מתוכננת כך שהדגל \texttt{in\_display\_area\_delayed} מסתנכרן באופן מושלם עם הנתון הנשלף מ-\texttt{doutb}.
+\subsection{מבוא לסימולציות: מבט-על על זרימת נתונים}
+טרם הצגת גלי הזמן, מופה מרחב העבודה לשני תחומים מרכזיים: תחום הקליטה מהמצלמה (אזור אדום), ותחום התצוגה והקריאה מהזיכרון (אזור כחול). דוח זה ממקד את תהליך האימות בתחום התצוגה.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\textwidth]{image_288352.jpg}
-    \caption{סימולציית ModelSim המאמתת את מסלול הנתונים הפנימי}
+    \includegraphics[width=0.85\textwidth]{image_281eb0.png}
+    \caption{מבט-על המגדיר את גבולות הגזרה: תחום הקליטה (מסגרת אדומה) אל מול תחום התצוגה (מסגרת כחולה)}
+    \label{fig:clock_domains_zoomout}
+\end{figure}
+
+\subsection{אימות לוגי בסביבת ModelSim}
+\subsubsection{אימות מסלול הנתונים והסנכרון: VGA Controller $\leftrightarrow$ BRAM}
+הסימולציה מאמתת את מנגנון ה-Pipeline. ניתן לראות כי רגיסטר הדגימה מונע גליצ'ים, וכי ברגע שדגל \texttt{in\_display\_area\_delayed} עולה ל-'1', הנתון שהמתין ב-\texttt{doutb} מנותב מיידית לערוצי ה-RGB הפיזיים באופן רציף.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image_288352.jpg}
+    \caption{סימולציית ModelSim המאמתת את מסלול הנתונים והסנכרון בין הזיכרון לבקר}
     \label{fig:modelsim_bram_vga_sync}
 \end{figure}
 
-\subsubsection{אימות חוקיות הפרוטוקול}
-\textbf{מבט-על מחזור שורה ($T_s$):} המונה האופקי סופר במדויק מ-0 ועד 799. 
+\subsubsection{אימות חוקיות הפרוטוקול האופקי}
+\begin{itemize}
+    \item \textbf{מבט-על מחזור שורה ($T_s$):} המונה האופקי (\texttt{hsync\_reg}) סופר באופן רציף מ-0 עד 799 (800 מחזורים) בדיוק לפי התקן.
+    \item \textbf{דופק הסנכרון ($T_{pw}$):} ספירה מ-0 עד 95 (96 מחזורים) שבה אות \texttt{hsync} מופעל וערוצי ה-RGB מושתקים ל-\texttt{"0000"}.
+    \item \textbf{זמן התייצבות ($T_{bp}$):} 48 מחזורים נוספים של השתקה (144 מחזורים מצטברים מתחילת השורה), כאשר בסיומם נפתח חלון הנתונים.
+    \item \textbf{אזור פעיל ($T_{disp}$):} מנייה של 640 מחזורים (144 עד 783). אפיק הכתובות \texttt{addrb} מייצר כתובות רציפות. היעדר מידע גרפי בסימולציה נובע מנתוני ה-Testbench ולא מחסימה לוגית.
+    \item \textbf{מרווח ביטחון ($T_{fp}$):} 16 המחזורים האחרונים (784 עד 799) בהם דגל התצוגה יורד ל-'0' והמערכת מושתקת כהכנה לסנכרון הבא.
+\end{itemize}
 
-\textbf{דופק הסנכרון ($T_{pw}$):} ריצת מונה מ-0 עד 95. ערוצי הצבע מושתקים ל-'0000'.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image_288ed3.jpg}
+    \caption{מבט-על של סימולציית מחזור שורה שלם ($T_s$)}
+    \label{fig:modelsim_row_ts}
+\end{figure}
 
-\textbf{זמן התייצבות ($T_{bp}$):} 48 מחזורים נוספים (סה"כ 144 מתחילת השורה) של השתקת נתונים מוחלטת.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image_288f89.jpg}
+    \caption{אימות דופק הסנכרון האופקי ($T_{pw}$)}
+    \label{fig:modelsim_tpw}
+\end{figure}
 
-\textbf{אזור פעיל ($T_{disp}$):} מנייה של 640 מחזורים. אפיק הכתובת (\texttt{addrb}) פועל ברציפות. (היעדר צבע בסימולציה נובע מהיעדר מידע מאותחל ב-Testbench ולא מחסימה לוגית).
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image_2892d0.jpg}
+    \caption{אימות שלב ה-Back Porch ($T_{bp}$)}
+    \label{fig:modelsim_tbp}
+\end{figure}
 
-\textbf{מרווח ביטחון ($T_{fp}$):} 16 המחזורים האחרונים (784-799) סוגרים את חלון התצוגה ומכינים את המערכת לסנכרון הבא.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image_28934e.jpg}
+    \caption{אימות האזור הפעיל ($T_{disp}$)}
+    \label{fig:modelsim_tdisp}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image_289676.jpg}
+    \caption{אימות ה-Front Porch ($T_{fp}$)}
+    \label{fig:modelsim_tfp}
+\end{figure}
+
+\subsection{אימות פיזי על גבי הסיליקון (Post-Silicon Validation)}
+\subsubsection{מעבר מתיאוריה לסיליקון ומגבלת "הקופסה השחורה"}
+בעוד שסביבת ModelSim מהווה סביבה אידיאלית (Zero Latency), המעבר לרכיב הפיזי חושף את המערכת להשהיות התפשטות (Propagation Delays). בדיקה חיצונית באמצעות פינים בלבד מתייחסת ל-FPGA כ"קופסה שחורה" ללא גישה לאותות הבקרה הפנימיים.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image_297bae.png}
+    \caption{המחשת מגבלת הדיבוג החיצוני: ה-FPGA כקופסה שחורה}
+    \label{fig:black_box_concept}
+\end{figure}
+
+\subsubsection{עלות הדיבוג וניתוח Trade-offs בשימוש ב-ILA}
+לשם דיבוג פנימי הוטמע כלי ה-Integrated Logic Analyzer (ILA). ה-ILA הינו חומרה פיזית הצורכת משאבים רבים על גבי הסיליקון.
+
+מניתוח דוחות ה-Utilization ב-Vivado עולה כי בקר ה-VGA המקורי דרש 1,014 יחידות לוגיות (Slice LUTs), בעוד שמערכת הדיבוג לבדה (\texttt{u\_ila\_0} ו-\texttt{dbg\_hub}) דרשה 1,732 יחידות נוספות — תוספת של מעל 100\% ביחס למערכת התפקודית. נתון זה ממחיש כי ה-ILA מהווה כלי אימות מעולה לפיתוח, אך אינו מתאים למוצר סופי עמוס משאבים.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image_297f52.png}
+    \caption{מפת המשאבים על גבי הסיליקון (Device View) המציגה את תוספת החומרה עבור ה-ILA}
+    \label{fig:ila_tradeoffs}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image_2982b0.png}
+    \caption{השוואת דוחות Utilization ב-Vivado לפני ואחרי שילוב ה-ILA}
+    \label{fig:vivado_utilization}
+\end{figure}
+
+\subsubsection{אימות מסלול הנתונים בזמן אמת ב-ILA}
+דגימת ה-ILA מתוך הסיליקון מוכיחה התאמה מלאה (1:1) לסימולציית ה-ModelSim. נראה בבירור כי עם פתיחת דגל התצוגה המושהה, המידע מ-\texttt{doutb} ננעל באוגר ומנותב ליציאות ה-RGB. כמו כן, באזור ההשחרה אפיק הכתובות קפוא, דבר המונע קריאות שווא מיותרות מהזיכרון.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image_29836d.png}
+    \caption{דגימת ILA מתוך הסיליקון המאמתת את זרימת הנתונים בזמן אמת}
+    \label{fig:ila_post_silicon_data_path}
+\end{figure}
 
 \newpage
 % ==========================================
-% CHAPTER 5: DISCUSSION
+% CHAPTER 5: PROPOSED ARCHITECTURE & EDGE AI
 % ==========================================
-\section{דיונים}
+\section{הצעת שדרוג ארכיטקטונית: שילוב Edge AI ומעבד פנימי}
+[כאן ייכנסו 2 השקפים על ה-MicroBlaze, Raspberry Pi ומודל ה-AI...]
 
 \newpage
 % ==========================================
-% CHAPTER 6: CONCLUSIONS
+% CHAPTER 6: DISCUSSION & CONCLUSIONS
 % ==========================================
-\section{מסקנות וסיכום}
+\section{דיון, סיכום ומסקנות}
 
 \end{document}
