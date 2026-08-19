@@ -36,7 +36,7 @@
     \vspace{3cm}
     {\Huge \textbf{פרויקט גמר באלקטרוניקה}} \\
     \vspace{1.5cm}
-    {\huge \textbf{מערכת משובצת לזיהוי נפילות בזמן אמת:}} \\
+    {\huge \textbf{פיתוח מערכת מבוססת FPGA  להתראת נפילה לחולי דמנציה}} \\
     \vspace{0.5cm}
     {\LARGE \textbf{קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס Artix-7, על מנת לאפשר עיבוד תמונה לזיהוי עמידה ממושכת לחולי דמנציה}} \\
     
@@ -63,9 +63,6 @@
 [תקציר הפרויקט בעברית...]
 
 \vspace{1cm}
-\begin{english}
-[English Abstract...]
-\end{english}
 \newpage
 
 % --- Tables of Contents ---
@@ -111,7 +108,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\textwidth]{image_280791.png}
+    \includegraphics[width=0.75\textwidth]{vga_analog_cathode_ray_concept.png}
     \caption{מבנה פנימי של מסך CRT והמחשת מנגנון תותח האלקטרונים}
     \label{fig:crt_concept}
 \end{figure}
@@ -125,7 +122,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.7\textwidth]{image_280846.png}
+    \includegraphics[width=0.7\textwidth]{vga_raster_scan_retrace_concept.png}
     \caption{המחשת מסלול הסריקה הקווית (Raster Scan) ותהליכי ההחזרה (Retrace) האופקית והאנכית}
     \label{fig:raster_scan}
 \end{figure}
@@ -145,7 +142,7 @@
         \hline
         Active Display & 640 & הקרן מציירת את הפיקסלים הפיזיים על המסך משמאל לימין. & שליפת נתונים מה-BRAM ושידור צבע (RGB) פעיל. \\
         \hline
-        Front Porch & 16 & מרווח זמן לקרן 'להירגע' בסוף השורה לפני שחוזרת אחורה. & כיבוי מיידי של ה-RGB ל-'0000' למניעת מריחות. \\
+        Front Porch & 16 & מרווח זמן לקרן להתייצב בסוף השורה לפני שחוזרת אחורה. & כיבוי מיידי של ה-RGB ל-'0000' למניעת מריחות. \\
         \hline
         Sync Pulse & 96 & מכת מתח (טריגר) שמאלצת את הקרן לקפוץ חזרה שמאלה. & הורדת האות הפיזי HSYNC ל-'0' למשך 96 שעונים. \\
         \hline
@@ -171,9 +168,9 @@
     \item \textbf{ממיר אותות (D to A Converter):} המרת האותות הדיגיטליים לרמות מתח אנלוגיות.
 \end{enumerate}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image_1e25c6.png}
+    \includegraphics[width=0.8\textwidth]{system_arch.png}
     \caption{תרשים מלבנים של ארכיטקטורת המערכת וזרימת הנתונים}
     \label{fig:system_arch}
 \end{figure}
@@ -183,10 +180,10 @@
 
 המערכת פועלת בתדר שעון פיקסל של 25MHz (זמן מחזור של 40ns), המבטיח קצב רענון תקני של 60Hz. כאשר המונה נמצא מחוץ לתחום התצוגה הפעילה, הלוגיקה מאלצת את אותות הצבע (\texttt{RGB}) לערך \texttt{'0000'} למניעת מריחות צבע בעת החזרת הקרן.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_280c2a.jpg}
-    \caption{בלוק דיאגרמה של המונים האופקיים והאנכיים בבקר ה-VGA, ותרשים תזמונים}
+    \includegraphics[width=0.85\textwidth]{vga_timing_waveform_and_table.png}
+    \caption{תרשים תזמונים של המונים האנכיים והאופקיים }
     \label{fig:vga_hardware_timers}
 \end{figure}
 
@@ -226,9 +223,9 @@
     \item \textbf{סינון דיגיטלי (Multiplexing):} כאשר הדגל פעיל ('1'), ערכי ה-RGB מנותבים ליציאות. בזמני ה-Porch וה-Sync, היציאות מאולצות לערך \texttt{"0000"} (שחור מוחלט).
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_2812f4.png}
+    \includegraphics[width=0.85\textwidth]{pathR_G_B.png}
     \caption{תרשים זרימה של עיבוד הפיקסל: מזיכרון ה-BRAM, דרך מנגנון הרישום והסנכרון, ועד לניתוב למרבב ולערוצי ה-RGB}
     \label{fig:pixel_processing_rgb}
 \end{figure}
@@ -241,16 +238,16 @@
     \item \textbf{אותות הסנכרון:} האותות \texttt{HSYNC} ו-\texttt{VSYNC} מוגנים באמצעות נגדי טור של $100\Omega$ ומזינים ישירות את מחבר ה-HD-DB15.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image_281b09.jpg}
+    \includegraphics[width=0.8\textwidth]{vga_dac_resistor_network.png}
     \caption{סכמה חשמלית של רשת הנגדים (DAC) ומחבר ה-HD-DB15}
     \label{fig:vga_dac_resistors}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{image_281e14.png}
+    \includegraphics[width=0.8\textwidth]{vga_voltage_divider_dac_scop.png}
     \caption{תרשים חשמלי המציג את סולם הנגדים בכרטיס (משמאל) ואת נגד הסיומת במסך (מימין)}
     \label{fig:dac_voltage_divider}
 \end{figure}
@@ -263,9 +260,9 @@
     \item \textbf{שעון מצלמה (\texttt{xclk\_pll}):} שעון בתדר $24\text{MHz}$ המנותב החוצה לפין פיזי לסנכרון רכיב המצלמה.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{image_287c0b.png}
+    \includegraphics[width=0.9\textwidth]{vivado_clk_vizard.png}
     \caption{ממשק הקינפוג של ה-Clocking Wizard ב-Vivado}
     \label{fig:vivado_clocking_wizard}
 \end{figure}
@@ -273,9 +270,9 @@
 \subsubsection{זיכרון התמונה (BRAM Frame Buffer)}
 רכיב הזיכרון מומש כ-Simple Dual-Port BRAM בגודל $307,200 \times 12$ ביט (המכיל פריים מלא ברזולוציית $640\times 480$). תצורה זו מספקת הפרדה מוחלטת בין תחומי השעון (CDC): פורט A קולט נתונים מהמצלמה בקצב של $100\text{MHz}$, בעוד פורט B משחרר נתונים לבקר ה-VGA בקצב של $25\text{MHz}$.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{image_287cc4.png}
+    \includegraphics[width=0.65\textwidth]{bram_ip_symbol.png}
     \caption{תרשים בלוקים של זיכרון ה-BRAM בתצורת Dual-Port}
     \label{fig:bram_dual_port}
 \end{figure}
@@ -285,7 +282,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\textwidth]{image_288006.png}
+    \includegraphics[width=0.9\textwidth]{vga_address_logic_code.png}
     \caption{קטע מקוד ה-VHDL המציג את תרגום הקואורדינטות ואת מנגנון ה-Pipeline Register}
     \label{fig:vga_bram_interface_code}
 \end{figure}
@@ -301,7 +298,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_281eb0.png}
+    \includegraphics[width=0.85\textwidth]{rtl_direct_vga_path_bounded.png}
     \caption{מבט-על המגדיר את גבולות הגזרה: תחום הקליטה (מסגרת אדומה) אל מול תחום התצוגה (מסגרת כחולה)}
     \label{fig:clock_domains_zoomout}
 \end{figure}
@@ -312,7 +309,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.95\textwidth]{image_288352.jpg}
+    \includegraphics[width=0.95\textwidth]{bram_vga_path.jpg}
     \caption{סימולציית ModelSim המאמתת את מסלול הנתונים והסנכרון בין הזיכרון לבקר}
     \label{fig:modelsim_bram_vga_sync}
 \end{figure}
@@ -328,35 +325,35 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_288ed3.jpg}
+    \includegraphics[width=0.85\textwidth]{ts.jpg}
     \caption{מבט-על של סימולציית מחזור שורה שלם ($T_s$)}
     \label{fig:modelsim_row_ts}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_288f89.jpg}
+    \includegraphics[width=0.85\textwidth]{tpw.jpg}
     \caption{אימות דופק הסנכרון האופקי ($T_{pw}$)}
     \label{fig:modelsim_tpw}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_2892d0.jpg}
+    \includegraphics[width=0.85\textwidth]{bp.jpg}
     \caption{אימות שלב ה-Back Porch ($T_{bp}$)}
     \label{fig:modelsim_tbp}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_28934e.jpg}
+    \includegraphics[width=0.85\textwidth]{tdisp.jpg}
     \caption{אימות האזור הפעיל ($T_{disp}$)}
     \label{fig:modelsim_tdisp}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_289676.jpg}
+    \includegraphics[width=0.85\textwidth]{fp.jpg}
     \caption{אימות ה-Front Porch ($T_{fp}$)}
     \label{fig:modelsim_tfp}
 \end{figure}
@@ -367,7 +364,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.7\textwidth]{image_297bae.png}
+    \includegraphics[width=0.7\textwidth]{black_box_concept.png}
     \caption{המחשת מגבלת הדיבוג החיצוני: ה-FPGA כקופסה שחורה}
     \label{fig:black_box_concept}
 \end{figure}
@@ -379,14 +376,14 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.85\textwidth]{image_297f52.png}
+    \includegraphics[width=0.85\textwidth]{device_view_with_and_witout_ila.png}
     \caption{מפת המשאבים על גבי הסיליקון (Device View) המציגה את תוספת החומרה עבור ה-ILA}
     \label{fig:ila_tradeoffs}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\textwidth]{image_2982b0.png}
+    \includegraphics[width=0.9\textwidth]{intializetion.png}
     \caption{השוואת דוחות Utilization ב-Vivado לפני ואחרי שילוב ה-ILA}
     \label{fig:vivado_utilization}
 \end{figure}
@@ -396,7 +393,7 @@
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.95\textwidth]{image_29836d.png}
+    \includegraphics[width=0.95\textwidth]{ila_hardware_data_path_transition.png}
     \caption{דגימת ILA מתוך הסיליקון המאמתת את זרימת הנתונים בזמן אמת}
     \label{fig:ila_post_silicon_data_path}
 \end{figure}
