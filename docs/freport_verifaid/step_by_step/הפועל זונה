@@ -1,0 +1,189 @@
+\documentclass[12pt, a4paper]{article}
+
+% --- Packages for Hebrew and English ---
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{hebrew}
+\setotherlanguage{english}
+\newfontfamily\hebrewfont[Script=Hebrew]{David CLM} 
+\newfontfamily\englishfont{Times New Roman}
+
+% --- Packages for Graphics, Math, and Formatting ---
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds}
+
+\begin{document}
+
+% --- Cover Page (No Page Number) ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Large \textbf{המרכז האקדמי לב}} \\
+    \vspace{0.5cm}
+    {\large \textbf{הפקולטה להנדסה ומדעי המחשב}} \\
+    {\large \textbf{החוג להנדסת חשמל ואלקטרוניקה}} \\
+    
+    \vspace{3cm}
+    {\Huge \textbf{פרויקט גמר באלקטרוניקה}} \\
+    \vspace{1.5cm}
+    {\huge \textbf{מערכת משובצת לזיהוי נפילות בזמן אמת:}} \\
+    \vspace{0.5cm}
+    {\LARGE \textbf{קליטת תמונה בזמן אמת ממצלמת OV7670 והצגתה דרך כרטיס Artix-7.
+על מנת לאפשר עיבוד תמונה לזיהויי עמידה ממושכת לחולי דמנציה.
+}} \\
+    
+    \vspace{4cm}
+    \begin{flushright}
+    \textbf{מגיש:} יוסי ברים \\
+    \textbf{מנחה:} מר ערן שלום \\
+    \end{flushright}
+    
+    \vfill
+    ירושלים, אלול תשפ"ו
+\end{titlepage}
+
+% --- Acknowledgements and Abstract ---
+\pagenumbering{arabic}
+\setcounter{page}{2}
+
+\section*{תודות}
+
+\newpage
+
+\section*{תקציר (Abstract)}
+[תקציר הפרויקט בעברית המחולק ל-4 פסקאות: רקע, שיטות, תוצאות ומשמעות...]
+
+\vspace{1cm}
+\begin{english}
+[English Abstract...]
+\end{english}
+\newpage
+
+% --- Table of Contents ---
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+% ==========================================
+% CHAPTER 1: INTRODUCTION
+% ==========================================
+\section{מבוא}
+
+\subsection{רקע ומוטיבציה}
+אוכלוסיית העולם המבוגרת גדלה בקצב מהיר, ועימה עולה שיעור האנשים המתמודדים עם בעיות זיכרון וירידה ביכולות הקוגניטיביות. אחת הבעיות המשמעותיות באוכלוסייה זו היא הקושי בהתנהלות בטוחה בסביבה הביתית. תופעה מסוכנת נפוצה היא עמידה ממושכת ללא שימת לב לעייפות המצטברת, מה שעלול להוביל לניסיון התיישבות פתאומי ללא ודאות שקיים כיסא מאחור, וכתוצאה מכך – לנפילות ופציעות חמורות. במקרים רבים, ההשלכות הפיזיות של נפילות אלו פוגעות באיכות החיים בצורה אנושה. 
+
+קיים אפוא צורך מהותי בפיתוח מערכות ניטור אוטומטיות, אשר לא ידרשו מהמטופל לשאת חיישנים לבישים (Wearables), אלא יתבססו על ניתוח המרחב באמצעות מצלמות ועיבוד תמונה מתקדם בשולי הרשת (Edge Computing).
+
+\subsection{מטרת הפרויקט}
+מטרתו המרכזית של הפרויקט היא לפתח פלטפורמת חומרה יציבה, מקבילית ויעילה, המנהלת את מסלול הנתונים השלם (Data Path) – החל מקליטת התמונה ממצלמת ה-OV7670, דרך אגירתה בזיכרון, ועד להצגתה הרציפה. הדגש המרכזי בפיתוח המערכת על גבי רכיב FPGA הוא היכולת לעבד את הנתונים הוויזואליים בזמן אמת,
+יכולת זו 
+מהווה יתרון 
+קריטי וחסר תחליף 
+עבור מערכת ניטור רפואית הנדרשת להגיב באופן מיידי לאירועי חירום, כדוגמת נפילת מטופל.
+
+הפלטפורמה נועדה להוות תשתית חומרתית איתנה, שעליה ניתן יהיה להריץ מערכת התראות אוטונומית מתקדמת. עבודה זו מתמקדת בתכנון מסלול הנתונים לתצוגה, פתרון אתגרי הסנכרון הפנימיים, וביצוע אימות  לוגי ופיזי מחמיר .
+\subsection{גישה לפתרון וחלוקת עבודה}
+פיתוח המערכת מתבסס על קוד תשתיתי שפותח בעבר על ידי סטודנט קודם. כמו כן, אימות התכן בחלק של קליטת הנתונים – מהמצלמה ועד לזיכרון התמונה (BRAM) – בוצע והושלם על ידי סטודנט נוסף בעבר. 
+
+העבודה הנוכחית מתמקדת בהשלמת מסלול הנתונים, הוספת שכבת זיהוי התנועה, והתוויית הארכיטקטורה לזיהוי חכם. תהליך זה התבצע כרונולוגית ופונקציונלית באופן הבא:
+
+\begin{itemize}
+    \item \textbf{1. אימות תכן תצוגה וחומרה (יוסי ברים - חלק ראשון):} 
+    שלב זה מתמקד באימות מחמיר של מסלול הנתונים מהזיכרון ועד להצגה על המסך. התהליך מוצג דרך מימוש ובחינה של פרוטוקול ה-VGA, ומבוצע בשני רבדים: תחילה אימות ברמת הקוד (Source) והלוגיקה באמצעות כלי הסימולציה ModelSim, ולאחר מכן ולידציה של החומרה הפיזית עצמה בשלב ה-Post-Silicon באמצעות כלי ה-ILA מבית Vivado.
+    
+    \item \textbf{2. עיבוד תמונה גולמי וגילוי תנועה (אלעד אסבג):} 
+    לאחר הבטחת יציבות מסלול הנתונים, שולבה לוגיקה לזיהוי שינויים במרחב הפיקסלים (Frame Differencing). שכבה זו מתריעה על כל תנועה במרחב.
+    \item \textbf{3. שדרוג ארכיטקטוני לבינה מלאכותית (יוסי ברים - חלק שני):} 
+    כדי לתת מענה לאתגר התראות השווא, מוצעת ארכיטקטורה המשלבת מודל בינה מלאכותית (AI) שתפקידו לברור ולזהות ספציפית דמות אדם מתוך סך השינויים שעליהם המערכת כבר יודעת להתריע , הקונספט הומחש והוכח מעשית (PoC) בסביבת תוכנה על גבי Raspberry Pi
+   , ברמת -FPGA יישום זה מוצג כהצעה ארכיטקטונית עתידית (תכנון HW/SW משולב עם מעבד פנימי)
+\end{itemize}
+\newpage
+% ==========================================
+% CHAPTER 2: THEORETICAL BACKGROUND
+% ==========================================
+\section{רקע תיאורטי וסקירת ספרות}
+
+
+\newpage
+% ==========================================
+% CHAPTER 3: DEVELOPMENT & METHODS
+% ==========================================
+\section{פיתוח ושיטות}
+
+
+% ==========================================
+% CHAPTER 4: RESULTS
+% ==========================================
+\section{תוצאות}
+
+\subsection{אימות לוגי ModelSim}
+% הצגת צורות הגלים של ה-Testbenches (קריאת פיקסלים, אותות סנכרון למסך).
+
+\subsection{אימות חומרה פיזי ILA}
+
+\newpage
+% ==========================================
+% CHAPTER 5: DISCUSSION
+% ==========================================
+\section{דיונים}
+
+\subsection{ניתוח בעיות סנכרון ואתגרי Clock Domain Crossing}
+% ביקורת על בעיית כפילות המסך וה-Tearing במערכת המקורית, ואיך ארכיטקטורה נכונה פותרת זאת.
+
+\subsection{השוואה ארכיטקטונית: חומרה ייעודית (FPGA) מול תוכנת קצה (Edge AI)}
+% השוואה של זמן פיתוח, צריכת הספק, גמישות עדכון אלגוריתמים, וביצועים דטרמיניסטיים.
+
+\newpage
+% ==========================================
+% CHAPTER 6: CONCLUSIONS
+% ==========================================
+\section{מסקנות וסיכום}
+
+
+\newpage
+% ==========================================
+% REFERENCES
+% ==========================================
+\begin{english}
+\renewcommand{\refname}{References}
+\begin{thebibliography}{99}
+
+\bibitem{ov7670_datasheet}
+OmniVision Technologies, ``OV7670/OV7171 CMOS VGA (640x480) CameraChip Sensor,'' Datasheet, 2006.
+
+\bibitem{nexys_a7}
+Digilent Inc., ``Nexys A7 FPGA Trainer Board Reference Manual,'' 2019.
+
+\bibitem{mobilenet}
+A. G. Howard et al., ``MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications,'' \textit{arXiv preprint arXiv:1704.04861}, 2017.
+
+\end{thebibliography}
+\end{english}
+
+\newpage
+% ==========================================
+% APPENDICES
+% ==========================================
+\appendix
+\section{נספח א': קוד המקור - בקר תצוגה (VHDL)}
+% [כאן ישולב הקוד הרלוונטי]
+
+\section{נספח ב': קוד המקור - אימות סימולציה (Testbench)}
+% [כאן ישולב קוד ה-TB]
+
+%\section{נספח ג': קוד לוגיקת ה-AI (Python)}
+% [כאן ישולב קוד הרזברי פאי]
+
+\end{document}
