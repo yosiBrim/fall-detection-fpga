@@ -8,7 +8,9 @@
 \newfontfamily\hebrewfont[Script=Hebrew]{David CLM} 
 \newfontfamily\englishfont{Times New Roman}
 
-% --- Packages for Graphics, Math, and Formatting ---
+
+\usepackage{qrcode}
+% --- Packages for Graphics, Tables, Math, and Formatting ---
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{geometry}
@@ -16,10 +18,42 @@
 \usepackage{fancyhdr}
 \usepackage{hyperref}
 \usepackage{setspace}
+\usepackage{array}
+\usepackage{float}
 \onehalfspacing
 
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds}
+
+% --- Packages for Code Listings ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{vhdlstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    language=VHDL
+}
+\lstset{style=vhdlstyle}
 
 \begin{document}
 
@@ -94,20 +128,25 @@
 עבור מערכת ניטור רפואית הנדרשת להגיב באופן מיידי לאירועי חירום, כדוגמת נפילת מטופל.
 
 הפלטפורמה נועדה להוות תשתית חומרתית איתנה, שעליה ניתן יהיה להריץ מערכת התראות אוטונומית מתקדמת. עבודה זו מתמקדת בתכנון מסלול הנתונים לתצוגה, פתרון אתגרי הסנכרון הפנימיים, וביצוע אימות  לוגי ופיזי מחמיר .
+
+
 \subsection{גישה לפתרון וחלוקת עבודה}
 פיתוח המערכת מתבסס על קוד תשתיתי שפותח בעבר על ידי סטודנט קודם. כמו כן, אימות התכן בחלק של קליטת הנתונים – מהמצלמה ועד לזיכרון התמונה (BRAM) – בוצע והושלם על ידי סטודנט נוסף בעבר. 
 
-העבודה הנוכחית מתמקדת בהשלמת מסלול הנתונים, הוספת שכבת זיהוי התנועה, והתוויית הארכיטקטורה לזיהוי חכם. תהליך זה התבצע כרונולוגית ופונקציונלית באופן הבא:
+העבודה הנוכחית מתמקדת בהשלמת מסלול הנתונים, הוספת שכבת זיהוי התנועה, והתוויית הארכיטקטורה לזיהוי חכם. תהליך זה התבצע כרונולוגית ופונקציונלית בשלושה שלבים עיקריים:
 
-\begin{itemize}
-    \item \textbf{1. אימות תכן תצוגה וחומרה (יוסי ברים - חלק ראשון):} 
-    שלב זה מתמקד באימות מחמיר של מסלול הנתונים מהזיכרון ועד להצגה על המסך. התהליך מוצג דרך מימוש ובחינה של פרוטוקול ה-VGA, ומבוצע בשני רבדים: תחילה אימות ברמת הקוד (Source) והלוגיקה באמצעות כלי הסימולציה ModelSim, ולאחר מכן ולידציה של החומרה הפיזית עצמה בשלב ה-Post-Silicon באמצעות כלי ה-ILA מבית Vivado.
-    
-    \item \textbf{2. עיבוד תמונה גולמי וגילוי תנועה (אלעד אסבג):} 
-    לאחר הבטחת יציבות מסלול הנתונים, שולבה לוגיקה לזיהוי שינויים במרחב הפיקסלים (Frame Differencing). שכבה זו מתריעה על כל תנועה במרחב.
-    \item \textbf{3. שדרוג ארכיטקטוני לבינה מלאכותית (יוסי ברים - חלק שני):} 
-    כדי לתת מענה לאתגר התראות השווא, מוצעת ארכיטקטורה המשלבת מודל בינה מלאכותית (AI) שתפקידו לברור ולזהות ספציפית דמות אדם מתוך סך השינויים שעליהם המערכת כבר יודעת להתריע , הקונספט הומחש והוכח מעשית (PoC) בסביבת תוכנה על גבי Raspberry Pi
-   , ברמת -FPGA יישום זה מוצג כהצעה ארכיטקטונית עתידית (תכנון HW/SW משולב עם מעבד פנימי)
+\textbf{אימות תכן תצוגה וחומרה (יוסי ברים - חלק ראשון):} 
+\\
+שלב זה מתמקד באימות מחמיר של מסלול הנתונים מהזיכרון ועד להצגה על המסך. התהליך מוצג דרך מימוש ובחינה של פרוטוקול ה-VGA, ומבוצע בשני רבדים: תחילה אימות ברמת הקוד (Source) והלוגיקה באמצעות כלי הסימולציה ModelSim, ולאחר מכן ולידציה של החומרה הפיזית עצמה בשלב ה-Post-Silicon באמצעות כלי ה-ILA מבית Vivado.
+
+\textbf{עיבוד תמונה גולמי וגילוי תנועה (אלעד אסבג):} 
+\\
+לאחר הבטחת יציבות מסלול הנתונים, שולבה לוגיקה לזיהוי שינויים במרחב הפיקסלים (Frame Differencing). שכבה זו מתריעה על כל תנועה במרחב.
+
+\textbf{שדרוג ארכיטקטוני לבינה מלאכותית (יוסי ברים - חלק שני):}
+\\
+כדי לתת מענה לאתגר התראות השווא, מוצעת ארכיטקטורה המשלבת מודל בינה מלאכותית (AI) שתפקידו לברור ולזהות ספציפית דמות אדם מתוך סך השינויים שעליהם המערכת כבר יודעת להתריע. הקונספט הומחש והוכח מעשית (PoC) בסביבת תוכנה על גבי Raspberry Pi. ברמת ה-FPGA, יישום זה מוצג כהצעה ארכיטקטונית עתידית (תכנון HW/SW משולב עם מעבד פנימי).
+
 \end{itemize}
 \newpage
 % ==========================================
@@ -115,6 +154,57 @@
 % ==========================================
 \section{רקע תיאורטי וסקירת ספרות}
 
+\subsection{מבוא לפרוטוקול \textenglish{VGA} וקונספט תותח האלקטרונים (\textenglish{CRT})}
+טכנולוגיית ה-\textenglish{VGA} פותחה במקור עבור מסכי שפופרת קרן קתודית (\textenglish{CRT - Cathode Ray Tube}), אשר פעולתם מבוססת על פיזיקה אנלוגית. מנגנון התצוגה פועל באמצעות "תותח אלקטרונים" היורה קרן פיזית על גבי מסך המצופה בזרחן, כאשר עוצמת הזרם החשמלי היא זו שקובעת את רמת ההארה של כל פיקסל.
+
+נקודה קריטית להבנת תזמוני הפרוטוקול היא המורשת האנלוגית שלו: אף על פי שהמסכים המודרניים כיום מבוססים על טכנולוגיות דיגיטליות (כגון \textenglish{LCD}), פרוטוקול ה-\textenglish{VGA} עדיין מחייב שידור של אותות השהייה. אותות אלו נועדו היסטורית לאפשר לקרן האלקטרונים הפיזית את זמן התנועה הנדרש כדי לחזור לתחילת שורה או לתחילת מסך (\textenglish{Retrace}), ולכן גם בקרים מודרניים ב-\textenglish{FPGA} נדרשים לממש זמנים אלו במדויק על מנת שהמסך יסתנכרן כראוי.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{vga_analog_cathode_ray_concept.png}
+    \caption{מבנה פנימי של מסך \textenglish{CRT} והמחשת מנגנון תותח האלקטרונים}
+    \label{fig:crt_concept}
+\end{figure}
+
+\subsection{סריקה קווית (\textenglish{Raster Scan}) ומנגנון ה-\textenglish{Retrace}}
+הצגת התמונה על גבי המסך מתבצעת בשיטת סריקה קווית (\textenglish{Raster Scan}). בשיטה זו, ציור התמונה מבוסס על קרן הסורקת את מערך הפיקסלים באופן שיטתי ומחזורי: משמאל לימין עבור כל שורה בנפרד, ומלמעלה למטה עבור הפריים כולו. 
+
+מאחר שתנועת הקרן חייבת להיות רציפה, נוצר מסלול סריקה דמוי "זיגזג" לאורך המסך. עובדה זו מכתיבה אילוץ הנדסי ופיזיקלי מרכזי בפרוטוקול: בכל פעם שהקרן מגיעה לקצה אזור התצוגה – בין אם בסוף שורה (קצה אופקי) ובין אם בתחתית המסך בסיום הפריים (קצה אנכי) – נדרש פסק זמן מוגדר כדי להחזיר אותה לנקודת ההתחלה. 
+
+פסק זמן זה מכונה החזרה (\textenglish{Retrace}) אופקית או אנכית, בהתאמה. בזמנים אלו חובה להבטיח שלא משודר מידע ויזואלי למסך (\textenglish{Blanking}), והם מנוהלים במערכת באמצעות אותות הסנכרון כדי לוודא יציבות של התמונה בזמן שהקרן עושה את דרכה חזרה.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{vga_raster_scan_retrace_concept.png}
+    \caption{המחשת מסלול הסריקה הקווית (\textenglish{Raster Scan}) ותהליכי ההחזרה (\textenglish{Retrace}) האופקית והאנכית}
+    \label{fig:raster_scan}
+\end{figure}
+
+\subsection{תזמוני המסך: מהפיזיקה למימוש הלוגי (\textenglish{RTL})}
+כדי ליישם את סריקת המסך וההחזרות (\textenglish{Retrace}) שנידונו לעיל, הפרוטוקול מגדיר ארבעה מצבי תזמון עיקריים עבור כל שורה (אופקי) ועבור כל פריים (אנכי). 
+
+הטבלה הבאה מתארת את הפרמטרים האופקיים (עבור רזולוציה של 640x480), את הצורך הפיזיקלי המקורי במסכי ה-\textenglish{CRT}, וכיצד אילוץ זה מתורגם הלכה למעשה למימוש הדיגיטלי (\textenglish{RTL}) במערכת ה-\textenglish{FPGA} שפותחה:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|p{3cm}|p{2cm}|p{4.5cm}|p{4.5cm}|}
+        \hline
+        \textbf{פרמטר} & \textbf{מחזורי שעון} & \textbf{הצורך הפיזיקלי המקורי (\textenglish{CRT})} & \textbf{המימוש שלנו (\textenglish{RTL})} \\
+        \hline
+        \hline
+        \textenglish{Active Display} & 640 & הקרן מציירת את הפיקסלים הפיזיים על המסך משמאל לימין. & שליפת נתונים מה-\textenglish{BRAM} ושידור צבע (\textenglish{RGB}) פעיל. \\
+        \hline
+        \textenglish{Front Porch} & 16 & מרווח זמן לקרן להתייצב בסוף השורה לפני שחוזרת אחורה. & כיבוי מיידי של ה-\textenglish{RGB} ל-'0000' למניעת מריחות. \\
+        \hline
+        \textenglish{Sync Pulse} & 96 & מכת מתח (טריגר) שמאלצת את הקרן לקפוץ חזרה שמאלה. & הורדת האות הפיזי \textenglish{HSYNC} ל-'0' למשך 96 שעונים. \\
+        \hline
+        \textenglish{Back Porch} & 48 & המתנה לייצוב הקרן בתחילת השורה החדשה בצד שמאל. & המשך השהיית ה-\textenglish{RGB} על '0000' עד הגעה לפיקסל הראשון. \\
+        \hline
+    \end{tabular}
+    \caption{פרמטרי תזמון \textenglish{VGA} - מהצורך הפיזיקלי ועד למימוש בחומרה}
+    \label{tab:vga_timings_physics}
+\end{table}
 
 \newpage
 % ==========================================
@@ -122,7 +212,119 @@
 % ==========================================
 \section{פיתוח ושיטות}
 
+\subsection{ארכיטקטורת המערכת וזרימת הנתונים}
+זרימת הנתונים במערכת בנויה כשרשרת עיבוד רציפה (\textenglish{Pipeline}) המורכבת מארבעה מודולים עיקריים המשורשרים זה לזה:
+\begin{enumerate}
+    \item \textbf{קליטת נתונים (\textenglish{OV7670\_capture}):} דגימת נתוני התמונה הגולמיים מחומרת המצלמה בזמן אמת.
+    \item \textbf{אוגר תמונה (\textenglish{Frame Buffer}):} אגירת הנתונים בזיכרון פנימי מובנה מסוג \textenglish{BRAM} לגישור על פערי תדרים.
+    \item \textbf{בקר תצוגה (\textenglish{VGA Controller}):} שליפת הנתונים מהזיכרון וייצור אותות הבקרה למסך בסנכרון מושלם.
+    \item \textbf{ממיר אותות (\textenglish{D to A Converter}):} המרת האותות הדיגיטליים לרמות מתח אנלוגיות התואמות לתקן התצוגה.
+\end{enumerate}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{system_arch.png}
+    \caption{תרשים מלבנים של ארכיטקטורת המערכת וזרימת הנתונים}
+    \label{fig:system_arch}
+\end{figure}
+
+\subsection{מימוש בקר התצוגה (\textenglish{VGA Controller})}
+בקר ה-\textenglish{VGA} מיושם בחומרה באמצעות שני מונים סינכרוניים: מונה אופקי ומונה אנכי. מחזור שורה שלם מורכב מ-800 פיקסלים (חיבור של 640 פיקסלים פעילים, 16 מחזורי \textenglish{Front Porch}, 96 מחזורי \textenglish{Sync Pulse}, ו-48 מחזורי \textenglish{Back Porch}). לפיכך, המונה האופקי (\textenglish{\texttt{hsync\_reg}}) סופר החל מ-0 ועד 799 ומתאפס.
+
+המערכת פועלת בתדר שעון פיקסל של 25\textenglish{MHz} (זמן מחזור של 40\textenglish{ns}), המבטיח קצב רענון תקני של 60\textenglish{Hz}. מילון האותות המרכזי של הבקר כולל את \textenglish{\texttt{pxl\_clk}} (שעון הפיקסלים), \textenglish{\texttt{hsync\_reg / vsync\_reg}} (מוני הקואורדינטות), ו-\textenglish{\texttt{in\_display\_area}} (דגל לוגי לזיהוי אזור פעיל). כאשר המונה נמצא מחוץ לתחום התצוגה הפעילה (מצבי ה-\textenglish{Blanking}), הלוגיקה מאלצת את אותות הצבע (\textenglish{RGB}) לערך \texttt{'0000'} למניעת מריחות צבע בעת החזרת הקרן.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{vga_timing_waveform_and_table.png}
+    \caption{תרשים תזמונים של המונים האנכיים והאופקיים בבקר ה-\textenglish{VGA}}
+    \label{fig:vga_hardware_timers}
+\end{figure}
+
+\subsubsection{עיבוד הפיקסל והמרה לאנלוגית (\textenglish{DAC})}
+לאחר שליפת הנתונים מזיכרון ה-\textenglish{BRAM}, המילה הנשלפת בגודל 12 ביט ננעלת באוגר \textenglish{\texttt{pxl\_data\_reg}} ומפוצלת לשלושה ערוצים: אדום (4 ביט), ירוק (4 ביט), וכחול (4 ביט). כאשר דגל התצוגה המושהה (\textenglish{\texttt{in\_display\_area\_delayed}}) פעיל, ערכי ה-\textenglish{RGB} מנותבים ליציאות דרך סינון דיגיטלי (\textenglish{Multiplexing}). 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{pathR_G_B.png}
+    \caption{תרשים זרימה של עיבוד הפיקסל: מזיכרון ה-\textenglish{BRAM}, דרך מנגנון הרישום והסנכרון, ועד לניתוב לערוצי ה-\textenglish{RGB}}
+    \label{fig:pixel_processing_rgb}
+\end{figure}
+
+מאחר שמסך ה-\textenglish{VGA} דורש אותות אנלוגיים רציפים, הוטמעה המרה דיגיטלית-לאנלוגית (\textenglish{DAC}) פסיבית באמצעות רשת נגדים (\textenglish{Resistor Network}). הביט המשמעותי ביותר (\textenglish{MSB}) מחובר לנגד בעל הערך הנמוך ביותר ($510\Omega$) להזרמת זרם מרבי, והביט הפחות משמעותי (\textenglish{LSB}) מחובר לנגד הגדול ביותר ($4\text{k}\Omega$). הזרמים מתנקזים לאדמה דרך נגד סיומת של $75\Omega$ המובנה במסך. שילוב זה יוצר מחלק מתח דינמי הממיר בצורה חלקה את רמות המתח הספרתיות למתח אנלוגי תקני. במקביל, אותות הסנכרון (\textenglish{HSYNC} ו-\textenglish{VSYNC}) מוגנים מזרם יתר באמצעות נגדי טור של $100\Omega$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{vga_dac_resistor_network.png}
+    \caption{סכמה חשמלית של רשת הנגדים (\textenglish{DAC}) ומחבר ה-\textenglish{HD-DB15}}
+    \label{fig:vga_dac_resistors}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{vga_voltage_divider_dac_scop.png}
+    \caption{תרשים חשמלי המציג את סולם הנגדים בכרטיס (משמאל) אל מול נגד הסיומת במסך (מימין)}
+    \label{fig:dac_voltage_divider}
+\end{figure}
+
+
+\subsection{מבט-על: חלוקת המערכת, ארכיטקטורת זיכרון ותחומי שעון}
+
+\subsubsection{מבט-על על המערכת וזרימת הנתונים}
+כדי להבין את אופן פעולת המערכת בשלמותה, נבחן את ארכיטקטורת זרימת הנתונים והחלוקה הלוגית של רכיבי החומרה. איור \ref{fig:system_overview_zones} מציג מבט-על הממחיש את שלבי העיבוד השונים ואת גבולות הגזרה.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{rtl_direct_vga_path_bounded.png}
+    \caption{מבט-על של המערכת: חלוקה לליבות עיבוד, תקשורת קליטה (אדום) ותקשורת תצוגה (כחול)}
+    \label{fig:system_overview_zones}
+\end{figure}
+
+כפי שמשתקף באיור, המערכת נשענת על ארבעה עוגנים מרכזיים:
+
+\textbf{מחולל שעונים (\textenglish{clk\_generator}):} \\
+רכיב \textenglish{PLL} המקבל שעון מערכת של 100\textenglish{MHz} ומפיק ממנו שני שעונים נפרדים: שעון 25\textenglish{MHz} עבור בקר ה-\textenglish{VGA}, ושעון 24\textenglish{MHz} ייעודי עבור המצלמה.
+
+\textbf{זיכרון התמונה (\textenglish{BRAM}):} \\
+זיכרון א-סינכרוני בתצורת \textenglish{Dual-Port}, הפועל כחוצץ בטוח המגשר בין קצב הכתיבה לבין קצב הקריאה. תצורה זו מאפשרת מעבר נתונים יציב ואמין בין תחומי השעון השונים.
+
+\textbf{התחום האדום (תקשורת המצלמה):} \\
+מייצג את התקשורת שבין המצלמה לזיכרון. בחלק זה, לוגיקת הקליטה (\textenglish{ov7670\_capture}) דוגמת את הפיקסלים ודוחפת אותם פנימה אל פורט \textenglish{A} של הזיכרון (\textenglish{clka}).
+
+\textbf{התחום הכחול (תקשורת התצוגה - עיקר הדגש):} \\
+מייצג את התקשורת שבין הזיכרון לבין המסך. תחום זה (\textenglish{VGA Domain}) כולל את שליפת הפיקסלים מפורט \textenglish{B} של הזיכרון (\textenglish{clkb}) על ידי בקר ה-\textenglish{VGA} וייצור אותות התצוגה. עבודת אימות התכן והסנכרון של מסלול זה מהווה את ליבת המיקוד שלנו בדוח זה.
+
+\subsubsection{מחולל השעונים (\textenglish{Clock Generator})}
+כפי שתואר במבט-העל, באמצעות רכיב ה-\textenglish{Clocking Wizard} ב-\textenglish{Vivado}, שעון המערכת הראשי של כרטיס ה-\textenglish{Artix-7} (100\textenglish{MHz}) מומר לשני שעונים נפרדים ויציבים החיוניים למערכת:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{vivado_clk_vizard.png}
+    \caption{ממשק הקינפוג של ה-\textenglish{Clocking Wizard} ב-\textenglish{Vivado} להפקת שעוני התצוגה והמצלמה}
+    \label{fig:vivado_clocking_wizard}
+\end{figure}
+
+\subsubsection{זיכרון התמונה (\textenglish{BRAM Frame Buffer})}
+רכיב הזיכרון מומש כ-\textenglish{Simple Dual-Port BRAM} בגודל $307,200 \times 12$ ביט (נפח המכיל במדויק פריים וידאו שלם ברזולוציית $640\times 480$ בעומק של 12 ביט צבע). 
+תצורה חומרתית זו מספקת הפרדה מוחלטת לפתרון בעיית חציית תחומי השעון (\textenglish{CDC}): פורט \textenglish{A} (הכתיבה) קולט את הנתונים מהמצלמה בקצב א-סינכרוני המבוסס על שעון המערכת, בעוד שפורט \textenglish{B} (הקריאה) משחרר את הנתונים לבקר ה-\textenglish{VGA} בקצב יציב ונפרד של 25\textenglish{MHz}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{bram_ip_symbol.png}
+    \caption{תרשים בלוקים של זיכרון ה-\textenglish{BRAM} בתצורת \textenglish{Dual-Port} המאפשרת הפרדת תחומי שעון}
+    \label{fig:bram_dual_port}
+\end{figure}
+
+\subsubsection{ממשק הזיכרון וסנכרון נתונים למסך}
+בקר התצוגה עובד במונחים של מרחב דו-ממדי (צירים \textenglish{X} ו-\textenglish{Y}), אך הזיכרון הוא רציף וחד-ממדי. לפיכך, הכתובת לזיכרון מחושבת בזמן אמת על ידי הלוגיקה בהתאם לנוסחה: $Address = X + 640 \times Y$. 
+כדי להתגבר על זמן השהיית הקריאה המובנה ברכיב הזיכרון (\textenglish{Read Latency}), הנתון הנשלף (\textenglish{\texttt{doutb}}) ננעל בתוך אוגר צינור נתונים (\textenglish{\texttt{pxl\_data\_reg}}), ובמקביל דגל התצוגה מושהה במחזור שעון אחד (\textenglish{\texttt{in\_display\_area\_delayed}}). מנגנון זה שומר על סנכרון מושלם בין הנתון המוצג לבין מיקומה הפיזי של הקרן על המסך.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{vga_address_logic_code.png}
+    \caption{קטע מקוד ה-\textenglish{VHDL} המציג את תרגום הקואורדינטות בזמן אמת ואת מנגנון ה-\textenglish{Pipeline Register}}
+    \label{fig:vga_bram_interface_code}
+\end{figure}
+\newpage
 % ==========================================
 % CHAPTER 4: RESULTS
 % ==========================================
